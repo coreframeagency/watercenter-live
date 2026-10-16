@@ -449,6 +449,7 @@ tbody tr:hover{background:var(--surface-2)}
 @media (prefers-reduced-motion:reduce){.btn,.kpi,.desk .tap,.tab{transition:none}}
 .login{background:radial-gradient(800px 500px at 80% 0,rgba(94,214,239,.30),transparent 60%),radial-gradient(700px 500px at 0 100%,rgba(11,107,166,.35),transparent 60%),linear-gradient(160deg,#041F2E,#07405E)!important}
 .loginbox{border-radius:24px!important;box-shadow:0 40px 80px -30px rgba(0,0,0,.6)!important;border:1px solid rgba(255,255,255,.2)!important}
+#viewSw{max-width:100%}#viewSw button{white-space:nowrap;flex:1 1 auto}@media(max-width:560px){#viewSw{width:100%}#viewSw button{padding:0 8px;font-size:13px}}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -474,7 +475,7 @@ tbody tr:hover{background:var(--surface-2)}
     </div>
     <div class="top-actions">
       <span class="pill info">Demo with sample data</span>
-      <span class="pill good" id="whoami" hidden></span><button id="logoutBtn" class="btn sm" type="button" hidden>Sign out</button>
+      <span class="pill good" id="whoami" hidden></span><div class="seg" id="viewSw" role="group" aria-label="Show calls for" hidden><button type="button" data-v="all" aria-pressed="true">All calls</button><button type="button" data-v="col" aria-pressed="false">Colombo calls</button><button type="button" data-v="kur" aria-pressed="false">Kurunegala calls</button></div><button id="logoutBtn" class="btn sm" type="button" hidden>Sign out</button>
       <button id="liveSwitch" class="switch" role="switch" aria-checked="false"><span class="track"></span><span>Live calls</span></button>
       <select id="simLang" aria-label="Language of the simulated call"><option value="any">Any language</option><option value="English">English call</option><option value="Sinhala">Sinhala call</option><option value="Tamil">Tamil call</option></select>
       <button id="simBtn" class="btn primary" type="button">Simulate incoming call</button>
@@ -1087,12 +1088,12 @@ function seed(){
 }
 
 /* ---------- helpers ---------- */
-function inRange(){var cut=Date.now()-S.range*DAY;return S.calls.filter(function(c){return c.ts>=cut&&(!USER||c.branch===USER)})}
+function inRange(){var cut=Date.now()-S.range*DAY;return S.calls.filter(function(c){return c.ts>=cut&&(!USER||c.branch===USER)&&(USER||!S.view||S.view==='all'||c.branch===S.view)})}
 function answered(c){return c.status!=='missed'}
 function isLead(c){return c.status==='done'&&c.score>=60&&c.outcome!=='not_lead'&&c.outcome!=='support'}
 function fmtDur(s){s=Math.round(s||0);if(!s)return '0:00';var m=Math.floor(s/60),x=s%60;return m+':'+(x<10?'0':'')+x}
 function lkr(n){return 'LKR '+Math.round(n).toLocaleString('en-US')}
-function pct(a,b){return b?Math.round(a/b*100)+'%':'0%'}
+function pc2(a,b){return b?Math.round(a/b*100)+'%':'0%'}
 function hhmm(d){return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
 function fmtTime(ts){
   var now=Date.now(),rel=now-ts,d=new Date(ts),t0=new Date();t0.setHours(0,0,0,0);
@@ -1150,8 +1151,8 @@ function renderKpis(){
   var miss=cs.filter(function(c){return c.status==='missed'&&!c.callback}).length;
   var items=[
     ['Calls',total,'Last '+S.range+' days',''],
-    ['Answered',pct(ans,total),ans+' of '+total,''],
-    ['Qualified leads',leads,pct(leads,total)+' of calls',''],
+    ['Answered',pc2(ans,total),ans+' of '+total,''],
+    ['Qualified leads',leads,pc2(leads,total)+' of calls',''],
     ['Average call',fmtDur(avg),'Answered calls',''],
     ['Cost per lead',leads&&spend?lkr(spend/leads):'No spend','Blended, all sources',''],
     ['Missed, no callback',miss,miss?'Call these back':'All followed up',miss?'alert':'']
@@ -1248,7 +1249,7 @@ function renderSources(){
   if(totalLeads){
     txt='<b>'+esc(top.s.name)+'</b> produced the most qualified leads ('+top.leads+'). ';
     if(paid)txt+='<b>'+esc(paid.s.name)+'</b> has the lowest cost per lead at <b>'+lkr(paid.cpl)+'</b>. ';
-    if(free.length)txt+='Sources with no ad spend ('+free.map(function(x){return esc(x.s.name)}).join(', ')+') produced <b>'+freeLeads+'</b> leads, '+pct(freeLeads,totalLeads)+' of the total.';
+    if(free.length)txt+='Sources with no ad spend ('+free.map(function(x){return esc(x.s.name)}).join(', ')+') produced <b>'+freeLeads+'</b> leads, '+pc2(freeLeads,totalLeads)+' of the total.';
   }else txt='No qualified leads in this range yet.';
   $('#insight').innerHTML=txt;
   var h='<thead><tr><th>Source</th><th>Calls</th><th class="num">Leads</th><th class="num">Lead rate</th><th class="num">Monthly spend (LKR)</th><th class="num">Cost per lead</th></tr></thead><tbody>';
@@ -1273,7 +1274,7 @@ function branchStats(){
 function renderBranches(){
   var h='<thead><tr><th>Branch</th><th>Main line</th><th class="num">Calls</th><th class="num">Answered</th><th class="num">Leads</th><th class="num">Lead rate</th><th class="num">Missed, no callback</th></tr></thead><tbody>';
   branchStats().forEach(function(x){
-    h+='<tr><td><b>'+esc(x.b.name)+'</b></td><td class="mono">'+esc(x.b.main)+'</td><td class="num">'+x.calls+'</td><td class="num">'+pct(x.ans,x.calls)+'</td><td class="num">'+x.leads+'</td><td class="num">'+Math.round(x.rate*100)+'%</td><td class="num">'+x.miss+'</td></tr>';
+    h+='<tr><td><b>'+esc(x.b.name)+'</b></td><td class="mono">'+esc(x.b.main)+'</td><td class="num">'+x.calls+'</td><td class="num">'+pc2(x.ans,x.calls)+'</td><td class="num">'+x.leads+'</td><td class="num">'+Math.round(x.rate*100)+'%</td><td class="num">'+x.miss+'</td></tr>';
   });
   $('#branchTable').innerHTML=h+'</tbody>';
 }
@@ -1299,7 +1300,7 @@ function reportText(){
   var st=srcStats(),cs=inRange(),leads=cs.filter(isLead).length,spend=SOURCES.reduce(function(a,s){return a+spendFor(s.id)},0);
   var miss=cs.filter(function(c){return c.status==='missed'&&!c.callback}).length;
   var l=['Water Center call report, last '+S.range+' days',
-   'Calls: '+cs.length+'. Answered: '+cs.filter(answered).length+' ('+pct(cs.filter(answered).length,cs.length)+'). Qualified leads: '+leads+'.',
+   'Calls: '+cs.length+'. Answered: '+cs.filter(answered).length+' ('+pc2(cs.filter(answered).length,cs.length)+'). Qualified leads: '+leads+'.',
    'Spend: '+lkr(spend)+'. Cost per lead: '+(leads&&spend?lkr(spend/leads):'n/a')+'.','','By source:'];
   st.forEach(function(x){l.push('- '+x.s.name+': '+x.calls+' calls, '+x.leads+' leads, '+(x.cpl!==null?lkr(x.cpl)+' per lead':(S.spend[x.s.id]?'no leads':'no ad spend')))});
   l.push('','By branch:');
@@ -2241,6 +2242,12 @@ document.addEventListener('input',function(e){
   if(t.getAttribute('data-f')==='notes'){var c=getCall(S.openId);if(c)c.notes=t.value;return}
   if(t.hasAttribute('data-spend')){S.spend[t.getAttribute('data-spend')]=Math.max(0,+t.value||0);updateCpl()}
 });
+function setView(v){
+  S.view=v;S.branch=v;S.fu.branch=v;
+  $$('#viewSw button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-v')===v)});
+  if($('#fBranch'))$('#fBranch').value=v;if($('#fuBranch'))$('#fuBranch').value=v;
+}
+$('#viewSw').addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button');if(!b)return;setView(b.getAttribute('data-v'));showTab(S.tab)});
 function applyLogin(){
   var on=!!(USER||OWNER);
   $('#login').hidden=on;$('#whoami').hidden=!on;$('#logoutBtn').hidden=!on;
@@ -2248,6 +2255,7 @@ function applyLogin(){
   if(USER){$('#whoami').textContent=BR[USER].name+' · '+BR[USER].main;S.branch=USER;S.desk.br=USER;setVisitor(S.web?S.web.source:'google',USER)}
   else if(OWNER){$('#whoami').textContent='Akith · Owner, both branches';S.branch='all'}
   else{S.branch='all'}
+  $('#viewSw').hidden=!OWNER;if(OWNER)setView('all');
   renderFilters();showTab(OWNER?'dash':on?'desk':S.tab);
   if(!on){$('#loginUser').value='';$('#loginPass').value=''}
 }
