@@ -418,6 +418,37 @@ pre.code{margin:0;padding:16px;background:var(--surface-2);border:1px solid var(
 .desk .autoline select{height:36px;width:auto;max-width:140px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:0 8px}
 .autoline label,.autoline .mono,.autoline b{white-space:nowrap}
 @media (max-width:560px){.autoline{flex-wrap:wrap!important}.desk .autoline select{width:100%!important;max-width:100%!important;flex:1 1 100%}.autoline .mono,.autoline b,.autoline label{white-space:normal}}
+
+/* ===== v3: premium finish ===== */
+:root{--sh1:0 1px 2px rgba(7,32,52,.05),0 10px 28px -12px rgba(7,32,52,.14);--sh2:0 2px 4px rgba(7,32,52,.06),0 28px 56px -20px rgba(7,32,52,.30);--ease:cubic-bezier(.2,.7,.2,1)}
+body{background:radial-gradient(900px 420px at 85% -80px,rgba(18,164,198,.14),transparent 65%),radial-gradient(700px 380px at -5% 0,rgba(11,107,166,.10),transparent 60%),var(--bg);background-attachment:fixed}
+.top{padding-block:24px 8px}
+.brand h1{letter-spacing:-.03em}
+.btn{border-radius:10px;transition:transform .2s var(--ease),box-shadow .2s var(--ease),background .2s,border-color .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--sh1)}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:linear-gradient(180deg,#1280C4,var(--brand));box-shadow:0 1px 0 rgba(255,255,255,.22) inset,0 8px 18px -8px rgba(11,107,166,.65)}
+.tabs{border-bottom:0;gap:4px;padding:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;display:inline-flex}
+.tab{height:40px;border:0;border-radius:10px;padding:0 16px;transition:background .2s,color .2s,box-shadow .2s}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--sh1)}
+.card,.kpi,.tablewrap{border-radius:16px;box-shadow:var(--sh1);border-color:var(--line)}
+.kpi{position:relative;overflow:hidden;transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--aqua),var(--brand));opacity:.9}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.pill{height:26px;padding:0 10px;letter-spacing:.01em}
+.desk .tap,.chips .chip,.tap{border-radius:12px;transition:transform .15s var(--ease),box-shadow .2s,background .2s,border-color .2s}
+.desk .tap:hover{transform:translateY(-1px);box-shadow:var(--sh1);border-color:var(--brand)}
+.desk .tap:active{transform:scale(.97)}
+input,select,textarea{border-radius:10px;transition:border-color .2s,box-shadow .2s}
+input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visible,.tab:focus-visible,.tap:focus-visible{outline:2px solid var(--aqua);outline-offset:2px;box-shadow:0 0 0 5px rgba(18,164,198,.16)}
+th{letter-spacing:.06em}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--surface-2)}
+#loginUser,#loginPass{height:48px}
+@media (prefers-reduced-motion:reduce){.btn,.kpi,.desk .tap,.tab{transition:none}}
+.login{background:radial-gradient(800px 500px at 80% 0,rgba(94,214,239,.30),transparent 60%),radial-gradient(700px 500px at 0 100%,rgba(11,107,166,.35),transparent 60%),linear-gradient(160deg,#041F2E,#07405E)!important}
+.loginbox{border-radius:24px!important;box-shadow:0 40px 80px -30px rgba(0,0,0,.6)!important;border:1px solid rgba(255,255,255,.2)!important}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">

@@ -277,6 +277,48 @@ body.editing .front{outline:2px dashed var(--aqua);outline-offset:-8px}
 .branch:hover{transform:translateY(-3px);border-color:var(--brand)}
 footer{border-top:3px solid var(--aqua)}
 @media (prefers-reduced-motion:reduce){.stack img,.ticker .track,.consult::after{animation:none!important}.js .rv{opacity:1;transform:none}.fc-in{transition:none}.step::before{transform:none}.prog{display:none}}
+
+/* ===== v3: premium finish ===== */
+:root{--shadow-1:0 1px 2px rgba(7,32,52,.06),0 8px 24px -8px rgba(7,32,52,.12);--shadow-2:0 2px 4px rgba(7,32,52,.06),0 24px 48px -16px rgba(7,32,52,.28);--ease:cubic-bezier(.2,.7,.2,1)}
+body{background:var(--bg)}
+.hero{background:radial-gradient(900px 520px at 78% 12%,rgba(94,214,239,.20),transparent 60%),radial-gradient(700px 480px at 8% 90%,rgba(11,107,166,.35),transparent 60%),linear-gradient(180deg,#031722,var(--sea-2) 72%,var(--sea-3))}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.hero h1{letter-spacing:-.035em;font-weight:700}
+.hero .eyebrow{letter-spacing:.22em}
+.btn{transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s,border-color .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-1)}
+.btn.primary{background:linear-gradient(180deg,#1280C4,var(--brand));box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 8px 20px -8px rgba(11,107,166,.7)}
+.hero .btn.primary{background:#fff;box-shadow:0 12px 32px -12px rgba(0,0,0,.55)}
+.hero .btn.ghost{backdrop-filter:blur(6px);background:rgba(255,255,255,.06)}
+.hero .btn.ghost:hover{background:rgba(255,255,255,.14)}
+.top.solid{background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:saturate(1.6) blur(16px);-webkit-backdrop-filter:saturate(1.6) blur(16px);box-shadow:0 1px 0 var(--line),0 12px 32px -20px rgba(7,32,52,.35)}
+.top nav a{position:relative;transition:color .2s}
+.top nav a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+.top nav a:hover::after{transform:scaleX(1)}
+.heropic,.hero .stack>*{box-shadow:0 40px 80px -30px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.14)}
+.ticker{background:linear-gradient(90deg,#0A5C90,#0B6BA6 50%,#0A5C90);box-shadow:0 -1px 0 rgba(255,255,255,.12) inset}
+.s{padding-block:112px}
+.idx{letter-spacing:.24em;font-weight:600}
+.head h2,.s h2{letter-spacing:-.03em}
+.s.alt{background:linear-gradient(180deg,var(--surface-2),var(--bg))}
+.fc .face{transition:box-shadow .4s var(--ease),transform .4s var(--ease)}
+.fc:hover .face{box-shadow:var(--shadow-2)}
+.fc .face.front::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset;pointer-events:none}
+.fc .flip{backdrop-filter:blur(8px);background:rgba(255,255,255,.14);transition:background .25s,transform .35s var(--ease)}
+.fc .flip:hover{background:rgba(255,255,255,.28);transform:rotate(90deg)}
+.step{transition:background .3s}
+.step svg{padding:8px;width:48px;height:48px;border-radius:14px;background:var(--brand-soft)}
+.consult{position:relative;overflow:hidden;box-shadow:var(--shadow-2);background:radial-gradient(600px 300px at 90% 0,rgba(94,214,239,.22),transparent 65%),linear-gradient(120deg,#041F2E,#07405E)}
+.consult li{backdrop-filter:blur(6px);transition:transform .3s var(--ease),background .3s}
+.consult li:hover{transform:translateX(4px);background:rgba(255,255,255,.13)}
+.branch{box-shadow:var(--shadow-1);transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.branch:hover{transform:translateY(-4px);box-shadow:var(--shadow-2)}
+.facts>*{transition:background .25s}
+input,select,textarea{transition:border-color .2s,box-shadow .2s}
+input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visible,a:focus-visible,button:focus-visible{outline:2px solid var(--aqua);outline-offset:3px;box-shadow:0 0 0 6px rgba(18,164,198,.15)}
+::selection{background:var(--aqua);color:#031722}
+footer{background:linear-gradient(180deg,var(--bg),var(--surface-2))}
+@media (prefers-reduced-motion:reduce){.btn,.fc .face,.branch,.consult li{transition:none}.btn:hover,.branch:hover{transform:none}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://watercenter.live/#org", "name": "Water Center", "url": "https://watercenter.live/site.html", "logo": "https://watercenter.live/images/logo.jpg", "slogan": "We care to the last drop", "image": "https://watercenter.live/images/og.jpg", "knowsAbout": ["Water pumps", "Borewell pumps", "Water filters", "RO water purifiers", "Hot water systems"], "areaServed": {"@type": "Country", "name": "Sri Lanka"}, "makesOffer": [{"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Home water pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Borewell and tubewell pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Waste water and cutter pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Swimming pool pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Engine pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Industrial and irrigation pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Solar water pump systems"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Pond pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Water filters"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "RO purifiers"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Hot water showers"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Pump service and repair"}}]}, {"@type": "WebSite", "@id": "https://watercenter.live/#site", "url": "https://watercenter.live/site.html", "name": "Water Center", "inLanguage": ["en", "si"]}, {"@type": "LocalBusiness", "image": "https://watercenter.live/images/og.jpg", "@id": "https://watercenter.live/#colombo", "name": "Water Center Colombo", "parentOrganization": {"@id": "https://watercenter.live/#org"}, "telephone": "+94717774056", "address": {"@type": "PostalAddress", "addressLocality": "Colombo", "addressCountry": "LK"}, "url": "https://watercenter.live/site.html"}, {"@type": "LocalBusiness", "image": "https://watercenter.live/images/og.jpg", "@id": "https://watercenter.live/#kurunegala", "name": "Water Center Kurunegala", "parentOrganization": {"@id": "https://watercenter.live/#org"}, "telephone": "+94374940955", "address": {"@type": "PostalAddress", "addressLocality": "Kurunegala", "addressCountry": "LK"}, "url": "https://watercenter.live/site.html"}]}</script>
 
