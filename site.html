@@ -319,6 +319,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-visib
 ::selection{background:var(--aqua);color:#031722}
 footer{background:linear-gradient(180deg,var(--bg),var(--surface-2))}
 @media (prefers-reduced-motion:reduce){.btn,.fc .face,.branch,.consult li{transition:none}.btn:hover,.branch:hover{transform:none}}
+.callbar{display:none}
+@media (max-width:760px){.callbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:20;padding:8px max(12px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 -1px 0 var(--line);transform:translateY(110%);transition:transform .35s var(--ease)}
+.callbar.on{transform:none}
+.callbar a{display:flex;align-items:center;justify-content:center;height:48px;border-radius:999px;font-weight:700;font-size:15px;text-decoration:none;background:linear-gradient(180deg,#1280C4,var(--brand));color:#fff}
+.callbar a+a{background:var(--brand-soft);color:var(--brand)}
+body{padding-bottom:64px}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://watercenter.live/#org", "name": "Water Center", "url": "https://watercenter.live/site.html", "logo": "https://watercenter.live/images/logo.jpg", "slogan": "We care to the last drop", "image": "https://watercenter.live/images/og.jpg", "knowsAbout": ["Water pumps", "Borewell pumps", "Water filters", "RO water purifiers", "Hot water systems"], "areaServed": {"@type": "Country", "name": "Sri Lanka"}, "makesOffer": [{"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Home water pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Borewell and tubewell pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Waste water and cutter pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Swimming pool pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Engine pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Industrial and irrigation pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Solar water pump systems"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Pond pumps"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Water filters"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "RO purifiers"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Hot water showers"}}, {"@type": "Offer", "itemOffered": {"@type": "Product", "name": "Pump service and repair"}}]}, {"@type": "WebSite", "@id": "https://watercenter.live/#site", "url": "https://watercenter.live/site.html", "name": "Water Center", "inLanguage": ["en", "si"]}, {"@type": "LocalBusiness", "image": "https://watercenter.live/images/og.jpg", "@id": "https://watercenter.live/#colombo", "name": "Water Center Colombo", "parentOrganization": {"@id": "https://watercenter.live/#org"}, "telephone": "+94717774056", "address": {"@type": "PostalAddress", "addressLocality": "Colombo", "addressCountry": "LK"}, "url": "https://watercenter.live/site.html"}, {"@type": "LocalBusiness", "image": "https://watercenter.live/images/og.jpg", "@id": "https://watercenter.live/#kurunegala", "name": "Water Center Kurunegala", "parentOrganization": {"@id": "https://watercenter.live/#org"}, "telephone": "+94374940955", "address": {"@type": "PostalAddress", "addressLocality": "Kurunegala", "addressCountry": "LK"}, "url": "https://watercenter.live/site.html"}]}</script>
 
@@ -479,6 +485,7 @@ footer{background:linear-gradient(180deg,var(--bg),var(--surface-2))}
   </div>
   <div class="wrap admin" hidden style="margin-top:16px"><p class="note" data-t="foot_n" style="color:#8DB1CA;max-width:80ch">To show pictures to every visitor, save them into an <b>images</b> folder next to this page and list their file names in the PHOTOS list at the top of the page script. Pictures added with edit mode stay in this browser only.</p></div>
 </footer>
+<div class="callbar" id="callbar" aria-label="Call a branch"><a href="tel:+94717774056">Call Colombo</a><a href="tel:+94374940955">Call Kurunegala</a></div>
 <div class="toast" id="toast" role="status"></div>
 <script>
 (function(){
@@ -780,5 +787,7 @@ watch();
 var sl='en';try{sl=localStorage.getItem('wcSiteLang')||'en'}catch(e){}
 openDB(function(){setLang(sl);reload()});
 })();
+
+(function(){var cb=document.getElementById('callbar');if(!cb)return;function u(){cb.classList.toggle('on',scrollY>innerHeight*.7)}addEventListener('scroll',u,{passive:true});u()})();
 </script>
 </body></html>
