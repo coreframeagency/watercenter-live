@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /tool.html
+Sitemap: https://watercenter.live/sitemap.xml
