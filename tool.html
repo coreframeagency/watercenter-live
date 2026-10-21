@@ -470,6 +470,7 @@ tbody tr:hover{background:var(--surface-2)}
 @media(max-width:560px){.qsheet{padding:20px}.qgrid{grid-template-columns:1fr}.qbar{padding:16px 20px}.qmeta{text-align:left}}
 .kpib{font:inherit;color:inherit;text-align:left;cursor:pointer}.kpib:hover{border-color:var(--aqua)}.kpib.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand) inset}.kpib:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .fud{margin:8px 0 0;display:grid;gap:4px;font-size:13px}.fud div{display:flex;gap:8px;flex-wrap:wrap}.fud dt{min-width:96px;color:var(--ink-2);font-weight:600}.fud dd{margin:0;overflow-wrap:anywhere}
+.histcard{border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:12px;padding:16px;background:var(--surface-2)}.histlist{margin:8px 0;padding-left:16px;display:grid;gap:4px;font-size:13px}.hist-new{padding:0 2px}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -583,6 +584,7 @@ tbody tr:hover{background:var(--surface-2)}
       </div>
       <div class="card" style="display:flex;flex-direction:column;gap:16px">
         <h3 style="margin:0">More about this caller</h3>
+        <div id="deskHist" aria-live="polite"></div>
         <div id="deskChecklist"></div>
         <div id="deskMore"></div>
         <label class="opt"><input type="checkbox" id="deskCid"> The number they are calling from is the best number</label>
@@ -1768,7 +1770,38 @@ function renderDeskSheet(){
   if(nat)h+='<p class="muted small" style="margin:16px 0 0">Sinhala and Tamil lines are drafts. A native speaker should review them before staff use them.</p>';
   $('#deskSheet').innerHTML=h;
 }
-function renderDesk(){var y=window.pageYOffset,sh=$('#deskSheet'),st=sh?sh.scrollTop:0;renderDeskTaps();renderDeskStatus();renderDeskSheet();var sr=$('#deskSaleRow');if(sr)sr.hidden=!(S.desk&&S.desk.outcome==='sold');if(sh)sh.scrollTop=st;if(window.pageYOffset!==y)window.scrollTo(0,y)}
+function histFor(ph){
+  var dg=String(ph||'').replace(/\D/g,'');if(dg.length<7)return [];
+  return S.calls.filter(function(c){
+    if(c.outcome==='not_lead')return false;
+    var full=String(c.phoneFull||'').replace(/\D/g,'');
+    if(full)return full.slice(-9)===dg.slice(-9);
+    var m=String(c.caller||'').match(/^(\d{3}) \*\*\* (\d{4})$/);
+    return !!m&&dg.length>=9&&dg.slice(0,3)===m[1]&&dg.slice(-4)===m[2];
+  }).sort(function(a,b){return b.ts-a.ts});
+}
+function renderDeskHist(){
+  var box=$('#deskHist');if(!box)return;
+  var f=deskForm(),list=histFor(f.phone);
+  if(!list.length){box.innerHTML=String(f.phone).replace(/\D/g,'').length>=7?'<div class="hist-new muted small">First call from this number.</div>':'';return}
+  var last=list[0],nm=list.map(function(c){return c.name}).filter(function(n){return n&&n!=='Caller'})[0]||'',st=stageLbl(crmStageOf(list)),loc=list.map(function(c){return c.loc}).filter(function(l){return l&&l!=='unknown area'})[0]||'';
+  var note=((S.crm.ov[last.branch+'|'+(last.phoneFull||last.caller)]||{}).note)||'';
+  var h='<div class="histcard"><div class="sechead"><h4 style="margin:0">Returning caller'+(nm?': '+esc(nm):'')+'</h4><span class="pill '+st[2]+'">'+esc(st[1])+'</span></div>';
+  h+='<div class="muted small" style="margin-top:4px">'+list.length+' earlier call'+(list.length===1?'':'s')+' · last '+crmDate(last.ts)+(loc?' · '+esc(loc):'')+'</div>';
+  h+='<ul class="histlist">'+list.slice(0,4).map(function(c){return '<li><b>'+crmDate(c.ts)+'</b> '+esc(c.intent||'Call')+' · '+esc(({booked:'Booked',quote:'Quote sent',new:'Info given',support:'Passed to service',missed:'Missed'})[c.outcome]||'Call')+(c.quoteRef?' · quote '+esc(c.quoteRef):'')+(c.signals&&c.signals.length?'<span class="muted small"> · '+esc(c.signals.slice(0,3).join(', '))+'</span>':'')+'</li>'}).join('')+'</ul>';
+  if(note)h+='<div class="small">Note: '+esc(note)+'</div>';
+  h+='<div style="margin-top:8px"><button type="button" class="btn sm" data-usehist="1">Use name and town</button></div></div>';
+  box.innerHTML=h;
+}
+function crmStageOf(list){var k=list[0].branch+'|'+(list[0].phoneFull||list[0].caller),o=S.crm.ov[k]||{};if(o.stage)return o.stage;return list.some(function(c){return c.sold})?'client':list.some(function(c){return c.outcome==='quote'})?'quoted':'lead'}
+function useHist(){
+  var list=histFor(deskForm().phone);if(!list.length)return;
+  var nm=list.map(function(c){return c.name}).filter(function(n){return n&&n!=='Caller'})[0],loc=list.map(function(c){return c.loc}).filter(function(l){return l&&l!=='unknown area'})[0];
+  if(nm&&!$('#deskName').value)$('#deskName').value=nm;
+  if(loc&&!S.desk.area&&BR[S.desk.br].locs.en.indexOf(loc)>-1)S.desk.area=loc;
+  renderDesk();
+}
+function renderDesk(){renderDeskHist();var y=window.pageYOffset,sh=$('#deskSheet'),st=sh?sh.scrollTop:0;renderDeskTaps();renderDeskStatus();renderDeskSheet();var sr=$('#deskSaleRow');if(sr)sr.hidden=!(S.desk&&S.desk.outcome==='sold');if(sh)sh.scrollTop=st;if(window.pageYOffset!==y)window.scrollTo(0,y)}
 function toggleIn(a,v){var i=a.indexOf(v);if(i>-1)a.splice(i,1);else a.push(v)}
 function deskTap(f,v){
   var d=S.desk;
@@ -2424,6 +2457,7 @@ document.addEventListener('click',function(e){
   var t=e.target;
   var tab=t.closest('[data-tab]');if(tab){showTab(tab.getAttribute('data-tab'));return}
   var dk=t.closest('[data-d]');if(dk){deskTap(dk.getAttribute('data-d'),dk.getAttribute('data-v'));return}
+  if(t.closest&&t.closest('[data-usehist]')){useHist();return}
   var fk=t.closest('[data-fukpi]');if(fk){var kv=fk.getAttribute('data-fukpi');S.fu.kf=(S.fu.kf===kv||kv==='open')?null:kv;if(kv==='open')S.fu.view='open';renderFollowups();return}
   var fv=t.closest('[data-fuview]');if(fv){S.fu.view=fv.getAttribute('data-fuview');S.fu.kf=null;renderFollowups();return}
   var sz=t.closest('[data-snooze]');if(sz){snooze(sz.getAttribute('data-snooze'),sz.getAttribute('data-how'));return}
@@ -2528,7 +2562,7 @@ document.addEventListener('change',function(e){
 });
 document.addEventListener('input',function(e){
   var t=e.target;
-  if(t.id==='deskName'||t.id==='deskPhone'||t.id==='deskNotes'){renderDeskStatus();return}
+  if(t.id==='deskName'||t.id==='deskPhone'||t.id==='deskNotes'){renderDeskStatus();if(t.id==='deskPhone')renderDeskHist();return}
   if(t.id==='labGateW'||t.id==='labGateF'){renderLabTable();return}
   if(t.id==='q'){S.q=t.value;renderList();return}
   if(t.id==='avgSale'){S.avgSale=Math.max(0,+t.value||0);renderCoaching();return}
