@@ -285,7 +285,8 @@ h4{font-size:13px;font-weight:600;margin:0 0 8px}
 #simLang{height:40px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:0 8px}
 .c-lang .tag{font-weight:600}
 /* toasts */
-#toasts{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none}
+#deskSheet,#deskTaps,#deskStatus,#deskChecklist{overflow-anchor:none}html{overflow-anchor:none}
+#toasts{position:fixed;overscroll-behavior:contain;left:0;right:0;bottom:0;z-index:30;display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none}
 .toast{pointer-events:auto;display:flex;align-items:center;gap:16px;max-width:560px;background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;min-height:40px;box-shadow:0 8px 32px rgba(0,0,0,.25)}
 .toast button{background:none;border:0;color:var(--aqua);font-weight:600;cursor:pointer;white-space:nowrap;padding:8px 0}
 footer{padding-top:48px;color:var(--ink-2);font-size:12px;max-width:72ch}
@@ -467,6 +468,8 @@ tbody tr:hover{background:var(--surface-2)}
 .qn{margin-top:16px;font-size:13px;color:#4F6B84}.qn ul{margin:6px 0 0;padding-left:18px}.qf{margin-top:16px;padding-top:12px;border-top:1px solid #DAE7F0;font-size:12px;color:#4F6B84}
 .qbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 28px;border-top:1px solid var(--line)}
 @media(max-width:560px){.qsheet{padding:20px}.qgrid{grid-template-columns:1fr}.qbar{padding:16px 20px}.qmeta{text-align:left}}
+.kpib{font:inherit;color:inherit;text-align:left;cursor:pointer}.kpib:hover{border-color:var(--aqua)}.kpib.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand) inset}.kpib:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.fud{margin:8px 0 0;display:grid;gap:4px;font-size:13px}.fud div{display:flex;gap:8px;flex-wrap:wrap}.fud dt{min-width:96px;color:var(--ink-2);font-weight:600}.fud dd{margin:0;overflow-wrap:anywhere}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -504,8 +507,8 @@ tbody tr:hover{background:var(--surface-2)}
     <button class="tab" role="tab" id="tab-dash" aria-controls="panel-dash" aria-selected="false" data-tab="dash" tabindex="-1" hidden>Dashboard</button>
     <button class="tab" role="tab" id="tab-desk" aria-controls="panel-desk" aria-selected="true" data-tab="desk">Handler desk</button>
     <button class="tab" role="tab" id="tab-followups" aria-controls="panel-followups" aria-selected="false" data-tab="followups" tabindex="-1">Follow-ups</button>
+    <button class="tab" role="tab" id="tab-clients" aria-controls="panel-clients" aria-selected="false" data-tab="clients" tabindex="-1">CRM</button>
     <button class="tab" role="tab" id="tab-calls" aria-controls="panel-calls" aria-selected="false" data-tab="calls" tabindex="-1">Call log</button>
-    <button class="tab" role="tab" id="tab-clients" aria-controls="panel-clients" aria-selected="false" data-tab="clients" tabindex="-1">Clients</button>
     <button class="tab" role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources" tabindex="-1">Sources</button>
     <button class="tab" role="tab" id="tab-sales" aria-controls="panel-sales" aria-selected="false" data-tab="sales" tabindex="-1">Sales and review</button>
     <button class="tab" role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab" tabindex="-1">Model lab</button>
@@ -1061,7 +1064,7 @@ function scriptById(id){return SCRIPTS.filter(function(x){return x.id===id})[0]}
 var S,P={id:null,playing:false,pos:0,timer:null},liveTimer=null,lastFocus=null,nextNum;
 function initState(){
   seq=0;nextNum={col:46,kur:46};
-  S={stage:'all',handler:'all',calls:[],range:30,src:'all',status:'all',outcome:'all',lang:'all',showEn:true,sl:'en',avgSale:75000,close:25,q:'',tab:'desk',branch:'all',openId:null,pool:[],spend:{},web:null,webCall:null,live:false,desk:newDesk(),tasks:[],fu:{branch:'all',view:'open'},lab:{results:[],last:null},trOpen:false,snooze:{},alerts:false,seen:{},crm:{ov:{},added:[],q:'',stage:'all',branch:'all',open:null,seq:0}};
+  S={stage:'all',handler:'all',calls:[],range:30,src:'all',status:'all',outcome:'all',lang:'all',showEn:true,sl:'en',avgSale:75000,close:25,q:'',tab:'desk',branch:'all',openId:null,pool:[],spend:{},web:null,webCall:null,live:false,desk:newDesk(),tasks:[],fu:{branch:'all',view:'open',kf:null},lab:{results:[],last:null},trOpen:false,snooze:{},alerts:false,seen:{},crm:{ov:{},added:[],q:'',stage:'all',branch:'all',open:null,seq:0}};
   SOURCES.forEach(function(s){S.spend[s.id]=s.spend});
   BRANCHES.forEach(function(b){S.pool.push({id:'n'+b.id,source:'all',branch:b.id,number:b.main,campaign:'Branch line',rule:'Every call to this number goes to the '+b.name+' handlers'})});
   seed();
@@ -1165,12 +1168,13 @@ function meter(score,big){var cls=score>=70?'hi':score<40?'lo':'';return '<span 
 
 /* ---------- toasts and copy ---------- */
 function toast(msg,actionLabel,fn){
-  var box=$('#toasts');
+  var box=$('#toasts'),y0=window.pageYOffset;
   while(box.children.length>=3)box.removeChild(box.firstChild);
   var el=document.createElement('div');el.className='toast';
   el.innerHTML='<span>'+esc(msg)+'</span>';
   if(actionLabel){var b=document.createElement('button');b.type='button';b.textContent=actionLabel;b.onclick=function(){fn();el.remove()};el.appendChild(b)}
   box.appendChild(el);
+  if(window.pageYOffset!==y0)window.scrollTo(0,y0);
   setTimeout(function(){if(el.parentNode)el.remove()},5600);
 }
 function copyText(text,okMsg){
@@ -1256,7 +1260,7 @@ function renderList(){
   var cn={all:all.length,English:0,Sinhala:0,Tamil:0};all.forEach(function(c){if(cn[c.lang]!==undefined)cn[c.lang]++});
   var fl=document.activeElement&&document.activeElement.getAttribute?document.activeElement.getAttribute('data-lang'):null;
   $('#langChips').innerHTML=[['all','All'],['English','English'],['Sinhala','සිංහල'],['Tamil','தமிழ்']].map(function(x){return '<button type="button" data-lang="'+x[0]+'" aria-pressed="'+(S.lang===x[0])+'"'+(x[0]==='Sinhala'?' lang="si"':x[0]==='Tamil'?' lang="ta"':'')+'>'+x[1]+' '+cn[x[0]]+'</button>'}).join('');
-  if(fl){var fb=$('#langChips [data-lang="'+fl+'"]');if(fb)fb.focus()}
+  if(fl){var fb=$('#langChips [data-lang="'+fl+'"]');if(fb)fb.focus({preventScroll:true})}
   $('#count').textContent='Showing '+list.length+' of '+all.length;
   var ul=$('#callList');
   if(!list.length){
@@ -1273,7 +1277,7 @@ function renderList(){
      +'<span class="c-status">'+statusPill(c)+stagePill(c)+'</span>'
      +'<span class="c-sum">'+esc(summaryFor(c))+'</span></button></li>';
   }).join('');
-  if(keep){var b=$('.row[data-id="'+keep+'"]');if(b)b.focus()}
+  if(keep){var b=$('.row[data-id="'+keep+'"]');if(b)b.focus({preventScroll:true})}
   S.calls.forEach(function(c){c.fresh=false});
 }
 
@@ -1402,8 +1406,8 @@ function renderDrawer(){
   var keepScroll=d.scrollTop,hadFocus=document.activeElement&&document.activeElement.id;
   d.innerHTML=h;
   d.scrollTop=keepScroll;
-  if(c.status==='live'){var tr=$('#tr');if(tr&&tr.lastElementChild)tr.lastElementChild.scrollIntoView({block:'nearest'})}
-  if(hadFocus&&hadFocus!=='drawer'){var e=document.getElementById(hadFocus);if(e&&d.contains(e))e.focus()}
+  if(c.status==='live'){var tr=$('#tr');if(tr&&tr.lastElementChild){var le=tr.lastElementChild,dr=d.getBoundingClientRect(),lr=le.getBoundingClientRect();if(lr.bottom>dr.bottom)d.scrollTop+=lr.bottom-dr.bottom+16}}
+  if(hadFocus&&hadFocus!=='drawer'){var e=document.getElementById(hadFocus);if(e&&d.contains(e))e.focus({preventScroll:true})}
   if(P.id===c.id)syncPlayer();
 }
 function openDrawer(id){
@@ -1412,7 +1416,7 @@ function openDrawer(id){
   S.openId=id;
   $('#scrim').hidden=false;$('#drawer').hidden=false;
   renderDrawer();renderList();
-  var b=$('#drawer [data-act="close"]');if(b)b.focus();
+  var b=$('#drawer [data-act="close"]');if(b)b.focus({preventScroll:true});
 }
 function closeDrawer(){
   var was=S.openId;
@@ -1420,8 +1424,8 @@ function closeDrawer(){
   $('#scrim').hidden=true;$('#drawer').hidden=true;
   renderList();
   var rb=was&&$('.row[data-id="'+was+'"]');
-  if(rb)rb.focus();
-  else if(lastFocus&&lastFocus.focus&&document.contains(lastFocus))lastFocus.focus();
+  if(rb)rb.focus({preventScroll:true});
+  else if(lastFocus&&lastFocus.focus&&document.contains(lastFocus))lastFocus.focus({preventScroll:true});
 }
 function stopPlay(){if(P.timer){clearInterval(P.timer);P.timer=null}P.playing=false}
 function syncPlayer(){
@@ -1764,7 +1768,7 @@ function renderDeskSheet(){
   if(nat)h+='<p class="muted small" style="margin:16px 0 0">Sinhala and Tamil lines are drafts. A native speaker should review them before staff use them.</p>';
   $('#deskSheet').innerHTML=h;
 }
-function renderDesk(){renderDeskTaps();renderDeskStatus();renderDeskSheet();var sr=$('#deskSaleRow');if(sr)sr.hidden=!(S.desk&&S.desk.outcome==='sold')}
+function renderDesk(){var y=window.pageYOffset,sh=$('#deskSheet'),st=sh?sh.scrollTop:0;renderDeskTaps();renderDeskStatus();renderDeskSheet();var sr=$('#deskSaleRow');if(sr)sr.hidden=!(S.desk&&S.desk.outcome==='sold');if(sh)sh.scrollTop=st;if(window.pageYOffset!==y)window.scrollTo(0,y)}
 function toggleIn(a,v){var i=a.indexOf(v);if(i>-1)a.splice(i,1);else a.push(v)}
 function deskTap(f,v){
   var d=S.desk;
@@ -1778,7 +1782,7 @@ function deskTap(f,v){
   if(!d.started&&(f==='need'||f==='lang'))d.started=Date.now();
   var fo=document.activeElement&&document.activeElement.getAttribute?document.activeElement.getAttribute('data-d')+'|'+document.activeElement.getAttribute('data-v'):null;
   renderDesk();
-  if(fo){var b=$('[data-d="'+fo.split('|')[0]+'"][data-v="'+fo.split('|')[1]+'"]');if(b&&b.focus)b.focus()}
+  if(fo){var b=$('[data-d="'+fo.split('|')[0]+'"][data-v="'+fo.split('|')[1]+'"]');if(b&&b.focus)b.focus({preventScroll:true})}
 }
 function deskStart(){S.desk.started=Date.now();$('#deskTimer').textContent='0:00'}
 function deskSample(){
@@ -1896,23 +1900,34 @@ function toggleTask(id){
   else{var m=S.tasks.filter(function(x){return x.id===id})[0];if(m)m.done=!m.done}
   renderFollowups();updateBadge();if(S.tab==='calls'){renderKpis();renderList()}
 }
+function fuDetail(t){
+  var c=getCall(t.call);if(!c)return '';
+  var nm=t.name||c.name||'Caller',ph=c.phoneFull||t.phone||c.caller||'',req=c.intent||t.need||'',sig=(c.signals||[]).filter(function(x){return x}).slice(0,4);
+  var rows=[['Customer',nm+(ph?' · '+ph:'')],['Requirement',req+(c.loc&&c.loc!=='unknown area'?' · '+c.loc:'')]];
+  if(sig.length)rows.push(['Gathered',sig.join(', ')]);
+  if(c.quoteRef)rows.push(['Quotation',c.quoteRef+' sent on WhatsApp']);
+  return '<dl class="fud">'+rows.map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+esc(r[1])+'</dd></div>'}).join('')+'</dl>';
+}
 function renderFollowups(){
   var all=allTasks(),now=Date.now(),b=S.fu.branch,v=S.fu.view;
   var scoped=all.filter(function(t){return b==='all'||t.branch===b});
   var open=scoped.filter(function(t){return !t.done}),od=open.filter(function(t){return t.due<now}),lead=open.filter(function(t){return LEADKIND.indexOf(t.kind)>-1});
-  $('#fuKpis').innerHTML=[['Open tasks',open.length,''],['Overdue',od.length,od.length?'Call these first':'Nothing late'],['Leads waiting',lead.length,'Missed, warm and quoted'],['Quotes waiting',open.filter(function(t){return t.kind==='quote'||t.kind==='check'}).length,'Send or chase these']].map(function(x){return '<div class="kpi"><span class="muted small">'+x[0]+'</span><b class="mono" style="font-size:24px">'+x[1]+'</b><span class="muted small">'+x[2]+'</span></div>'}).join('');
+  var kq=open.filter(function(t){return t.kind==='quote'||t.kind==='check'}),kf=S.fu.kf;
+  $('#fuKpis').innerHTML=[['open','Open tasks',open.length,'Show all open'],['overdue','Overdue',od.length,od.length?'Call these first':'Nothing late'],['leads','Leads waiting',lead.length,'Missed, warm and quoted'],['quotes','Quotes waiting',kq.length,'Send or chase these']].map(function(x){return '<button type="button" class="kpi kpib'+(kf===x[0]?' on':'')+'" data-fukpi="'+x[0]+'" aria-pressed="'+(kf===x[0])+'"><span class="muted small">'+x[1]+'</span><b class="mono" style="font-size:24px">'+x[2]+'</b><span class="muted small">'+x[3]+'</span></button>'}).join('');
   $('#fuBranch').hidden=!!USER;
   $('#fuBranch').innerHTML='<option value="all">All branches</option>'+BRANCHES.map(function(x){return '<option value="'+x.id+'">'+esc(x.name)+'</option>'}).join('');$('#fuBranch').value=b;
   $('#fuView').innerHTML=[['open','Open'],['done','Done'],['all','All']].map(function(x){return '<button type="button" data-fuview="'+x[0]+'" aria-pressed="'+(v===x[0])+'">'+x[1]+'</button>'}).join('');
   var list=scoped.filter(function(t){return v==='all'||(v==='open'?!t.done:t.done)});
+  if(kf){list=open;if(kf==='overdue')list=od;else if(kf==='leads')list=lead;else if(kf==='quotes')list=kq}
+  var KFL={open:'open tasks',overdue:'overdue tasks',leads:'leads waiting',quotes:'quotes waiting'};
   $('#fuAlerts').textContent='Reminders: '+(S.alerts?'on':'off');$('#fuAlerts').setAttribute('aria-pressed',String(S.alerts));
-  $('#fuCount').textContent='Showing '+list.length+' of '+scoped.length;
+  $('#fuCount').innerHTML='Showing '+list.length+' of '+scoped.length+(kf?' · filtered to '+KFL[kf]+' <button type="button" class="btn sm" data-fukpi="'+kf+'">Clear filter</button>':'');
   if(!list.length){$('#fuList').innerHTML='<li class="empty">'+(v==='open'?'Nothing open. Every lead has a next step.':'Nothing here yet.')+'</li>';return}
   $('#fuList').innerHTML=list.map(function(t){
     var late=!t.done&&t.due<now;
     var cp=['en','si','ta'].filter(function(l){return t.msg&&t.msg[l]}).map(function(l){return '<button type="button" class="btn sm" data-copy="'+esc(t.msg[l])+'" data-msg="Message copied"'+(l==='en'?'':' lang="'+l+'"')+'>'+'Copy message: '+(l==='en'?'English':l==='si'?'සිංහල':'தமிழ்')+'</button>'}).join('');
     return '<li class="fu'+(t.done?' done':'')+'">'
-     +'<div><div class="ftitle">'+esc(t.title)+'</div><div class="fmeta"><span class="pill '+(t.done?'good':late?'bad':'info')+'">'+(t.done?'Done':relDue(t.due))+'</span><span class="tag">'+esc(KINDL[t.kind])+'</span><span class="tag">'+esc(BR[t.branch].name)+'</span>'+(t.heat!==null&&t.heat!==undefined?'<span class="muted small">Lead score '+t.heat+'</span>':'')+'</div></div>'
+     +'<div><div class="ftitle">'+esc(t.title)+'</div>'+fuDetail(t)+'<div class="fmeta"><span class="pill '+(t.done?'good':late?'bad':'info')+'">'+(t.done?'Done':relDue(t.due))+'</span><span class="tag">'+esc(KINDL[t.kind])+'</span><span class="tag">'+esc(BR[t.branch].name)+'</span>'+(t.heat!==null&&t.heat!==undefined?'<span class="muted small">Lead score '+t.heat+'</span>':'')+'</div></div>'
      +'<div class="fact">'+'<button type="button" class="fchk" data-fu="'+t.id+'" aria-pressed="'+t.done+'"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 12l5 5 9-10" fill="none" stroke="currentColor" stroke-width="3"/></svg>'+(t.done?'Done. Undo':'Mark done')+'</button>'+(t.done?'':'<a class="btn sm" href="'+gcalUrl(t)+'" target="_blank" rel="noopener">Add to calendar</a><button type="button" class="btn sm" data-snooze="'+t.id+'" data-how="h">+1 h</button><button type="button" class="btn sm" data-snooze="'+t.id+'" data-how="d">Tomorrow 9am</button>')+'<button type="button" class="btn sm" data-opencall="'+t.call+'">Open call</button></div></li>';
   }).join('');
 }
@@ -2057,7 +2072,7 @@ function crmCsv(){
 $('#crmQ').addEventListener('input',function(){S.crm.q=this.value;renderClients()});
 $('#crmBranch').addEventListener('change',function(){S.crm.branch=this.value;renderClients()});
 $('#crmStage').addEventListener('change',function(){S.crm.stage=this.value;renderClients()});
-$('#crmAddBtn').addEventListener('click',function(){var b=$('#crmAddBox');b.open=true;try{b.scrollIntoView({block:'nearest'})}catch(e){}$('#crmName').focus()});
+$('#crmAddBtn').addEventListener('click',function(){var b=$('#crmAddBox');b.open=true;try{b.scrollIntoView({block:'nearest'})}catch(e){}$('#crmName').focus({preventScroll:true})});
 $('#crmCsv').addEventListener('click',function(){var n=crmFiltered(crmContacts()).length;copyText(crmCsv(),n+' clients copied. Paste into Google Sheets or Excel.')});
 $('#crmList').addEventListener('change',function(e){var t=e.target,k=t.getAttribute&&t.getAttribute('data-stage');if(!k)return;S.crm.ov[k]=S.crm.ov[k]||{};S.crm.ov[k].stage=t.value;S.crm.open=k;renderClients()});
 $('#crmList').addEventListener('input',function(e){var t=e.target,k=t.getAttribute&&t.getAttribute('data-note');if(!k)return;S.crm.ov[k]=S.crm.ov[k]||{};S.crm.ov[k].note=t.value});
@@ -2358,9 +2373,9 @@ function openQuote(){
   var d=S.desk;if(!d.need||d.need==='none'){return}
   var q=buildQuote(),m=$('#qScrim');
   $('#qPaper').innerHTML='<div class="qsheet">'+quoteHtml(q)+'</div><div class="qbar"><div class="muted small" id="qHint">'+(waNumber(q.phone)?'Sends to '+esc(q.phone)+' on WhatsApp.':'No valid phone entered. WhatsApp will ask who to send it to.')+'</div><div class="top-actions"><button class="btn primary" type="button" id="qSend">Send on WhatsApp</button><button class="btn" type="button" id="qCopy">Copy text</button><button class="btn" type="button" id="qClose">Close</button></div></div>';
-  m.hidden=false;S.qOpen=true;var b=$('#qSend');if(b)b.focus();
+  m.hidden=false;S.qOpen=true;var b=$('#qSend');if(b)b.focus({preventScroll:true});
 }
-function closeQuote(){var m=$('#qScrim');if(m)m.hidden=true;S.qOpen=false;var b=$('#deskQuote');if(b)b.focus()}
+function closeQuote(){var m=$('#qScrim');if(m)m.hidden=true;S.qOpen=false;var b=$('#deskQuote');if(b)b.focus({preventScroll:true})}
 function sendQuote(){
   var q=buildQuote(),n=waNumber(q.phone),url='https://wa.me/'+(n||'')+'?text='+encodeURIComponent(quoteText(q));
   S.desk.quote={ref:q.ref,at:Date.now()};
@@ -2409,7 +2424,8 @@ document.addEventListener('click',function(e){
   var t=e.target;
   var tab=t.closest('[data-tab]');if(tab){showTab(tab.getAttribute('data-tab'));return}
   var dk=t.closest('[data-d]');if(dk){deskTap(dk.getAttribute('data-d'),dk.getAttribute('data-v'));return}
-  var fv=t.closest('[data-fuview]');if(fv){S.fu.view=fv.getAttribute('data-fuview');renderFollowups();return}
+  var fk=t.closest('[data-fukpi]');if(fk){var kv=fk.getAttribute('data-fukpi');S.fu.kf=(S.fu.kf===kv||kv==='open')?null:kv;if(kv==='open')S.fu.view='open';renderFollowups();return}
+  var fv=t.closest('[data-fuview]');if(fv){S.fu.view=fv.getAttribute('data-fuview');S.fu.kf=null;renderFollowups();return}
   var sz=t.closest('[data-snooze]');if(sz){snooze(sz.getAttribute('data-snooze'),sz.getAttribute('data-how'));return}
   if(t.id==='fuAlerts'){enableAlerts();return}
   if(t.id==='fuIcs'){var o=allTasks().filter(function(x){return !x.done});copyText(buildIcs(o),o.length+' events copied. Paste into a text file named tasks.ics and open it to import into Google, Outlook or Apple Calendar.');return}
@@ -2550,14 +2566,14 @@ document.addEventListener('keydown',function(e){
   var tab=e.target.closest&&e.target.closest('.tab');
   if(tab&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){
     var tabs=$$('.tab'),i=tabs.indexOf(tab),n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];
-    showTab(n.getAttribute('data-tab'));n.focus();
+    showTab(n.getAttribute('data-tab'));n.focus({preventScroll:true});
   }
   if(e.key==='Tab'&&S.openId){
     var f=$$('#drawer button,#drawer select,#drawer textarea,#drawer [tabindex]').filter(function(x){return !x.disabled});
     if(f.length){
-      if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f[f.length-1].focus()}
-      else if(!e.shiftKey&&document.activeElement===f[f.length-1]){e.preventDefault();f[0].focus()}
-      else if(!$('#drawer').contains(document.activeElement)){e.preventDefault();f[0].focus()}
+      if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f[f.length-1].focus({preventScroll:true})}
+      else if(!e.shiftKey&&document.activeElement===f[f.length-1]){e.preventDefault();f[0].focus({preventScroll:true})}
+      else if(!$('#drawer').contains(document.activeElement)){e.preventDefault();f[0].focus({preventScroll:true})}
     }
   }
 });
