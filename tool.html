@@ -472,6 +472,7 @@ tbody tr:hover{background:var(--surface-2)}
 .fud{margin:8px 0 0;display:grid;gap:4px;font-size:13px}.fud div{display:flex;gap:8px;flex-wrap:wrap}.fud dt{min-width:96px;color:var(--ink-2);font-weight:600}.fud dd{margin:0;overflow-wrap:anywhere}
 .histcard{border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:12px;padding:16px;background:var(--surface-2)}.histlist{margin:8px 0;padding-left:16px;display:grid;gap:4px;font-size:13px}.hist-new{padding:0 2px}
 .deskact{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}.deskact .top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn.out{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);font-weight:600}.btn.out:hover{background:var(--bad);color:#fff}.btn.out[hidden]{display:none}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -497,11 +498,12 @@ tbody tr:hover{background:var(--surface-2)}
     </div>
     <div class="top-actions">
       <span class="pill info">Demo with sample data</span>
-      <span class="pill good" id="whoami" hidden></span><div class="seg" id="viewSw" role="group" aria-label="Show calls for" hidden><button type="button" data-v="all" aria-pressed="true">All calls</button><button type="button" data-v="col" aria-pressed="false">Colombo calls</button><button type="button" data-v="kur" aria-pressed="false">Kurunegala calls</button></div><button id="logoutBtn" class="btn sm" type="button" hidden>Sign out</button>
+      <span class="pill good" id="whoami" hidden></span><div class="seg" id="viewSw" role="group" aria-label="Show calls for" hidden><button type="button" data-v="all" aria-pressed="true">All calls</button><button type="button" data-v="col" aria-pressed="false">Colombo calls</button><button type="button" data-v="kur" aria-pressed="false">Kurunegala calls</button></div>
       <button id="liveSwitch" class="switch" role="switch" aria-checked="false"><span class="track"></span><span>Live calls</span></button>
       <select id="simLang" aria-label="Language of the simulated call"><option value="any">Any language</option><option value="English">English call</option><option value="Sinhala">Sinhala call</option><option value="Tamil">Tamil call</option></select>
       <button id="simBtn" class="btn primary" type="button">Simulate incoming call</button>
       <button id="themeBtn" class="btn icon" type="button" aria-label="Switch between light and dark theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+      <button id="logoutBtn" class="btn sm out" type="button" hidden>Sign out</button>
     </div>
   </header>
 
