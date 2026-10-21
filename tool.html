@@ -471,6 +471,7 @@ tbody tr:hover{background:var(--surface-2)}
 .kpib{font:inherit;color:inherit;text-align:left;cursor:pointer}.kpib:hover{border-color:var(--aqua)}.kpib.on{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand) inset}.kpib:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .fud{margin:8px 0 0;display:grid;gap:4px;font-size:13px}.fud div{display:flex;gap:8px;flex-wrap:wrap}.fud dt{min-width:96px;color:var(--ink-2);font-weight:600}.fud dd{margin:0;overflow-wrap:anywhere}
 .histcard{border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:12px;padding:16px;background:var(--surface-2)}.histlist{margin:8px 0;padding-left:16px;display:grid;gap:4px;font-size:13px}.hist-new{padding:0 2px}
+.deskact{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}.deskact .top-actions{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -576,6 +577,7 @@ tbody tr:hover{background:var(--surface-2)}
               <div class="field grow"><label for="deskName" class="sr">Caller name</label><input id="deskName" autocomplete="off" placeholder="Name"></div>
               <div class="field grow"><label for="deskPhone" class="sr">Phone number</label><input id="deskPhone" inputmode="tel" autocomplete="off" placeholder="Phone"></div>
             </div></div>
+            <div class="deskact" id="deskActions"></div>
           </div>
         </div>
         <div class="deskcol sticky">
@@ -1746,9 +1748,10 @@ function renderDeskStatus(){
   var lbl=heat>=70?'Hot':heat>=40?'Warm':'Cold',cls=heat>=70?'good':heat>=40?'warn':'';
   var missing=CHK6.filter(function(x){return !k[x[0]]}).map(function(x){return x[1].toLowerCase()});
   var h='<div class="statusrow"><div class="heat"><b class="mono">'+heat+'</b><span class="pill '+cls+'">'+lbl+' lead</span><span class="muted small">'+n+' of 6</span></div>';
-  h+='<div class="top-actions"><button class="btn primary" type="button" id="deskSave">Save call</button><button class="btn wa" type="button" id="deskQuote"'+(d.need&&d.need!=='none'?'':' disabled')+'>'+(d.quote?'Quotation sent. View again':'Send quotation on WhatsApp')+'</button><button class="btn" type="button" id="deskClear">Clear</button></div></div>';
-  h+='<div class="msg" id="deskMsg" role="status"></div>';
-  $('#deskStatus').innerHTML=h;
+  h+='</div>';
+  var ah='<div class="top-actions"><button class="btn primary" type="button" id="deskSave">Save call</button><button class="btn wa" type="button" id="deskQuote"'+(d.need&&d.need!=='none'?'':' disabled')+'>'+(d.quote?'Quotation sent. View again':'Send quotation on WhatsApp')+'</button><button class="btn" type="button" id="deskClear">Clear</button></div>';
+  ah+='<div class="msg" id="deskMsg" role="status"></div>';
+  $('#deskStatus').innerHTML=h;var dact=$('#deskActions');if(dact)dact.innerHTML=ah;
   var c='<div class="chk6">'+CHK6.map(function(x){return '<span class="pill '+(k[x[0]]?'good':'off')+'">'+esc(x[1])+'</span>'}).join('')+'</div><p class="muted small" style="margin:8px 0 0">'+(missing.length?'Still needed: '+esc(missing.join(', '))+'.':'Everything is captured. Save the call.')+'</p>';
   $('#deskChecklist').innerHTML=c;
 }
