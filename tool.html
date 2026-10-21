@@ -456,6 +456,17 @@ tbody tr:hover{background:var(--surface-2)}
 .frow .fd{text-align:right}
 .pack{white-space:pre-wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:16px;font:13px/1.6 var(--mono);margin:0 0 16px;overflow:auto}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:560px){.row2{grid-template-columns:1fr}.frow{grid-template-columns:1fr 1fr 40px 44px}}
+.btn.wa{background:#128C7E;border-color:#128C7E;color:#fff}.btn.wa:hover{filter:brightness(1.08)}.btn.wa:disabled{opacity:.45}
+.qscrim{position:fixed;inset:0;z-index:60;background:rgba(8,28,46,.55);backdrop-filter:blur(4px);display:grid;place-items:center;padding:16px;overflow:auto}.qscrim[hidden]{display:none}
+.qpaper{width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border-radius:20px;box-shadow:0 40px 80px -30px rgba(0,0,0,.6);display:flex;flex-direction:column}
+.qsheet{padding:28px;background:#fff;color:#0A2540;border-radius:20px 20px 0 0}
+.qh{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:16px;border-bottom:2px solid #0B6BA6}
+.qbrand{display:block;font-size:22px;letter-spacing:-.02em;color:#0B6BA6}.qh span,.qmeta span{display:block;font-size:13px;color:#4F6B84}.qmeta{text-align:right}.qmeta b{font-size:20px;display:block}
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}.qgrid small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#4F6B84}.qgrid b{display:block}.qgrid span{display:block;font-size:13px;color:#4F6B84}
+.qt{width:100%;min-width:0;table-layout:auto;border-collapse:collapse;font-size:14px}.qt th{background:transparent!important;padding:8px 0!important}.qt td{padding:12px 0!important;border-top:0!important}.qt tbody tr:hover{background:transparent}.qt th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#4F6B84;padding:8px 0;border-bottom:1px solid #DAE7F0}.qt td{padding:12px 0;border-bottom:1px solid #DAE7F0;vertical-align:top}.qt td small{display:block;color:#4F6B84;font-size:12px}.qt .num{text-align:right;white-space:nowrap}.qt tfoot td{font-weight:700;font-size:16px;border-bottom:0;color:#0B6BA6}
+.qn{margin-top:16px;font-size:13px;color:#4F6B84}.qn ul{margin:6px 0 0;padding-left:18px}.qf{margin-top:16px;padding-top:12px;border-top:1px solid #DAE7F0;font-size:12px;color:#4F6B84}
+.qbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 28px;border-top:1px solid var(--line)}
+@media(max-width:560px){.qsheet{padding:20px}.qgrid{grid-template-columns:1fr}.qbar{padding:16px 20px}.qmeta{text-align:left}}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -854,6 +865,7 @@ tbody tr:hover{background:var(--surface-2)}
 
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Call detail" hidden></aside>
+<div class="qscrim" id="qScrim" hidden><div class="qpaper" id="qPaper" role="dialog" aria-modal="true" aria-label="Quotation preview"></div></div>
 <div id="toasts" role="status" aria-live="polite"></div>
 
 <script>
@@ -1728,7 +1740,7 @@ function renderDeskStatus(){
   var lbl=heat>=70?'Hot':heat>=40?'Warm':'Cold',cls=heat>=70?'good':heat>=40?'warn':'';
   var missing=CHK6.filter(function(x){return !k[x[0]]}).map(function(x){return x[1].toLowerCase()});
   var h='<div class="statusrow"><div class="heat"><b class="mono">'+heat+'</b><span class="pill '+cls+'">'+lbl+' lead</span><span class="muted small">'+n+' of 6</span></div>';
-  h+='<div class="top-actions"><button class="btn primary" type="button" id="deskSave">Save call</button><button class="btn" type="button" id="deskClear">Clear</button></div></div>';
+  h+='<div class="top-actions"><button class="btn primary" type="button" id="deskSave">Save call</button><button class="btn wa" type="button" id="deskQuote"'+(d.need&&d.need!=='none'?'':' disabled')+'>'+(d.quote?'Quotation sent. View again':'Send quotation on WhatsApp')+'</button><button class="btn" type="button" id="deskClear">Clear</button></div></div>';
   h+='<div class="msg" id="deskMsg" role="status"></div>';
   $('#deskStatus').innerHTML=h;
   var c='<div class="chk6">'+CHK6.map(function(x){return '<span class="pill '+(k[x[0]]?'good':'off')+'">'+esc(x[1])+'</span>'}).join('')+'</div><p class="muted small" style="margin:8px 0 0">'+(missing.length?'Still needed: '+esc(missing.join(', '))+'.':'Everything is captured. Save the call.')+'</p>';
@@ -1811,6 +1823,7 @@ function saveDeskCall(){
     summary:N.title+' enquiry from '+area+'. '+(d.time?deskLabel(TIMES,d.time)+'. ':'')+(d.budget?deskLabel(BUDGETS,d.budget)+'. ':'')+'Outcome: '+deskLabel(OUTS,d.outcome)+'. Captured: '+got.join(', ')+'.'+(miss.length?' Missing: '+miss.join(', ')+'.':'')+(f.notes?' Note: '+f.notes:''),
     intent:N.title,score:heat,tags:[N.title,deskLabel(OUTS,d.outcome)],signals:d.quals.concat(d.time==='now'?['Needs it today']:[],d.budget==='ok'?['Budget fits']:[]),
     lang:lang,conf:100,outcome:OUTMAP[d.outcome],notes:f.notes,callback:false,handler:true,phoneFull:f.phone||'',sold:d.outcome==='sold',chk:k,by:ME||((HANDLERS[br.id]||['Desk'])[0]),stage:({visit:'visit',quote:'quoted',sold:'won',callback:'new',info:'new',support:'none',wrong:'none'})[d.outcome]||'new'};
+  if(d.quote){c.quoteRef=d.quote.ref;c.tags.push('Quotation sent');c.summary+=' Quotation '+d.quote.ref+' sent on WhatsApp.'}
   if(d.outcome==='sold'){c.saleAmt=+($('#deskSale').value||0)||0;c.invoice=($('#deskInv').value||'').trim()}
   S.calls.unshift(c);
   var ts=makeTasks(d,c,f);ts.forEach(function(t){S.tasks.push(t)});
@@ -2197,7 +2210,7 @@ function pipelineHtml(c){
   var s=stageOf(c),h='<div class="sec"><h3>Lead pipeline</h3><div class="field"><label for="stage">Stage</label><select id="stage" data-f="stage">'+STG.map(function(x){return '<option value="'+x[0]+'"'+(s===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div>';
   if(s==='lost'){var w=whyOf(c)||'';h+='<div class="field"><label for="lostWhy">Lost because</label><select id="lostWhy" data-f="lostWhy"><option value="">Choose a reason</option>'+LOSTW.map(function(x){return '<option value="'+x[0]+'"'+(w===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div>'}
   if(s==='won'){var sl=saleOf(c);h+='<div class="field"><label for="saleAmt">Sale amount (LKR)</label><input id="saleAmt" data-f="saleAmt" type="number" min="0" step="500" inputmode="numeric" value="'+(sl.amt||'')+'"></div><div class="field"><label for="invoice">Invoice number</label><input id="invoice" data-f="invoice" value="'+esc(sl.inv)+'" placeholder="From the sales invoice"></div>'+(c.verified?'<span class="pill good">Matched to an invoice</span>':'<span class="muted small">Not matched to an invoice yet.</span>')}
-  h+='<div class="muted small" style="margin-top:8px">Handled by '+esc(handlerOf(c)||'-')+'</div><div class="d-actions"><button class="btn sm" type="button" data-act="flag" aria-pressed="'+!!c.review+'">'+(c.review?'Flagged for review (tap to remove)':'Flag for review')+'</button></div></div>';
+  h+=(c.quoteRef?'<div class="muted small" style="margin-top:8px">Quotation '+esc(c.quoteRef)+' was sent on WhatsApp.</div>':'')+'<div class="muted small" style="margin-top:8px">Handled by '+esc(handlerOf(c)||'-')+'</div><div class="d-actions"><button class="btn sm" type="button" data-act="flag" aria-pressed="'+!!c.review+'">'+(c.review?'Flagged for review (tap to remove)':'Flag for review')+'</button></div></div>';
   return h;
 }
 function missedInfo(c){
@@ -2307,6 +2320,54 @@ document.addEventListener('click',function(e){
   else if(t.id==='reviewCopy')copyText(buildReview(),'Review pack copied');
 });
 
+/* ---------- quotation on WhatsApp ---------- */
+var PRICES={pump_home:[['1 HP home pump, self-priming',45000]],borewell:[['Borewell submersible pump',120000]],filter:[['Whole-house water filter',38000]],purifier:[['RO water purifier',68500]]};
+var QL={
+ en:{h:'Quotation',cust:'Customer',need:'Requirement',item:'Item',price:'Price',from:'From',onreq:'On request',est:'Estimated from',notes:'Notes',n1:'Prices are samples and are confirmed after a site check.',n2:'Installation and parts are priced once the model is chosen.',n3:'Reply here or call us to book the visit.',greet:'Hello',thanks:'Thank you for calling Water Center',visit:'Site visit',details:'What you told us',ref:'Ref',date:'Date',area:'Area',phone:'Phone',after:'Quoted after a site visit',after2:'Quoted after inspection'},
+  si:{h:'මිල ගණන්',cust:'ගනුදෙනුකරු',need:'අවශ්‍යතාව',item:'භාණ්ඩය',price:'මිල',from:'සිට',onreq:'ඉල්ලීම මත',est:'ඇස්තමේන්තුගත මිල',notes:'සටහන්',n1:'මිල ගණන් නියැදි වන අතර ස්ථානය පරීක්ෂා කිරීමෙන් පසු තහවුරු කෙරේ.',n2:'සවි කිරීම සහ අමතර කොටස් මිල, මාදිලිය තෝරා ගැනීමෙන් පසු දැනුම් දෙනු ලැබේ.',n3:'මෙතැනින් පිළිතුරු දෙන්න, නැත්නම් අපට අමතන්න.',greet:'ආයුබෝවන්',thanks:'වෝටර් සෙන්ටර් අමතා ඇති ස්තූතියි',visit:'ස්ථාන පරීක්ෂාව',details:'ඔබ පැවසූ දේ',ref:'යොමුව',date:'දිනය',area:'ප්‍රදේශය',phone:'දුරකථනය',after:'ස්ථාන පරීක්ෂාවෙන් පසු මිල දැනුම් දෙනු ලැබේ',after2:'පරීක්ෂාවෙන් පසු මිල දැනුම් දෙනු ලැබේ'},
+  ta:{h:'விலைப்புள்ளி',cust:'வாடிக்கையாளர்',need:'தேவை',item:'பொருள்',price:'விலை',from:'முதல்',onreq:'கேட்டால்',est:'மதிப்பிடப்பட்ட விலை',notes:'குறிப்புகள்',n1:'விலைகள் மாதிரி விலைகள்; இடத்தைப் பார்த்த பின் உறுதிசெய்யப்படும்.',n2:'பொருத்துதல் மற்றும் பாகங்களின் விலை மாதிரி தேர்ந்தெடுத்த பின் தெரிவிக்கப்படும்.',n3:'இங்கே பதிலளிக்கவும் அல்லது எங்களை அழைக்கவும்.',greet:'வணக்கம்',thanks:'வாட்டர் சென்டரை அழைத்ததற்கு நன்றி',visit:'இடப் பார்வை',details:'நீங்கள் சொன்னவை',ref:'குறிப்பு எண்',date:'தேதி',area:'பகுதி',phone:'தொலைபேசி',after:'இடத்தைப் பார்த்த பின் விலை தெரிவிக்கப்படும்',after2:'பரிசோதனைக்குப் பின் விலை தெரிவிக்கப்படும்'}
+};
+function qNum(n){return Math.round(n).toLocaleString('en-US')}
+function buildQuote(){
+  var d=S.desk,f=deskForm(),N=CSN[d.need],br=BR[d.br],L=QL[d.lang]||QL.en;
+  if(!d.quoteRef){S.qseq=(S.qseq||0)+1;var dt=new Date();d.quoteRef='WC-'+br.id.toUpperCase()+'-'+String(dt.getFullYear()).slice(2)+String(dt.getMonth()+1).padStart(2,'0')+String(dt.getDate()).padStart(2,'0')+'-'+String(100+S.qseq)}
+  var items=(PRICES[d.need]||[]).map(function(x){return {n:x[0],p:x[1]}});
+  if(!items.length)items.push({n:N.title,p:null,after:d.need==='pump_service'?L.after2:L.after});
+  var total=items.reduce(function(a,x){return a+(x.p||0)},0);
+  var area=d.area&&d.area!=='out'?d.area:'',tm=d.time?deskLabel(TIMES,d.time):'';
+  var det=d.quals.slice();if(tm)det.push(tm);
+  return {ref:d.quoteRef,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),name:f.name,phone:f.phone,area:area,need:N.title,det:det,items:items,total:total,cross:N.cross,br:br,L:L,lang:d.lang};
+}
+function quoteHtml(q){
+  var L=q.L,h='<div class="qh"><div><b class="qbrand">Water Center</b><span>'+esc(q.br.name)+' · '+esc(q.br.main)+'</span></div><div class="qmeta"><b>'+esc(L.h)+'</b><span>'+esc(L.ref)+' '+esc(q.ref)+'</span><span>'+esc(L.date)+' '+esc(q.date)+'</span></div></div>';
+  h+='<div class="qgrid"><div><small>'+esc(L.cust)+'</small><b>'+esc(q.name||'Customer')+'</b><span>'+esc(q.phone||'')+'</span><span>'+esc(q.area?L.area+': '+q.area:'')+'</span></div><div><small>'+esc(L.need)+'</small><b>'+esc(q.need)+'</b>'+(q.det.length?'<span>'+q.det.map(esc).join(' · ')+'</span>':'')+'</div></div>';
+  h+='<table class="qt"><thead><tr><th>'+esc(L.item)+'</th><th class="num">'+esc(L.price)+' (LKR)</th></tr></thead><tbody>'+q.items.map(function(x){return '<tr><td>'+esc(x.n)+(x.after?'<small>'+esc(x.after)+'</small>':'')+'</td><td class="num">'+(x.p?esc(L.from)+' '+qNum(x.p):esc(L.onreq))+'</td></tr>'}).join('')+'</tbody>'+(q.total?'<tfoot><tr><td>'+esc(L.est)+'</td><td class="num">'+qNum(q.total)+'</td></tr></tfoot>':'')+'</table>';
+  h+='<div class="qn"><b>'+esc(L.notes)+'</b><ul><li>'+esc(L.n1)+'</li><li>'+esc(L.n2)+'</li><li>'+esc(L.n3)+'</li></ul></div><div class="qf">'+esc(q.br.main)+' · Water Center '+esc(q.br.name)+'</div>';
+  return h;
+}
+function quoteText(q){
+  var L=q.L,t=[L.greet+(q.name?' '+q.name:'')+', '+L.thanks+'.','','*'+L.h+'* '+q.ref,q.date,''];
+  t.push('*'+L.need+':* '+q.need);if(q.det.length)t.push(L.details+': '+q.det.join(', '));if(q.area)t.push(L.area+': '+q.area);t.push('');
+  q.items.forEach(function(x){t.push('- '+x.n+': '+(x.p?L.from+' LKR '+qNum(x.p):x.after||L.onreq))});
+  if(q.total)t.push('*'+L.est+' LKR '+qNum(q.total)+'*');
+  t.push('','_'+L.n1+'_',L.n3,'','Water Center '+q.br.name+' '+q.br.main);
+  return t.join('\n');
+}
+function waNumber(p){var d=String(p||'').replace(/\D/g,'');if(d.length===10&&d[0]==='0')return '94'+d.slice(1);if(d.length===11&&d.slice(0,2)==='94')return d;return ''}
+function openQuote(){
+  var d=S.desk;if(!d.need||d.need==='none'){return}
+  var q=buildQuote(),m=$('#qScrim');
+  $('#qPaper').innerHTML='<div class="qsheet">'+quoteHtml(q)+'</div><div class="qbar"><div class="muted small" id="qHint">'+(waNumber(q.phone)?'Sends to '+esc(q.phone)+' on WhatsApp.':'No valid phone entered. WhatsApp will ask who to send it to.')+'</div><div class="top-actions"><button class="btn primary" type="button" id="qSend">Send on WhatsApp</button><button class="btn" type="button" id="qCopy">Copy text</button><button class="btn" type="button" id="qClose">Close</button></div></div>';
+  m.hidden=false;S.qOpen=true;var b=$('#qSend');if(b)b.focus();
+}
+function closeQuote(){var m=$('#qScrim');if(m)m.hidden=true;S.qOpen=false;var b=$('#deskQuote');if(b)b.focus()}
+function sendQuote(){
+  var q=buildQuote(),n=waNumber(q.phone),url='https://wa.me/'+(n||'')+'?text='+encodeURIComponent(quoteText(q));
+  S.desk.quote={ref:q.ref,at:Date.now()};
+  try{window.open(url,'_blank','noopener')}catch(e){}
+  toast('Opened in WhatsApp. Tap Send there. Quotation '+q.ref+'.');
+  closeQuote();renderDeskStatus();
+}
 /* ---------- tabs ---------- */
 function showTab(t){
   S.tab=t;
@@ -2393,6 +2454,10 @@ document.addEventListener('click',function(e){
     else if(a==='copy'&&c){copyText(c.caller+' | '+c.branchName+' | '+SRC[c.source].name+' | '+c.campaign+' | '+c.lang+'\n'+c.intent+', score '+c.score+'/100\n'+c.summary,'Summary copied')}
     return;
   }
+  if(t.closest&&t.closest('#deskQuote')){openQuote();return}
+  if(t.closest&&t.closest('#qSend')){sendQuote();return}
+  if(t.closest&&t.closest('#qCopy')){var qq=buildQuote();copyText(quoteText(qq),'Quotation text copied');return}
+  if(t.closest&&t.closest('#qClose')||t.id==='qScrim'){closeQuote();return}
   if(t.id==='scrim'){closeDrawer();return}
   if(t.closest('#logoutBtn')){closeDrawer();USER=null;OWNER=false;ME=null;applyLogin();return}
   if(t.closest('#simBtn')){simulateCall();return}
@@ -2480,6 +2545,7 @@ $('#loginForm').addEventListener('submit',function(e){
 });
 document.addEventListener('keydown',function(e){
   if(S.tab==='desk'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^[1-9]$/.test(e.key)&&e.target&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName||'')){deskTap('need',NEEDS[+e.key-1]);return}
+  if(e.key==='Escape'&&S.qOpen){closeQuote();return}
   if(e.key==='Escape'&&S.openId)closeDrawer();
   var tab=e.target.closest&&e.target.closest('.tab');
   if(tab&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){
