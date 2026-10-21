@@ -451,6 +451,11 @@ tbody tr:hover{background:var(--surface-2)}
 .loginbox{border-radius:24px!important;box-shadow:0 40px 80px -30px rgba(0,0,0,.6)!important;border:1px solid rgba(255,255,255,.2)!important}
 #viewSw{max-width:100%}#viewSw button{white-space:nowrap;flex:1 1 auto}@media(max-width:560px){#viewSw{width:100%}#viewSw button{padding:0 8px;font-size:13px}}
 @media(max-width:360px){#viewSw button{padding:0 4px;font-size:12px}#viewSw{gap:2px;padding:3px}}
+.frow{display:grid;grid-template-columns:minmax(120px,1.3fr) 2fr 44px 48px;gap:12px;align-items:center;padding:8px 0;font-size:14px}
+.frow .bar{display:block;height:10px;background:var(--surface-2);border-radius:999px;overflow:hidden}.frow .bar .b{display:block;height:100%;background:linear-gradient(90deg,var(--aqua),var(--brand));border-radius:999px;min-width:2px}
+.frow .fd{text-align:right}
+.pack{white-space:pre-wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:16px;font:13px/1.6 var(--mono);margin:0 0 16px;overflow:auto}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:560px){.row2{grid-template-columns:1fr}.frow{grid-template-columns:1fr 1fr 40px 44px}}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -462,7 +467,7 @@ tbody tr:hover{background:var(--surface-2)}
     <div class="field"><label for="loginPass">Password</label><input id="loginPass" type="password" autocomplete="current-password"></div>
     <div class="msg" id="loginMsg" role="alert"></div>
     <button class="btn primary" type="submit" style="height:48px">Sign in</button>
-    <div class="demohint"><b>Demo logins</b><span class="mono">colombo / colombo-demo</span><span class="mono">kurunegala / kurunegala-demo</span><span class="mono">akith / akith-demo</span><span class="muted small">Demo only. The live system uses real accounts on the server.</span></div>
+    <div class="demohint"><b>Demo logins</b><span class="mono">colombo / colombo-demo</span><span class="mono">kurunegala / kurunegala-demo</span><span class="mono">akith / akith-demo</span><span class="mono">nimali / nimali-demo (Colombo handler)</span><span class="mono">chathura / chathura-demo (Kurunegala handler)</span><span class="muted small">Demo only. The live system uses real accounts on the server.</span></div>
   </form>
 </div>
 <div class="wrap">
@@ -490,7 +495,8 @@ tbody tr:hover{background:var(--surface-2)}
     <button class="tab" role="tab" id="tab-followups" aria-controls="panel-followups" aria-selected="false" data-tab="followups" tabindex="-1">Follow-ups</button>
     <button class="tab" role="tab" id="tab-calls" aria-controls="panel-calls" aria-selected="false" data-tab="calls" tabindex="-1">Call log</button>
     <button class="tab" role="tab" id="tab-clients" aria-controls="panel-clients" aria-selected="false" data-tab="clients" tabindex="-1">Clients</button>
-    <button class="tab" role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources" tabindex="-1">Sources and spend</button>
+    <button class="tab" role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources" tabindex="-1">Sources</button>
+    <button class="tab" role="tab" id="tab-sales" aria-controls="panel-sales" aria-selected="false" data-tab="sales" tabindex="-1">Sales and review</button>
     <button class="tab" role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab" tabindex="-1">Model lab</button>
   </nav>
 
@@ -512,10 +518,31 @@ tbody tr:hover{background:var(--surface-2)}
         <div class="card"><div class="sechead"><h2 style="margin:0">Calls per day</h2><div class="legend"><span><i style="background:var(--brand)"></i>Colombo</span><span><i style="background:var(--aqua)"></i>Kurunegala</span></div></div><div id="dChart"></div></div>
         <div class="card"><h2>Needs attention</h2><ul class="attn" id="dAttn"></ul></div>
       </div>
+      <div class="dgrid">
+        <div class="card"><h2>Where calls turn into sales</h2><div id="dFunnel"></div></div>
+        <div class="card"><h2>Why leads were lost</h2><div id="dLost"></div></div>
+      </div>
       <div class="tablewrap"><table id="dBranch" style="min-width:560px"><thead><tr><th>Branch</th><th class="num">Calls</th><th class="num">Answered</th><th class="num">Missed</th><th class="num">Leads</th><th class="num">Booked</th><th class="num">Open follow-ups</th></tr></thead><tbody></tbody></table></div>
       <div class="dgrid">
         <div class="card"><div class="sechead"><h2 style="margin:0">Happening now</h2><span class="pill good" id="dLive"><span class="dot"></span>Live</span></div><ul class="feed" id="dFeed"></ul></div>
         <div class="card"><h2>What callers want</h2><div id="dNeeds"></div><h3 style="margin-top:24px">Language</h3><div class="chips" id="dLang"></div></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-sales" role="tabpanel" aria-labelledby="tab-sales" hidden>
+      <div class="card">
+        <h2>Match invoices to calls</h2>
+        <p class="muted" style="margin:0 0 16px;max-width:68ch">Paste last month's invoices, one per line: invoice number, date (YYYY-MM-DD), caller phone, amount. We match each one to a call by the last four digits of the phone and the date. Matched sales count as verified.</p>
+        <div class="field"><label for="invText">Invoices</label><textarea id="invText" rows="5" placeholder="INV-1042, 2026-10-03, 0771234567, 85000"></textarea></div>
+        <div class="d-actions"><button class="btn primary" type="button" id="invMatch">Match invoices</button><button class="btn" type="button" id="invSample">Load sample invoices</button></div>
+        <div id="invOut" aria-live="polite"></div>
+      </div>
+      <div class="tablewrap"><table id="hTable" style="min-width:640px"></table></div>
+      <div class="card">
+        <h2>Monthly review pack</h2>
+        <p class="muted" style="margin:0 0 16px;max-width:68ch">The numbers for the monthly session with the handlers, with a suggested agenda built from the data.</p>
+        <pre class="pack" id="reviewOut"></pre>
+        <div class="d-actions"><button class="btn" type="button" id="reviewCopy">Copy the review pack</button></div>
       </div>
     </section>
 
@@ -545,6 +572,7 @@ tbody tr:hover{background:var(--surface-2)}
         <div id="deskChecklist"></div>
         <div id="deskMore"></div>
         <label class="opt"><input type="checkbox" id="deskCid"> The number they are calling from is the best number</label>
+        <div class="row2" id="deskSaleRow" hidden><div class="field"><label for="deskSale">Sale amount (LKR)</label><input id="deskSale" type="number" min="0" step="500" inputmode="numeric"></div><div class="field"><label for="deskInv">Invoice number</label><input id="deskInv" placeholder="Optional, from the invoice"></div></div>
         <div class="field"><label for="deskNotes">Note for the team</label><textarea id="deskNotes"></textarea></div>
       </div>
     </section>
@@ -604,7 +632,10 @@ tbody tr:hover{background:var(--surface-2)}
           <option value="price">Price check only</option>
           <option value="review">Needs language review</option>
           <option value="coach">Needs coaching</option>
+          <option value="flagged">Flagged for review</option>
         </select>
+        <select id="fStage" aria-label="Filter by lead stage"></select>
+        <select id="fHandler" aria-label="Filter by handler"></select>
         <select id="fOutcome" aria-label="Filter by outcome">
           <option value="all">Any outcome</option>
           <option value="new">New</option>
@@ -667,7 +698,7 @@ tbody tr:hover{background:var(--surface-2)}
         <button id="copyReport" class="btn" type="button">Copy report as text</button>
         <span class="msg muted" id="reportMsg" aria-live="polite"></span>
       </div>
-      <p class="muted small" style="margin:0">Monthly spend is editable. Cost per lead is spend for the selected range divided by qualified leads. A qualified lead is an answered call with a score of 60 or higher that is not marked support or not a lead.</p>
+      <p class="muted small" style="margin:0">Sales are calls whose lead stage is Won. A qualified lead is an answered call with a score of 60 or higher that is not marked support or not a lead.</p>
     </section>
 
     <section class="panel" id="panel-numbers" role="tabpanel" aria-labelledby="tab-numbers" hidden>
@@ -845,8 +876,8 @@ var SOURCES=[
 ];
 var SRC={};SOURCES.forEach(function(s){SRC[s.id]=s});
 SRC.unknown={id:'unknown',name:'Not asked',campaigns:['Not asked'],click:null,spend:0,landing:'-'};
-var USER=null,OWNER=false;
-var ACCOUNTS=[{user:'colombo',pass:'colombo-demo',branch:'col'},{user:'kurunegala',pass:'kurunegala-demo',branch:'kur'},{user:'akith',pass:'akith-demo',branch:null,owner:true,name:'Akith'}];
+var USER=null,OWNER=false,ME=null;
+var ACCOUNTS=[{user:'colombo',pass:'colombo-demo',branch:'col'},{user:'kurunegala',pass:'kurunegala-demo',branch:'kur'},{user:'akith',pass:'akith-demo',branch:null,owner:true,name:'Akith'},{user:'nimali',pass:'nimali-demo',branch:'col',name:'Nimali'},{user:'sanjaya',pass:'sanjaya-demo',branch:'col',name:'Sanjaya'},{user:'chathura',pass:'chathura-demo',branch:'kur',name:'Chathura'}];
 var BRANCHES=[
   {id:'col',name:'Colombo',nameN:{si:'කොළඹ',ta:'கொழும்பு'},main:'071 777 4056',prefix:'011 555 01',w:60,
    locs:{en:['Nugegoda','Rajagiriya','Dehiwala','Battaramulla','Maharagama','Kottawa','Moratuwa','Kaduwela','Wattala','Piliyandala'],
@@ -1018,7 +1049,7 @@ function scriptById(id){return SCRIPTS.filter(function(x){return x.id===id})[0]}
 var S,P={id:null,playing:false,pos:0,timer:null},liveTimer=null,lastFocus=null,nextNum;
 function initState(){
   seq=0;nextNum={col:46,kur:46};
-  S={calls:[],range:30,src:'all',status:'all',outcome:'all',lang:'all',showEn:true,sl:'en',avgSale:75000,close:25,q:'',tab:'desk',branch:'all',openId:null,pool:[],spend:{},web:null,webCall:null,live:false,desk:newDesk(),tasks:[],fu:{branch:'all',view:'open'},lab:{results:[],last:null},trOpen:false,snooze:{},alerts:false,seen:{},crm:{ov:{},added:[],q:'',stage:'all',branch:'all',open:null,seq:0}};
+  S={stage:'all',handler:'all',calls:[],range:30,src:'all',status:'all',outcome:'all',lang:'all',showEn:true,sl:'en',avgSale:75000,close:25,q:'',tab:'desk',branch:'all',openId:null,pool:[],spend:{},web:null,webCall:null,live:false,desk:newDesk(),tasks:[],fu:{branch:'all',view:'open'},lab:{results:[],last:null},trOpen:false,snooze:{},alerts:false,seen:{},crm:{ov:{},added:[],q:'',stage:'all',branch:'all',open:null,seq:0}};
   SOURCES.forEach(function(s){S.spend[s.id]=s.spend});
   BRANCHES.forEach(function(b){S.pool.push({id:'n'+b.id,source:'all',branch:b.id,number:b.main,campaign:'Branch line',rule:'Every call to this number goes to the '+b.name+' handlers'})});
   seed();
@@ -1148,14 +1179,14 @@ function copyText(text,okMsg){
 function renderKpis(){
   var cs=inRange(),total=cs.length,ans=cs.filter(answered).length,leads=cs.filter(isLead).length;
   var done=cs.filter(function(c){return c.status==='done'}),avg=done.length?done.reduce(function(a,c){return a+c.duration},0)/done.length:0;
-  var spend=SOURCES.reduce(function(a,s){return a+spendFor(s.id)},0);
+  var won=cs.filter(function(c){return stageOf(c)==='won'}).length;
   var miss=cs.filter(function(c){return c.status==='missed'&&!c.callback}).length;
   var items=[
     ['Calls',total,'Last '+S.range+' days',''],
     ['Answered',pc2(ans,total),ans+' of '+total,''],
     ['Qualified leads',leads,pc2(leads,total)+' of calls',''],
     ['Average call',fmtDur(avg),'Answered calls',''],
-    ['Cost per lead',leads&&spend?lkr(spend/leads):'No spend','Blended, all sources',''],
+    ['Calls to sales',pc2(won,total),won+' sales','good'],
     ['Missed, no callback',miss,miss?'Call these back':'All followed up',miss?'alert':'']
   ];
   $('#kpis').innerHTML=items.map(function(k){return '<div class="kpi '+k[3]+'"><span class="k-l">'+k[0]+'</span><strong class="k-v">'+k[1]+'</strong><span class="k-s">'+k[2]+'</span></div>'}).join('');
@@ -1175,6 +1206,9 @@ function filtered(){
     if(S.status==='price'&&!(c.status==='done'&&c.tags.indexOf('Price')>=0&&c.score<40))return false;
     if(S.status==='review'&&!(c.status==='done'&&c.conf<90))return false;
     if(S.status==='coach'&&!(agentScore(c)!==null&&agentScore(c)<=6))return false;
+    if(S.status==='flagged'&&!c.review)return false;
+    if(S.stage!=='all'&&stageOf(c)!==S.stage)return false;
+    if(S.handler!=='all'&&handlerOf(c)!==S.handler)return false;
     if(S.outcome!=='all'&&c.outcome!==S.outcome)return false;
     if(S.lang!=='all'&&c.lang!==S.lang)return false;
     if(q){
@@ -1224,7 +1258,7 @@ function renderList(){
      +'<span class="meta"><span class="c-time">'+fmtTime(c.ts)+'</span><span class="c-src"><span class="tag">'+esc(SRC[c.source].name)+'</span></span><span class="c-lang">'+langTag(c)+'</span>'
      +'<span class="c-dur mono">'+(c.status==='done'?fmtDur(c.duration):c.status==='missed'?'0:00':'...')+'</span>'
      +'<span class="c-score">'+(showScore?'<span class="score">'+meter(c.score)+'<b class="mono">'+c.score+'</b></span>':'<span class="muted">-</span>')+'</span></span>'
-     +'<span class="c-status">'+statusPill(c)+'</span>'
+     +'<span class="c-status">'+statusPill(c)+stagePill(c)+'</span>'
      +'<span class="c-sum">'+esc(summaryFor(c))+'</span></button></li>';
   }).join('');
   if(keep){var b=$('.row[data-id="'+keep+'"]');if(b)b.focus()}
@@ -1234,32 +1268,28 @@ function renderList(){
 /* ---------- sources ---------- */
 function srcStats(){
   var cs=inRange();
-  return SOURCES.map(function(s){
-    var mine=cs.filter(function(c){return c.source===s.id}),leads=mine.filter(isLead).length,sp=spendFor(s.id);
-    return {s:s,calls:mine.length,leads:leads,rate:mine.length?leads/mine.length:0,spend:sp,cpl:leads&&sp?sp/leads:null};
+  return SOURCES.concat([SRC.unknown]).map(function(s){
+    var mine=cs.filter(function(c){return c.source===s.id}),leads=mine.filter(isLead).length,won=mine.filter(function(c){return stageOf(c)==='won'}).length;
+    return {s:s,calls:mine.length,leads:leads,won:won,rate:mine.length?leads/mine.length:0};
   });
 }
 function renderSources(){
   var st=srcStats(),maxCalls=Math.max.apply(null,st.map(function(x){return x.calls}).concat([1]));
-  var totalLeads=st.reduce(function(a,x){return a+x.leads},0);
-  var top=st.slice().sort(function(a,b){return b.leads-a.leads})[0];
-  var paid=st.filter(function(x){return x.cpl!==null}).sort(function(a,b){return a.cpl-b.cpl})[0];
-  var free=st.filter(function(x){return !S.spend[x.s.id]});
-  var freeLeads=free.reduce(function(a,x){return a+x.leads},0);
-  var txt='';
+  var totalLeads=st.reduce(function(a,x){return a+x.leads},0),totalCalls=st.reduce(function(a,x){return a+x.calls},0);
+  var known=st.filter(function(x){return x.s.id!=='unknown'});
+  var top=known.slice().sort(function(a,b){return b.leads-a.leads})[0],best=known.slice().sort(function(a,b){return b.won-a.won})[0];
+  var unk=st.filter(function(x){return x.s.id==='unknown'})[0],txt='';
   if(totalLeads){
-    txt='<b>'+esc(top.s.name)+'</b> produced the most qualified leads ('+top.leads+'). ';
-    if(paid)txt+='<b>'+esc(paid.s.name)+'</b> has the lowest cost per lead at <b>'+lkr(paid.cpl)+'</b>. ';
-    if(free.length)txt+='Sources with no ad spend ('+free.map(function(x){return esc(x.s.name)}).join(', ')+') produced <b>'+freeLeads+'</b> leads, '+pc2(freeLeads,totalLeads)+' of the total.';
+    txt='<b>'+esc(top.s.name)+'</b> produced the most qualified leads ('+top.leads+').';
+    if(best&&best.won)txt+=' <b>'+esc(best.s.name)+'</b> produced the most sales ('+best.won+').';
   }else txt='No qualified leads in this range yet.';
+  txt+=' <b>'+pc2(unk.calls,totalCalls)+'</b> of calls have no source ('+unk.calls+' of '+totalCalls+'). Tap Heard via on every call to shrink this.';
   $('#insight').innerHTML=txt;
-  var h='<thead><tr><th>Source</th><th>Calls</th><th class="num">Leads</th><th class="num">Lead rate</th><th class="num">Monthly spend (LKR)</th><th class="num">Cost per lead</th></tr></thead><tbody>';
+  var h='<thead><tr><th>Source</th><th>Calls</th><th class="num">Leads</th><th class="num">Lead rate</th><th class="num">Sales</th><th class="num">Calls to sales</th></tr></thead><tbody>';
   st.forEach(function(x){
     h+='<tr><td><b>'+esc(x.s.name)+'</b></td>'
      +'<td><div class="barcell"><span class="mono" style="min-width:24px">'+x.calls+'</span><span class="bar"><span class="a" style="width:'+(x.calls/maxCalls*100)+'%"></span><span class="b" style="width:'+(x.leads/maxCalls*100)+'%"></span></span></div></td>'
-     +'<td class="num">'+x.leads+'</td><td class="num">'+Math.round(x.rate*100)+'%</td>'
-     +'<td class="num"><input class="num-in" type="number" min="0" step="1000" inputmode="numeric" id="spend-'+x.s.id+'" data-spend="'+x.s.id+'" value="'+S.spend[x.s.id]+'" aria-label="Monthly spend for '+esc(x.s.name)+'"></td>'
-     +'<td class="num" data-cpl="'+x.s.id+'">'+(x.cpl!==null?lkr(x.cpl):(S.spend[x.s.id]?'No leads':'No spend'))+'</td></tr>';
+     +'<td class="num">'+x.leads+'</td><td class="num">'+Math.round(x.rate*100)+'%</td><td class="num">'+x.won+'</td><td class="num">'+pc2(x.won,x.calls)+'</td></tr>';
   });
   $('#srcTable').innerHTML=h+'</tbody>';
   renderBranches();
@@ -1279,10 +1309,7 @@ function renderBranches(){
   });
   $('#branchTable').innerHTML=h+'</tbody>';
 }
-function updateCpl(){
-  srcStats().forEach(function(x){var el=$('[data-cpl="'+x.s.id+'"]');if(el)el.textContent=x.cpl!==null?lkr(x.cpl):(S.spend[x.s.id]?'No leads':'No spend')});
-  renderKpis();
-}
+function updateCpl(){renderKpis()}
 function renderChart(){
   var cs=inRange(),days=[],t0=new Date();t0.setHours(0,0,0,0);
   for(var i=S.range-1;i>=0;i--){var s=t0.getTime()-i*DAY;days.push({s:s,calls:0,leads:0})}
@@ -1298,12 +1325,11 @@ function renderChart(){
   $('#dayChart').innerHTML=h;
 }
 function reportText(){
-  var st=srcStats(),cs=inRange(),leads=cs.filter(isLead).length,spend=SOURCES.reduce(function(a,s){return a+spendFor(s.id)},0);
+  var st=srcStats(),cs=inRange(),leads=cs.filter(isLead).length,won=cs.filter(function(c){return stageOf(c)==='won'}).length;
   var miss=cs.filter(function(c){return c.status==='missed'&&!c.callback}).length;
   var l=['Water Center call report, last '+S.range+' days',
-   'Calls: '+cs.length+'. Answered: '+cs.filter(answered).length+' ('+pc2(cs.filter(answered).length,cs.length)+'). Qualified leads: '+leads+'.',
-   'Spend: '+lkr(spend)+'. Cost per lead: '+(leads&&spend?lkr(spend/leads):'n/a')+'.','','By source:'];
-  st.forEach(function(x){l.push('- '+x.s.name+': '+x.calls+' calls, '+x.leads+' leads, '+(x.cpl!==null?lkr(x.cpl)+' per lead':(S.spend[x.s.id]?'no leads':'no ad spend')))});
+   'Calls: '+cs.length+'. Answered: '+cs.filter(answered).length+' ('+pc2(cs.filter(answered).length,cs.length)+'). Qualified leads: '+leads+'. Sales: '+won+' ('+pc2(won,cs.length)+' of calls).','','By source:'];
+  st.forEach(function(x){l.push('- '+x.s.name+': '+x.calls+' calls, '+x.leads+' leads, '+x.won+' sales')});
   l.push('','By branch:');
   branchStats().forEach(function(x){l.push('- '+x.b.name+': '+x.calls+' calls, '+x.leads+' leads, '+x.miss+' missed with no callback')});
   l.push('','Missed calls with no callback: '+miss+'.');
@@ -1337,7 +1363,7 @@ function renderDrawer(){
   var h='<div class="d-head"><div><h2 class="mono">'+esc(c.caller)+'</h2><div class="chips">'+statusPill(c)+'<span class="tag">'+esc(SRC[c.source].name)+'</span></div></div><button class="btn icon" type="button" data-act="close" aria-label="Close call detail"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
   if(c.status==='missed'){
     h+='<div class="sum"><div class="lbl">Missed call</div>No one answered and no voicemail was left. '+(c.callback?'This caller has been called back.':'Call this number back.')+'</div>';
-    h+='<div class="d-actions"><button class="btn primary" type="button" data-act="callback">'+(c.callback?'Undo called back':'Mark as called back')+'</button></div>';
+    h+='<div class="d-actions"><button class="btn primary" type="button" data-act="callback">'+(c.callback?'Undo called back':'Mark as called back')+'</button></div>'+missedInfo(c);
   }else if(live){
     h+='<div class="sum"><div class="lbl">'+(c.status==='ringing'?'Ringing':c.status==='live'?'Live transcript':'Scoring')+'</div>'+(c.status==='ringing'?'Waiting for an agent to pick up.':c.status==='live'?'Transcribing as the call happens.':'Writing the summary and scoring the lead.')+'</div>';
   }else{
@@ -1345,7 +1371,7 @@ function renderDrawer(){
     h+='<div class="sec"><h3>Lead score</h3><div class="bigscore">'+meter(c.score)+'<b>'+c.score+'</b></div><span class="muted small">'+esc(c.intent)+'</span>'
       +(c.signals.length?'<ul class="signals">'+c.signals.map(function(s){return '<li>'+esc(s)+'</li>'}).join('')+'</ul>':'<span class="muted small">No buying signals detected.</span>')
       +'<div class="chips" style="margin-top:8px">'+c.tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('')+'</div></div>';
-    h+='<div class="sec"><div class="field"><label for="outcome">Outcome</label><select id="outcome" data-f="outcome">'+Object.keys(OUT_LABEL).map(function(k){return '<option value="'+k+'"'+(c.outcome===k?' selected':'')+'>'+OUT_LABEL[k]+'</option>'}).join('')+'</select></div></div>';
+    h+='<div class="sec"><div class="field"><label for="outcome">Outcome</label><select id="outcome" data-f="outcome">'+Object.keys(OUT_LABEL).map(function(k){return '<option value="'+k+'"'+(c.outcome===k?' selected':'')+'>'+OUT_LABEL[k]+'</option>'}).join('')+'</select></div></div>'+pipelineHtml(c);
     if(!c.handler)h+='<div class="sec"><h3>Recording</h3><div class="player"><button class="btn icon" type="button" data-act="play" aria-label="Play recording"><svg viewBox="0 0 24 24" aria-hidden="true" id="playIcon"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></button><div class="wave" id="wave" data-act="seek" aria-label="Recording position">'+waveBars(c,P.id===c.id?P.pos:0)+'</div><span class="mono small muted" id="ptime">0:00 / '+fmtDur(c.duration)+'</span></div><span class="muted small">Demo playback. No audio is stored for this sample.</span></div>';
   }
   if(c.lines.length){
@@ -1726,7 +1752,7 @@ function renderDeskSheet(){
   if(nat)h+='<p class="muted small" style="margin:16px 0 0">Sinhala and Tamil lines are drafts. A native speaker should review them before staff use them.</p>';
   $('#deskSheet').innerHTML=h;
 }
-function renderDesk(){renderDeskTaps();renderDeskStatus();renderDeskSheet()}
+function renderDesk(){renderDeskTaps();renderDeskStatus();renderDeskSheet();var sr=$('#deskSaleRow');if(sr)sr.hidden=!(S.desk&&S.desk.outcome==='sold')}
 function toggleIn(a,v){var i=a.indexOf(v);if(i>-1)a.splice(i,1);else a.push(v)}
 function deskTap(f,v){
   var d=S.desk;
@@ -1749,7 +1775,7 @@ function deskSample(){
   S.desk=d;$('#deskName').value='';$('#deskPhone').value='';$('#deskCid').checked=false;$('#deskNotes').value='';
   renderDesk();toast('Incoming call on the '+BR[d.br].name+' line. The sheet is ready.');
 }
-function deskClear(){S.desk=newDesk();$('#deskName').value='';$('#deskPhone').value='';$('#deskCid').checked=false;$('#deskNotes').value='';$('#deskTimer').textContent='0:00';renderDesk()}
+function deskClear(){S.desk=newDesk();$('#deskName').value='';$('#deskPhone').value='';$('#deskCid').checked=false;$('#deskNotes').value='';$('#deskTimer').textContent='0:00';if($('#deskSale'))$('#deskSale').value='';if($('#deskInv'))$('#deskInv').value='';renderDesk()}
 function maskPhone(p){var dg=p.replace(/\D/g,'');return dg.length>=9?dg.slice(0,3)+' *** '+dg.slice(-4):'Caller ID'}
 function taskMsgs(kind,nm,brId,need){
   var br=BR[brId],n=nm||'',e='Hello'+(n?' '+n:'')+', this is Water Center '+br.name+'. ';
@@ -1764,7 +1790,7 @@ function makeTasks(d,c,f){
   function add(kind,title,due,m){out.push({id:'t'+(++tseq),kind:kind,title:title,call:c.id,branch:c.branch,due:due,name:f.name,phone:ph,need:need,heat:c.score,msg:m||taskMsgs('info',f.name,c.branch,need),done:false})}
   var o=d.outcome;
   if(o==='visit')add('visit','Site visit for '+who+': '+need+', '+area,now+tw);
-  else if(o==='quote'){add('quote','Send the quote to '+who+' ('+ph+'): '+need,now+2*H);add('check','Check the quote landed with '+who,now+2*DAY+2*H)}
+  else if(o==='quote'){add('quote','Send the quote to '+who+' ('+ph+'): '+need,now+2*H);add('check','Check the quote landed with '+who,now+2*DAY+2*H);add('check','Close or nudge the quote for '+who+' (last chase)',now+7*DAY)}
   else if(o==='callback')add('callback','Call back '+who+' ('+ph+'): '+need,now+({now:H,week:DAY,month:3*DAY}[d.time]||DAY),taskMsgs('callback',f.name,c.branch,need));
   else if(o==='info'&&c.score>=25){add('price','Send prices to '+who+' on WhatsApp',now+H);add('callback','Follow up with '+who+' (no decision yet)',now+7*DAY,taskMsgs('callback',f.name,c.branch,need))}
   else if(o==='sold'){add('aftercare','Check the install with '+who,now+7*DAY);if(d.need!=='warranty'&&d.need!=='price')add('aftercare','Offer '+(d.need==='pump_service'?'a service plan':'a filter or service plan')+' to '+who,now+30*DAY)}
@@ -1774,6 +1800,8 @@ function makeTasks(d,c,f){
 function saveDeskCall(){
   var d=S.desk,f=deskForm(),msg=$('#deskMsg');
   if(!d.need||!d.outcome){msg.className='msg err';msg.textContent='Tap what the caller needs and how the call ended.';return}
+  if(!d.src&&!S.srcOk){S.srcOk=true;msg.className='msg err';msg.textContent='Where did the caller hear about us? Pick it in Heard via, or tap Save call again to leave it unknown.';return}
+  S.srcOk=false;
   var k=deskChk(d,f),heat=deskHeat(d,f),br=BR[d.br],num=numberFor(d.src,null,d.br),N=CSN[d.need];
   var got=CHK6.filter(function(x){return k[x[0]]}).map(function(x){return x[1].toLowerCase()}),miss=CHK6.filter(function(x){return !k[x[0]]}).map(function(x){return x[1].toLowerCase()});
   var area=d.area==='out'?'outside the area':d.area||'unknown area',lang=LN[d.lang];
@@ -1782,7 +1810,8 @@ function saveDeskCall(){
     duration:d.started?Math.round((Date.now()-d.started)/1000):0,scenario:'desk',lines:[],shown:0,
     summary:N.title+' enquiry from '+area+'. '+(d.time?deskLabel(TIMES,d.time)+'. ':'')+(d.budget?deskLabel(BUDGETS,d.budget)+'. ':'')+'Outcome: '+deskLabel(OUTS,d.outcome)+'. Captured: '+got.join(', ')+'.'+(miss.length?' Missing: '+miss.join(', ')+'.':'')+(f.notes?' Note: '+f.notes:''),
     intent:N.title,score:heat,tags:[N.title,deskLabel(OUTS,d.outcome)],signals:d.quals.concat(d.time==='now'?['Needs it today']:[],d.budget==='ok'?['Budget fits']:[]),
-    lang:lang,conf:100,outcome:OUTMAP[d.outcome],notes:f.notes,callback:false,handler:true,phoneFull:f.phone||'',sold:d.outcome==='sold',chk:k};
+    lang:lang,conf:100,outcome:OUTMAP[d.outcome],notes:f.notes,callback:false,handler:true,phoneFull:f.phone||'',sold:d.outcome==='sold',chk:k,by:ME||((HANDLERS[br.id]||['Desk'])[0]),stage:({visit:'visit',quote:'quoted',sold:'won',callback:'new',info:'new',support:'none',wrong:'none'})[d.outcome]||'new'};
+  if(d.outcome==='sold'){c.saleAmt=+($('#deskSale').value||0)||0;c.invoice=($('#deskInv').value||'').trim()}
   S.calls.unshift(c);
   var ts=makeTasks(d,c,f);ts.forEach(function(t){S.tasks.push(t)});
   S.desk=newDesk();$('#deskName').value='';$('#deskPhone').value='';$('#deskCid').checked=false;$('#deskNotes').value='';$('#deskTimer').textContent='0:00';
@@ -1850,7 +1879,7 @@ function openCount(){var n=0,now=Date.now();allTasks().forEach(function(t){if(!t
 function updateBadge(){var n=openCount(),b=$('#tab-followups');if(b)b.innerHTML='Follow-ups'+(n?'<span class="badge" aria-label="'+n+' overdue">'+n+'</span>':'')}
 function toggleTask(id){
   var t=allTasks().filter(function(x){return x.id===id})[0];if(!t)return;
-  if(t.derived){var c=getCall(t.call);if(c){c.callback=!c.callback;if(S.openId===c.id)renderDrawer()}}
+  if(t.derived){var c=getCall(t.call);if(c){c.callback=!c.callback;c.callbackAt=c.callback?Date.now():null;if(S.openId===c.id)renderDrawer()}}
   else{var m=S.tasks.filter(function(x){return x.id===id})[0];if(m)m.done=!m.done}
   renderFollowups();updateBadge();if(S.tab==='calls'){renderKpis();renderList()}
 }
@@ -1858,8 +1887,7 @@ function renderFollowups(){
   var all=allTasks(),now=Date.now(),b=S.fu.branch,v=S.fu.view;
   var scoped=all.filter(function(t){return b==='all'||t.branch===b});
   var open=scoped.filter(function(t){return !t.done}),od=open.filter(function(t){return t.due<now}),lead=open.filter(function(t){return LEADKIND.indexOf(t.kind)>-1});
-  var val=lead.length*S.avgSale*S.close/100;
-  $('#fuKpis').innerHTML=[['Open tasks',open.length,''],['Overdue',od.length,od.length?'Call these first':'Nothing late'],['Leads waiting',lead.length,'Missed, warm and quoted'],['Value at stake',lkr(val),'Placeholder sale value and close rate']].map(function(x){return '<div class="kpi"><span class="muted small">'+x[0]+'</span><b class="mono" style="font-size:24px">'+x[1]+'</b><span class="muted small">'+x[2]+'</span></div>'}).join('');
+  $('#fuKpis').innerHTML=[['Open tasks',open.length,''],['Overdue',od.length,od.length?'Call these first':'Nothing late'],['Leads waiting',lead.length,'Missed, warm and quoted'],['Quotes waiting',open.filter(function(t){return t.kind==='quote'||t.kind==='check'}).length,'Send or chase these']].map(function(x){return '<div class="kpi"><span class="muted small">'+x[0]+'</span><b class="mono" style="font-size:24px">'+x[1]+'</b><span class="muted small">'+x[2]+'</span></div>'}).join('');
   $('#fuBranch').hidden=!!USER;
   $('#fuBranch').innerHTML='<option value="all">All branches</option>'+BRANCHES.map(function(x){return '<option value="'+x.id+'">'+esc(x.name)+'</option>'}).join('');$('#fuBranch').value=b;
   $('#fuView').innerHTML=[['open','Open'],['done','Done'],['all','All']].map(function(x){return '<button type="button" data-fuview="'+x[0]+'" aria-pressed="'+(v===x[0])+'">'+x[1]+'</button>'}).join('');
@@ -2070,8 +2098,8 @@ function renderDash(){
   var booked=cs.filter(function(c){return c.outcome==='booked'}).length,tasks=allTasks(),now=Date.now();
   var overdue=tasks.filter(function(t){return !t.done&&t.due<now}).length;
   var done=cs.filter(function(c){return c.status==='done'&&c.duration}),avg=done.length?done.reduce(function(a,c){return a+c.duration},0)/done.length:0;
-  var today=cs.filter(function(c){return dayKey(c.ts)===dayKey(now)}).length;
-  var items=[['Calls received',total,'Last '+S.range+' days'],['Today',today,'so far'],['Answered',dPc(ans,total),ans+' of '+total],['Missed',miss,dPc(miss,total)+' of calls'],['Qualified leads',leads,dPc(leads,total)+' of calls'],['Booked or sold',booked,'visits and sales'],['Average call',fmtDur(avg),'answered calls']];
+  var today=cs.filter(function(c){return dayKey(c.ts)===dayKey(now)}).length,wonN=cs.filter(function(c){return stageOf(c)==='won'}).length;
+  var items=[['Calls received',total,'Last '+S.range+' days'],['Today',today,'so far'],['Answered',dPc(ans,total),ans+' of '+total],['Missed',miss,dPc(miss,total)+' of calls'],['Qualified leads',leads,dPc(leads,total)+' of calls'],['Booked or sold',booked,'visits and sales'],['Calls to sales',dPc(wonN,total),wonN+' sales'],['Call-back time',medCb(cs),'median, missed calls'],['Average call',fmtDur(avg),'answered calls']];
   $('#dKpis').innerHTML=items.map(function(k){return '<div class="kpi"><span class="k-l">'+k[0]+'</span><strong class="k-v">'+k[1]+'</strong><span class="k-s">'+k[2]+'</span></div>'}).join('');
   // chart
   var n=Math.min(S.range,30),days=[],map={};
@@ -2084,7 +2112,8 @@ function renderDash(){
   // attention
   var missNo=cs.filter(function(c){return c.status==='missed'&&!c.callback}).length,hot=cs.filter(function(c){return isLead(c)&&c.outcome==='new'}).length;
   function at(l,v,cls,tab,btn){return '<li><span>'+l+'</span><span style="display:flex;gap:16px;align-items:center"><b class="'+(v?cls:'ok')+'">'+v+'</b><button type="button" class="btn sm" data-tab="'+tab+'">'+btn+'</button></span></li>'}
-  $('#dAttn').innerHTML=at('Overdue follow-ups',overdue,'bad','followups','Open')+at('Missed calls, no callback',missNo,'warn','calls','Open')+at('Hot leads, no next step',hot,'warn','calls','Open')+at('People in the client base',crmContacts().length,'ok','clients','Open');
+  $('#dAttn').innerHTML=at('Overdue follow-ups',overdue,'bad','followups','Open')+at('Missed calls, no callback',missNo,'warn','calls','Open')+at('Hot leads, no next step',hot,'warn','calls','Open')+at('Call-backs over 1 hour late',lateCb(cs),'bad','calls','Open')+at('People in the client base',crmContacts().length,'ok','clients','Open');
+  renderFunnel(cs);renderLost(cs);
   // branches
   $('#dBranch tbody').innerHTML=BRANCHES.map(function(b){
     var bc=cs.filter(function(c){return c.branch===b.id}),ba=bc.filter(answered).length,bt=tasks.filter(function(t){return t.branch===b.id&&!t.done}).length;
@@ -2102,13 +2131,190 @@ function renderDash(){
 }
 setInterval(function(){if(S.tab==='dash'&&!document.hidden)renderDash()},5000);
 
+/* ---------- conversion: stages, lost reasons, sales, handlers ---------- */
+var STG=[['new','New'],['quoted','Quoted'],['visit','Visit booked'],['visit_done','Visit done'],['won','Won'],['lost','Lost'],['none','Not a lead']];
+var STGRANK={new:1,quoted:2,visit:3,visit_done:4,won:5};
+var LOSTW=[['price','Price too high'],['elsewhere','Bought elsewhere'],['noanswer','Stopped answering'],['notready','Not ready yet'],['other','Other']];
+var HANDLERS={col:['Nimali','Sanjaya'],kur:['Chathura','Dulani']};
+function hnum(c){return Math.abs(hashSeed(c.id))}
+function dflt(c){
+  var fin=c.status==='done'||c.status==='missed';
+  if(c._d&&fin)return c._d;
+  var h=hnum(c),age=(Date.now()-c.ts)/DAY,o=c.outcome,d={stage:'none',lostAt:null,why:null,amt:0,inv:''};
+  if(!fin){d.stage='new';return d}
+  if(c.status==='done'){
+    var lead=isLead(c)||o==='quote'||o==='booked'||c.sold;
+    if(c.sold||o==='sold')d.stage='won';
+    else if(!lead||o==='support'||o==='not_lead')d.stage='none';
+    else{var r=h%10;
+      if(o==='booked')d.stage=age<3?'visit':r<4?'won':r<6?'visit_done':r<8?'lost':'visit';
+      else if(o==='quote')d.stage=age<2?'quoted':r<2?'won':r<6?'lost':'quoted';
+      else d.stage=age>5&&r<5?'lost':'new';
+    }
+    if(d.stage==='lost'){var LA=({booked:['visit_done','visit'],quote:['quoted']})[o]||['new'];d.lostAt=LA[h%LA.length];d.why=LOSTW[h%4][0]}
+    if(d.stage==='won'){d.amt=40000+(h%35)*5000;d.inv=h%4?'INV-'+(1000+h%9000):''}
+  }
+  c._d=d;return d;
+}
+function stageOf(c){return c.stage!==undefined?c.stage:dflt(c).stage}
+function lostAtOf(c){return c.lostAt||dflt(c).lostAt}
+function whyOf(c){return c.lostWhy!==undefined?c.lostWhy:dflt(c).why}
+function saleOf(c){var d=dflt(c);return {amt:c.saleAmt!==undefined?c.saleAmt:d.amt,inv:c.invoice!==undefined?c.invoice:d.inv}}
+function handlerOf(c){if(c.status==='missed')return '';if(c.by)return c.by;var l=HANDLERS[c.branch]||['Desk'];return l[hnum(c)%l.length]}
+function reached(c){var s=stageOf(c);if(s==='lost')return STGRANK[lostAtOf(c)||'new']||1;return STGRANK[s]||0}
+function stageName(k){var r=STG.filter(function(x){return x[0]===k})[0];return r?r[1]:k}
+function stagePill(c){var k=stageOf(c);if(c.status!=='done'||k==='none')return '';return ' <span class="pill '+(k==='won'?'good':k==='lost'?'bad':'info')+'">'+esc(stageName(k))+'</span>'}
+function cbMs(c){if(c.status!=='missed'||!c.callback)return null;return c.callbackAt?Math.max(60000,c.callbackAt-c.ts):(6+hnum(c)%80)*6e4}
+function fmtMin(ms){var m=Math.round(ms/6e4);return m<60?m+' min':Math.floor(m/60)+' h '+(m%60)+' min'}
+function medCb(cs){var a=cs.map(cbMs).filter(function(x){return x!==null}).sort(function(x,y){return x-y});return a.length?fmtMin(a[Math.floor(a.length/2)]):'-'}
+function lateCb(cs){var now=Date.now();return cs.filter(function(c){return c.status==='missed'&&!c.callback&&now-c.ts>36e5&&now-c.ts<2*DAY}).length}
+function fillExtraFilters(){
+  var a=$('#fStage'),b=$('#fHandler');if(!a||!b)return;
+  a.innerHTML='<option value="all">Any stage</option>'+STG.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join('');a.value=S.stage;
+  var hs=[];BRANCHES.forEach(function(br){if(!USER||br.id===USER)(HANDLERS[br.id]||[]).forEach(function(n){hs.push(n)})});
+  b.innerHTML='<option value="all">All handlers</option>'+hs.map(function(n){return '<option>'+n+'</option>'}).join('');b.value=S.handler;
+}
+function funnelRows(cs){
+  var ans=cs.filter(answered),leads=ans.filter(function(c){return isLead(c)||reached(c)>=1}),prog=leads.filter(function(c){return reached(c)>=2}),won=leads.filter(function(c){return stageOf(c)==='won'});
+  return [['Calls received',cs.length],['Answered',ans.length],['Real leads',leads.length],['Quote sent or visit booked',prog.length],['Won',won.length]];
+}
+function renderFunnel(cs){
+  var rows=funnelRows(cs),top=Math.max(rows[0][1],1),h='';
+  rows.forEach(function(r,i){
+    var prev=i?rows[i-1][1]:null,drop=prev?(prev?Math.round((1-r[1]/prev)*100):0):null;
+    h+='<div class="frow"><span class="fl">'+esc(r[0])+'</span><span class="bar"><span class="b" style="width:'+Math.round(r[1]/top*100)+'%"></span></span><b class="mono">'+r[1]+'</b><span class="muted small fd">'+(prev?(drop>0?'-'+drop+'%':'0%'):'')+'</span></div>';
+  });
+  h+='<p class="muted small" style="margin:12px 0 0">The percentage is the share lost since the step above. Calls to sales: <b>'+dPc(rows[4][1],cs.length)+'</b>.</p>';
+  $('#dFunnel').innerHTML=h;
+}
+function renderLost(cs){
+  var cnt={},tot=0;cs.forEach(function(c){if(stageOf(c)==='lost'){var w=whyOf(c)||'unset';cnt[w]=(cnt[w]||0)+1;tot++}});
+  var keys=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]}),mx=keys.length?cnt[keys[0]]:1;
+  var nm=function(k){var r=LOSTW.filter(function(x){return x[0]===k})[0];return r?r[1]:'No reason recorded'};
+  $('#dLost').innerHTML=keys.length?keys.map(function(k){return '<div class="hrow"><span>'+esc(nm(k))+'</span><span class="bar"><span class="b" style="width:'+Math.round(cnt[k]/mx*100)+'%"></span></span><b class="mono" style="text-align:right">'+cnt[k]+'</b></div>'}).join('')+'<p class="muted small" style="margin:12px 0 0">'+tot+' lost leads in this range.</p>':'<span class="muted">No lost leads in this range.</span>';
+}
+function pipelineHtml(c){
+  var s=stageOf(c),h='<div class="sec"><h3>Lead pipeline</h3><div class="field"><label for="stage">Stage</label><select id="stage" data-f="stage">'+STG.map(function(x){return '<option value="'+x[0]+'"'+(s===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div>';
+  if(s==='lost'){var w=whyOf(c)||'';h+='<div class="field"><label for="lostWhy">Lost because</label><select id="lostWhy" data-f="lostWhy"><option value="">Choose a reason</option>'+LOSTW.map(function(x){return '<option value="'+x[0]+'"'+(w===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></div>'}
+  if(s==='won'){var sl=saleOf(c);h+='<div class="field"><label for="saleAmt">Sale amount (LKR)</label><input id="saleAmt" data-f="saleAmt" type="number" min="0" step="500" inputmode="numeric" value="'+(sl.amt||'')+'"></div><div class="field"><label for="invoice">Invoice number</label><input id="invoice" data-f="invoice" value="'+esc(sl.inv)+'" placeholder="From the sales invoice"></div>'+(c.verified?'<span class="pill good">Matched to an invoice</span>':'<span class="muted small">Not matched to an invoice yet.</span>')}
+  h+='<div class="muted small" style="margin-top:8px">Handled by '+esc(handlerOf(c)||'-')+'</div><div class="d-actions"><button class="btn sm" type="button" data-act="flag" aria-pressed="'+!!c.review+'">'+(c.review?'Flagged for review (tap to remove)':'Flag for review')+'</button></div></div>';
+  return h;
+}
+function missedInfo(c){
+  var cb=cbMs(c),late=!c.callback&&Date.now()-c.ts>36e5;
+  return '<div class="sec"><h3>Call-back</h3><div class="muted small">An automatic text went to the caller about a minute after the call was missed. In this demo it is simulated. The live system sends it through the phone service.</div><div style="margin-top:8px">'+(cb!==null?'<span class="pill good">Called back after '+fmtMin(cb)+'</span>':late?'<span class="pill bad">Overdue: not called back after '+fmtMin(Date.now()-c.ts)+'</span>':'<span class="pill warn">Waiting for a call-back</span>')+'</div></div>';
+}
+function editPipeline(f,v){
+  var c=getCall(S.openId);if(!c)return;
+  if(f==='stage'){c.stage=v;if(v==='lost'){c.lostAt=c.lostAt||lostAtOf(c)||'new';if(c.lostWhy===undefined)c.lostWhy=whyOf(c)||''}toast('Stage set to '+stageName(v)+(v==='lost'&&!c.lostWhy?'. Add the reason.':''))}
+  else if(f==='lostWhy'){c.lostWhy=v;toast('Reason saved')}
+  else if(f==='saleAmt'){c.saleAmt=Math.max(0,+v||0);toast('Sale amount saved')}
+  else if(f==='invoice'){c.invoice=String(v||'').trim();toast('Invoice number saved')}
+  refresh(c);if(S.tab==='dash')renderDash();if(S.tab==='sales')renderSales();
+}
+/* ---------- sales and review ---------- */
+function digits(p){return String(p||'').replace(/\D/g,'')}
+function last4(c){var d=digits(c.phoneFull||c.caller);return d.slice(-4)}
+function parseInvoices(t){
+  return String(t||'').split(/\n/).map(function(l){return l.trim()}).filter(Boolean).map(function(l){
+    var p=l.split(/[,\t]/).map(function(x){return x.trim()});
+    var amt=+String(p[3]||'').replace(/[^\d.]/g,''),dt=new Date(p[1]);
+    return {inv:p[0],date:isNaN(dt.getTime())?null:dt.getTime(),phone:digits(p[2]),amt:amt||0,raw:l};
+  }).filter(function(x){return x.inv&&/\d/.test(x.phone)&&x.date!==null});
+}
+function matchInvoices(){
+  var list=parseInvoices($('#invText').value);
+  if(!list.length){$('#invOut').innerHTML='<p class="msg err" style="margin-top:16px">No usable lines. Use: invoice number, date (YYYY-MM-DD), phone, amount.</p>';return}
+  var used={},matched=[],un=[];
+  list.forEach(function(iv){
+    var l4=iv.phone.slice(-4),best=null;
+    inRange().concat(S.calls).forEach(function(c){
+      if(used[c.id]||c.status!=='done'||last4(c)!==l4)return;
+      var dd=(iv.date-c.ts)/DAY;if(dd<-3||dd>60)return;
+      if(!best||Math.abs(dd)<Math.abs((iv.date-best.ts)/DAY))best=c;
+    });
+    if(best){used[best.id]=1;best.stage='won';best.invoice=iv.inv;best.saleAmt=iv.amt||saleOf(best).amt;best.verified=true;matched.push({iv:iv,c:best})}
+    else un.push(iv);
+  });
+  var cs=inRange(),won=cs.filter(function(c){return stageOf(c)==='won'}),ver=won.filter(function(c){return c.verified}),unver=won.length-ver.length;
+  var tot=matched.reduce(function(a,m){return a+m.iv.amt},0);
+  var h='<div class="kpis" style="margin-top:16px"><div class="kpi"><span class="muted small">Invoices read</span><b class="mono" style="font-size:24px">'+list.length+'</b></div><div class="kpi"><span class="muted small">Matched to a call</span><b class="mono" style="font-size:24px">'+matched.length+'</b><span class="muted small">'+lkr(tot)+'</span></div><div class="kpi"><span class="muted small">No call found</span><b class="mono" style="font-size:24px">'+un.length+'</b><span class="muted small">walk-ins or unlogged calls</span></div><div class="kpi"><span class="muted small">Won, no invoice yet</span><b class="mono" style="font-size:24px">'+unver+'</b><span class="muted small">check these with the branch</span></div></div>';
+  h+='<p style="margin:16px 0 0">Verified calls to sales: <b>'+dPc(ver.length,cs.length)+'</b> ('+ver.length+' of '+cs.length+' calls). Including sales not yet matched: <b>'+dPc(won.length,cs.length)+'</b>.</p>';
+  if(un.length)h+='<p class="muted small" style="margin:8px 0 0">No call found for: '+un.map(function(x){return esc(x.inv)}).join(', ')+'.</p>';
+  $('#invOut').innerHTML=h;
+  refresh(S.calls[0]||{id:''});renderHandlers();renderReview();
+}
+function sampleInvoices(){
+  var won=S.calls.filter(function(c){return c.status==='done'&&stageOf(c)==='won'&&!c.verified}).slice(0,12),n=0,out=[];
+  won.forEach(function(c,i){
+    if(i%5===4)return;
+    var sl=saleOf(c),d=new Date(c.ts+(1+i%5)*DAY),p=c.phoneFull||(digits(c.caller).slice(0,3)+'000'+last4(c)).slice(0,10);
+    out.push((sl.inv||'INV-'+(2000+i))+', '+d.toISOString().slice(0,10)+', '+(c.phoneFull?c.phoneFull:'077 000 '+last4(c))+', '+(sl.amt||65000));n++;
+  });
+  out.push('INV-9001, '+new Date().toISOString().slice(0,10)+', 0710000000, 52000');
+  $('#invText').value=out.join('\n');
+}
+function handlerStats(cs){
+  var m={};
+  cs.forEach(function(c){
+    var h=handlerOf(c);if(!h)return;
+    var k=h+'|'+c.branch;m[k]=m[k]||{h:h,b:c.branch,calls:0,leads:0,won:0,flag:0,chk:0,chkN:0};
+    var o=m[k];o.calls++;if(isLead(c)||reached(c)>=1)o.leads++;if(stageOf(c)==='won')o.won++;if(c.review)o.flag++;
+    if(c.chk){var ks=Object.keys(c.chk);o.chkN+=ks.length;ks.forEach(function(x){if(c.chk[x])o.chk++})}
+  });
+  return Object.keys(m).map(function(k){return m[k]}).sort(function(a,b){return b.won-a.won||b.calls-a.calls});
+}
+function renderHandlers(){
+  var hs=handlerStats(inRange().filter(answered));
+  var h='<thead><tr><th>Handler</th><th>Branch</th><th class="num">Answered</th><th class="num">Leads</th><th class="num">Won</th><th class="num">Calls to sales</th><th class="num">Call sheet complete</th><th class="num">Flagged</th></tr></thead><tbody>';
+  hs.forEach(function(x){h+='<tr><td><b>'+esc(x.h)+'</b></td><td>'+esc(BR[x.b].name)+'</td><td class="num">'+x.calls+'</td><td class="num">'+x.leads+'</td><td class="num">'+x.won+'</td><td class="num">'+dPc(x.won,x.calls)+'</td><td class="num">'+(x.chkN?dPc(x.chk,x.chkN):'-')+'</td><td class="num">'+x.flag+'</td></tr>'});
+  $('#hTable').innerHTML=h+'</tbody>';
+}
+function buildReview(){
+  var cs=inRange(),ans=cs.filter(answered),f=funnelRows(cs),lost=cs.filter(function(c){return stageOf(c)==='lost'});
+  var L=['Water Center monthly review, last '+S.range+' days'+(USER?' ('+BR[USER].name+')':''),'',
+   'Calls: '+cs.length+'. Answered: '+ans.length+' ('+dPc(ans.length,cs.length)+'). Missed: '+(cs.length-ans.length)+'. Median call-back time: '+medCb(cs)+'.',
+   'Funnel: '+f.map(function(r){return r[0].toLowerCase()+' '+r[1]}).join(' > ')+'.',
+   'Calls to sales: '+dPc(f[4][1],cs.length)+'. Verified against invoices: '+dPc(cs.filter(function(c){return stageOf(c)==='won'&&c.verified}).length,cs.length)+'.',''];
+  var cnt={};lost.forEach(function(c){var w=whyOf(c)||'unset';cnt[w]=(cnt[w]||0)+1});
+  var nm=function(k){var r=LOSTW.filter(function(x){return x[0]===k})[0];return r?r[1]:'No reason recorded'};
+  var ks=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]});
+  L.push('Lost leads: '+lost.length+(ks.length?'. Top reasons: '+ks.slice(0,3).map(function(k){return nm(k).toLowerCase()+' ('+cnt[k]+')'}).join(', '):'')+'.');
+  var cold=cs.filter(function(c){return stageOf(c)==='quoted'&&Date.now()-c.ts>7*DAY}).length;
+  L.push('Quotes older than 7 days with no result: '+cold+'.');
+  var unk=cs.filter(function(c){return c.source==='unknown'}).length;L.push('Calls with no source: '+unk+' ('+dPc(unk,cs.length)+').','');
+  L.push('Handlers:');handlerStats(ans).forEach(function(x){L.push('- '+x.h+' ('+BR[x.b].name+'): '+x.calls+' answered, '+x.leads+' leads, '+x.won+' won ('+dPc(x.won,x.calls)+')'+(x.flag?', '+x.flag+' flagged':''))});
+  var fl=cs.filter(function(c){return c.review});L.push('','Calls flagged for review: '+fl.length+'.');fl.slice(0,5).forEach(function(c){L.push('- '+c.caller+', '+c.branchName+', '+(c.intent||'')+' ('+(handlerOf(c)||'')+')')});
+  var agg={};CHK6.forEach(function(k){agg[k[0]]={n:0,t:0,l:k[1]}});cs.forEach(function(c){if(c.chk)CHK6.forEach(function(k){agg[k[0]].n++;if(c.chk[k[0]])agg[k[0]].t++})});
+  var weak=CHK6.map(function(k){return agg[k[0]]}).filter(function(a){return a.n>=3}).sort(function(a,b){return a.t/a.n-b.t/b.n})[0];
+  L.push('','Suggested agenda for the session:');
+  var ag=[];
+  if(cs.length-ans.length>0)ag.push('Missed calls: '+(cs.length-ans.length)+' this period. Who covers the phone at busy times?');
+  if(ks.length)ag.push('Lost leads: the top reason is '+nm(ks[0]).toLowerCase()+'. Replay two lost calls and agree what to say next time.');
+  if(weak)ag.push('Call sheet: '+weak.l.toLowerCase()+' is the question asked least ('+Math.round(weak.t/weak.n*100)+'% of logged calls).');
+  if(cold)ag.push('Quotes: chase the '+cold+' quotes older than 7 days.');
+  if(fl.length)ag.push('Replay the '+fl.length+' flagged calls.');
+  if(!ag.length)ag.push('No standout problems. Review the funnel and set one target for next month.');
+  ag.forEach(function(x,i){L.push((i+1)+'. '+x)});
+  return L.join('\n');
+}
+function renderReview(){$('#reviewOut').textContent=buildReview()}
+function renderSales(){renderHandlers();renderReview()}
+document.addEventListener('click',function(e){
+  var t=e.target.closest?e.target.closest('#invMatch,#invSample,#reviewCopy'):null;if(!t)return;
+  if(t.id==='invMatch')matchInvoices();
+  else if(t.id==='invSample'){sampleInvoices();toast('Sample invoices loaded. Tap Match invoices.')}
+  else if(t.id==='reviewCopy')copyText(buildReview(),'Review pack copied');
+});
+
 /* ---------- tabs ---------- */
 function showTab(t){
   S.tab=t;
   var tb=$('.toolbar');if(tb)tb.hidden=(t==='desk'||t==='lab'||t==='followups'||t==='clients'||t==='data');
   $$('.tab').forEach(function(b){var on=b.getAttribute('data-tab')===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  ['dash','desk','followups','clients','calls','coaching','sources','numbers','data','web','lab'].forEach(function(p){$('#panel-'+p).hidden=p!==t});
+  ['dash','desk','followups','clients','calls','coaching','sources','numbers','data','web','sales','lab'].forEach(function(p){$('#panel-'+p).hidden=p!==t});
   if(t==='desk')renderDesk();
+  if(t==='sales')renderSales();
   if(t==='followups')renderFollowups();
   if(t==='lab')renderLab();
   if(t==='clients')renderClients();
@@ -2120,7 +2326,8 @@ function showTab(t){
   if(t==='numbers')renderNumbers();
   if(t==='web'){renderWebOpts();renderWeb()}
 }
-function renderFilters(){
+function renderFilters(){renderFilters0();fillExtraFilters()}
+function renderFilters0(){
   $('#fSource').innerHTML='<option value="all">All sources</option>'+SOURCES.map(function(s){return '<option value="'+s.id+'">'+esc(s.name)+'</option>'}).join('');
   $('#fBranch').innerHTML='<option value="all">All branches</option>'+BRANCHES.map(function(b){return '<option value="'+b.id+'">'+esc(b.name)+'</option>'}).join('');
   $('#fBranch').hidden=!!USER;$('#fBranch').value=S.branch;$('#fSource').value=S.src;$('#fStatus').value=S.status;$('#fOutcome').value=S.outcome;$('#q').value=S.q;
@@ -2158,7 +2365,7 @@ document.addEventListener('click',function(e){
   if(t.id==='copyRunner'){copyText(RUNNER,'Script copied');return}
   var rg=t.closest('[data-range]');if(rg){setRange(+rg.getAttribute('data-range'));return}
   var row=t.closest('.row');if(row){openDrawer(row.getAttribute('data-id'));return}
-  if(t.id==='clearF'){S.branch='all';S.src='all';S.status='all';S.outcome='all';S.lang='all';S.q='';renderFilters();renderList();return}
+  if(t.id==='clearF'){S.branch='all';S.src='all';S.status='all';S.outcome='all';S.lang='all';S.q='';S.stage='all';S.handler='all';renderFilters();renderList();return}
   var cp=t.closest('[data-copy]');if(cp){copyText(cp.getAttribute('data-copy'),cp.getAttribute('data-msg')||('Copied '+cp.getAttribute('data-copy')));return}
   var lg=t.closest('[data-lang]');if(lg){S.lang=lg.getAttribute('data-lang');renderList();return}
   var sl=t.closest('[data-sl]');if(sl){S.sl=sl.getAttribute('data-sl');renderScripts();return}
@@ -2181,12 +2388,13 @@ document.addEventListener('click',function(e){
     else if(a==='toggleEn'){S.showEn=!S.showEn;renderDrawer()}
     else if(a==='seek'&&c&&c.status==='done'){
       var rect=act.getBoundingClientRect();P.id=c.id;P.pos=clamp((e.clientX-rect.left)/rect.width,0,1);syncPlayer();
-    }else if(a==='callback'&&c){c.callback=!c.callback;toast(c.callback?'Marked as called back':'Callback flag removed');refresh(c)}
+    }else if(a==='flag'&&c){c.review=!c.review;toast(c.review?'Flagged for the monthly review':'Flag removed');refresh(c)}
+    else if(a==='callback'&&c){c.callback=!c.callback;c.callbackAt=c.callback?Date.now():null;toast(c.callback?'Marked as called back':'Callback flag removed');refresh(c)}
     else if(a==='copy'&&c){copyText(c.caller+' | '+c.branchName+' | '+SRC[c.source].name+' | '+c.campaign+' | '+c.lang+'\n'+c.intent+', score '+c.score+'/100\n'+c.summary,'Summary copied')}
     return;
   }
   if(t.id==='scrim'){closeDrawer();return}
-  if(t.closest('#logoutBtn')){closeDrawer();USER=null;OWNER=false;applyLogin();return}
+  if(t.closest('#logoutBtn')){closeDrawer();USER=null;OWNER=false;ME=null;applyLogin();return}
   if(t.closest('#simBtn')){simulateCall();return}
   if(t.closest('#themeBtn')){
     var root=document.documentElement,dark=root.getAttribute('data-theme')==='dark',nx=dark?'light':'dark';
@@ -2221,14 +2429,18 @@ document.addEventListener('change',function(e){
   if(t.id==='fuBranch'){S.fu.branch=t.value;renderFollowups();return}
   if(t.id==='deskCid'){renderDeskStatus();return}
   if(t.id==='deskArea'){S.desk.area=t.value||null;renderDeskStatus();renderDeskSheet();return}
-  if(t.id==='deskSrc'){S.desk.src=t.value||null;renderDeskSheet();return}
+  if(t.id==='deskSrc'){S.desk.src=t.value||null;S.srcOk=false;renderDeskSheet();return}
   if(t.id==='deskBr'){deskTap('br',t.value);return}
   if(t.id==='labFile'){var fl=t.files&&t.files[0];if(fl){try{$('#labAudio').src=URL.createObjectURL(fl);$('#labAudioMsg').textContent='Loaded '+fl.name+'. If it will not play here, open the file in your own player. Scoring works either way.'}catch(x){$('#labAudioMsg').textContent='This page cannot play the file. Open it in your own player.'}}return}
   if(t.id==='fSource'){S.src=t.value;renderList();return}
   if(t.id==='fBranch'){S.branch=t.value;renderList();return}
   if(t.id==='fStatus'){S.status=t.value;renderList();return}
+  if(t.id==='fStage'){S.stage=t.value;renderList();return}
+  if(t.id==='fHandler'){S.handler=t.value;renderList();return}
   if(t.id==='fOutcome'){S.outcome=t.value;renderList();return}
   if(t.id==='fLang'){S.lang=t.value;renderList();return}
+  var pf=t.getAttribute('data-f');
+  if(pf==='stage'||pf==='lostWhy'||pf==='saleAmt'||pf==='invoice'){editPipeline(pf,t.value);return}
   if(t.getAttribute('data-f')==='outcome'){
     var c=getCall(S.openId);if(c){c.outcome=t.value;toast('Outcome set to '+OUT_LABEL[c.outcome]);renderKpis();renderList();if(S.tab==='sources')renderSources();if(S.tab==='coaching')renderCoaching();renderDrawer()}
   }
@@ -2241,7 +2453,6 @@ document.addEventListener('input',function(e){
   if(t.id==='avgSale'){S.avgSale=Math.max(0,+t.value||0);renderCoaching();return}
   if(t.id==='closeRate'){S.close=clamp(+t.value||0,0,100);renderCoaching();return}
   if(t.getAttribute('data-f')==='notes'){var c=getCall(S.openId);if(c)c.notes=t.value;return}
-  if(t.hasAttribute('data-spend')){S.spend[t.getAttribute('data-spend')]=Math.max(0,+t.value||0);updateCpl()}
 });
 function setView(v){
   S.view=v;S.branch=v;S.fu.branch=v;
@@ -2253,7 +2464,7 @@ function applyLogin(){
   var on=!!(USER||OWNER);
   $('#login').hidden=on;$('#whoami').hidden=!on;$('#logoutBtn').hidden=!on;
   $('#tab-dash').hidden=!OWNER;
-  if(USER){$('#whoami').textContent=BR[USER].name+' · '+BR[USER].main;S.branch=USER;S.desk.br=USER;setVisitor(S.web?S.web.source:'google',USER)}
+  if(USER){$('#whoami').textContent=(ME?ME+' · ':'')+BR[USER].name+' · '+BR[USER].main;S.branch=USER;S.desk.br=USER;setVisitor(S.web?S.web.source:'google',USER)}
   else if(OWNER){$('#whoami').textContent='Akith · Owner, both branches';S.branch='all'}
   else{S.branch='all'}
   $('#viewSw').hidden=!OWNER;if(OWNER)setView('all');
@@ -2265,7 +2476,7 @@ $('#loginForm').addEventListener('submit',function(e){
   var u=($('#loginUser').value||'').trim().toLowerCase(),p=$('#loginPass').value||'',msg=$('#loginMsg');
   var a=ACCOUNTS.filter(function(x){return x.user===u&&x.pass===p})[0];
   if(!a){msg.className='msg err';msg.textContent='That username and password do not match. Check the demo logins below.';return}
-  msg.className='msg';msg.textContent='';USER=a.branch;OWNER=!!a.owner;applyLogin();
+  msg.className='msg';msg.textContent='';USER=a.branch;OWNER=!!a.owner;ME=(a.name&&!a.owner)?a.name:null;applyLogin();
 });
 document.addEventListener('keydown',function(e){
   if(S.tab==='desk'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^[1-9]$/.test(e.key)&&e.target&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName||'')){deskTap('need',NEEDS[+e.key-1]);return}
