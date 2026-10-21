@@ -474,6 +474,7 @@ tbody tr:hover{background:var(--surface-2)}
 .deskact{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}.deskact .top-actions{display:flex;gap:8px;flex-wrap:wrap}
 .btn.out{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);font-weight:600}.btn.out:hover{background:var(--bad);color:#fff}.btn.out[hidden]{display:none}
 .qedit{display:grid;gap:16px}.qedit .qgrid{margin:0}.qrows{display:grid;gap:8px}.qrow{display:grid;grid-template-columns:1fr 120px auto;gap:8px;align-items:center}.qrow input,.qedit input,.qedit textarea{width:100%;min-width:0}@media(max-width:560px){.qrow{grid-template-columns:1fr 96px}.qrow .btn{grid-column:1/-1;justify-self:start}}
+.qlogo{display:flex;align-items:center;gap:16px}.qlogo img{width:56px;height:56px;border-radius:12px;object-fit:cover}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -2392,9 +2393,10 @@ function buildQuote(){
   return {ref:d.quoteRef,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),name:f.name,phone:f.phone,area:area,need:N.title,det:det,items:items,notes:[L.n1,L.n2,L.n3],br:br,L:L,lang:d.lang};
 }
 function qLbl(q){var pr=q.items.filter(function(x){return x.p});return pr.length&&pr.every(function(x){return x.exact})?({si:'එකතුව',ta:'மொத்தம்'})[q.lang]||'Total':q.L.est}
+function qLogo(){var l=document.querySelector('.logo');return l?l.getAttribute('src'):''}
 function qTotal(q){return q.items.reduce(function(a,x){return a+(+x.p||0)},0)}
 function quoteHtml(q){
-  var L=q.L,tot=qTotal(q),h='<div class="qh"><div><b class="qbrand">Water Center</b><span>'+esc(q.br.name)+' · '+esc(q.br.main)+'</span></div><div class="qmeta"><b>'+esc(L.h)+'</b><span>'+esc(L.ref)+' '+esc(q.ref)+'</span><span>'+esc(L.date)+' '+esc(q.date)+'</span></div></div>';
+  var L=q.L,tot=qTotal(q),h='<div class="qh"><div class="qlogo">'+(qLogo()?'<img src="'+qLogo()+'" alt="Water Center logo" width="56" height="56">':'')+'<div><b class="qbrand">Water Center</b><span>'+esc(q.br.name)+' · '+esc(q.br.main)+'</span></div></div><div class="qmeta"><b>'+esc(L.h)+'</b><span>'+esc(L.ref)+' '+esc(q.ref)+'</span><span>'+esc(L.date)+' '+esc(q.date)+'</span></div></div>';
   h+='<div class="qgrid"><div><small>'+esc(L.cust)+'</small><b>'+esc(q.name||'Customer')+'</b><span>'+esc(q.phone||'')+'</span><span>'+esc(q.area?L.area+': '+q.area:'')+'</span></div><div><small>'+esc(L.need)+'</small><b>'+esc(q.need)+'</b>'+(q.det.length?'<span>'+q.det.map(esc).join(' · ')+'</span>':'')+'</div></div>';
   h+='<table class="qt"><thead><tr><th>'+esc(L.item)+'</th><th class="num">'+esc(L.price)+' (LKR)</th></tr></thead><tbody>'+q.items.map(function(x){return '<tr><td>'+esc(x.n)+(x.after&&!x.p?'<small>'+esc(x.after)+'</small>':'')+'</td><td class="num">'+(x.p?(x.exact?'':esc(L.from)+' ')+qNum(+x.p):esc(L.onreq))+'</td></tr>'}).join('')+'</tbody>'+(tot?'<tfoot><tr><td>'+esc(qLbl(q))+'</td><td class="num" id="qTot">'+qNum(tot)+'</td></tr></tfoot>':'')+'</table>';
   if(q.notes.length)h+='<div class="qn"><b>'+esc(L.notes)+'</b><ul>'+q.notes.map(function(n){return '<li>'+esc(n)+'</li>'}).join('')+'</ul></div>';
