@@ -492,6 +492,8 @@ tbody tr:hover{background:var(--surface-2)}
 .flscroll{max-height:none;height:min(72vh,760px);min-height:480px}.flwrap.full{position:fixed;inset:16px;z-index:70;background:var(--surface);box-shadow:0 0 0 100vmax rgba(8,28,46,.55)}.flwrap.full .flscroll{height:calc(100vh - 88px)}.fltool{display:flex;gap:8px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line);background:var(--surface)}.fltype{font-size:11px!important}.fltitle{font-size:15px!important}.swatches{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sw{width:32px;height:32px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}.sw[aria-pressed=true]{box-shadow:0 0 0 3px var(--ink)}
 #panel-scripts{max-width:none}.studio{display:grid;grid-template-columns:240px minmax(0,1fr) 340px;gap:16px;align-items:start;margin-bottom:16px}.stl,.str{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:16px;align-content:start;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}.sttop{display:grid;gap:8px}.stlab{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}.stbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.stl input,.stl select{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink);font:inherit;margin-top:4px}.stc .flwrap{margin-top:0;border-radius:16px;border-width:2px}.stc .flscroll{height:calc(100vh - 96px);min-height:620px;max-height:none;background-image:none}.flpal .chips{display:grid;gap:8px;margin-top:8px}.paltile{display:grid;grid-template-columns:16px 1fr;gap:0 8px;text-align:left;border:1px solid var(--line);border-left:6px solid var(--c);border-radius:8px;padding:8px 16px 8px 8px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}.paltile i{grid-row:span 2}.paltile b{font-size:14px}.paltile span{font-size:12px;color:var(--ink-2)}.paltile:hover{background:var(--surface-2)}.str{padding:16px}.str:empty{display:none}
 @media(max-width:1180px){.studio{grid-template-columns:1fr}.stl,.str{position:static;max-height:none}.flpal .chips{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.stc .flscroll{min-height:480px;height:70vh}}
+.tipbox{position:fixed;z-index:200;display:none;max-width:260px;background:#0b1f33;color:#fff;font-size:13px;line-height:1.4;padding:8px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(8,28,46,.3);pointer-events:none}body.noscroll{overflow:hidden}.studio.full{position:fixed;inset:0;z-index:70;margin:0;padding:16px;background:var(--bg,#eef5fa);overflow:auto;grid-template-columns:240px minmax(0,1fr) 340px;align-items:stretch}.studio.full .stl,.studio.full .str{position:static;max-height:calc(100vh - 32px)}.studio.full .stc .flscroll{height:calc(100vh - 66px)}.sttop{grid-template-columns:auto 1fr;align-items:center}.sttop .pill{grid-column:1/-1;justify-self:start}.sttop h2{grid-column:1/-1}
+@media(max-width:1180px){.studio.full{grid-template-columns:1fr}.studio.full .stl,.studio.full .str{max-height:none}}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -600,18 +602,18 @@ tbody tr:hover{background:var(--surface-2)}
     <section class="panel" id="panel-scripts" role="tabpanel" aria-labelledby="tab-scripts" hidden>
       <div class="studio">
         <aside class="stl" aria-label="Script tools">
-          <div class="sttop"><h2 style="margin:0">Script editor</h2><span id="fpStatus" class="pill good"></span></div>
+          <div class="sttop"><button type="button" class="btn sm" id="stBack" data-tip="Go back to where you were">← Back</button><h2 style="margin:0">Script editor</h2><span id="fpStatus" class="pill good"></span></div>
           <p class="msg err" id="fpLock" role="note" hidden>Only the owner edits scripts. You can read them here.</p>
           <div class="field"><label for="fpSel">Script profile</label><select id="fpSel"></select></div>
-          <div class="field" id="fpAdmin" hidden><label for="fpNewName">Coreframe: new profile</label><input id="fpNewName" placeholder="Name"><select id="fpNewNeed" aria-label="Used for"></select><div class="stbtns"><button class="btn" type="button" id="fpNew">Create copy</button><button class="btn sm out" type="button" id="fpDelP">Delete</button></div></div>
+          <div class="field" id="fpAdmin" hidden><label for="fpNewName">Coreframe: new profile</label><input id="fpNewName" placeholder="Name"><select id="fpNewNeed" aria-label="Used for"></select><div class="stbtns"><button class="btn" type="button" id="fpNew" data-tip="Create copy: make a new profile from the one selected">Create copy</button><button class="btn sm out" type="button" id="fpDelP" data-tip="Delete the selected profile">Delete</button></div></div>
           <div id="fpAddRow" class="flpal"><h3 class="stlab">Add a tile</h3><div class="chips"></div></div>
           <h3 class="stlab">View</h3>
-          <div class="stbtns"><button type="button" class="btn sm" data-fz="-" aria-label="Zoom out">−</button><span id="fzv" class="muted small">100%</span><button type="button" class="btn sm" data-fz="+" aria-label="Zoom in">+</button></div>
-          <div class="stbtns"><button type="button" class="btn sm" data-fz="0">Fit to width</button><button type="button" class="btn sm" id="fpTidy">Tidy up</button><button type="button" class="btn sm" id="flFull">Full screen</button></div>
+          <div class="stbtns"><button type="button" class="btn sm" data-fz="-" aria-label="Zoom out" data-tip="Zoom out: make the map smaller">−</button><span id="fzv" class="muted small">100%</span><button type="button" class="btn sm" data-fz="+" aria-label="Zoom in" data-tip="Zoom in: make the map bigger">+</button></div>
+          <div class="stbtns"><button type="button" class="btn sm" data-fz="0" data-tip="Fit to width: shrink or grow the map to fit this window">Fit to width</button><button type="button" class="btn sm" id="fpTidy" data-tip="Tidy up: put every tile back in neat columns. Your own positions are lost.">Tidy up</button><button type="button" class="btn sm" id="flFull" data-tip="Full screen: the whole editor fills the window, with the tools kept">Full screen</button></div>
           <p class="muted small" style="margin:0">Drag a tile to move it. Drag from the dot on its right edge onto another tile to link them.</p>
           <h3 class="stlab">Publish</h3>
           <div class="field"><label for="fpNote">What changed (optional)</label><input id="fpNote" placeholder="For example: new price reply"></div>
-          <div class="stbtns"><button class="btn primary" type="button" id="fpPub">Publish</button><button class="btn" type="button" id="fpDiscard">Discard draft</button></div>
+          <div class="stbtns"><button class="btn primary" type="button" id="fpPub" data-tip="Publish: save your changes as a new version. Handlers see it on their next call.">Publish</button><button class="btn" type="button" id="fpDiscard" data-tip="Discard draft: throw away changes you have not published">Discard draft</button></div>
           <p class="muted small" style="margin:0">Handlers see a published version on their next call.</p>
         </aside>
         <div class="stc"><div class="flwrap" id="flWrap"><div id="flMap" class="flscroll"></div></div></div>
@@ -2522,6 +2524,7 @@ var PAL=['#2563a8','#6b46c1','#15803d','#c2570c','#b4235a','#0f766e','#475569','
 function fcol(x){return x.color||FT[x.type][1]}
 var FT={say:['Say','#2563a8','What to say'],ask:['Ask','#6b46c1','A question with answers'],signal:['Buying signal','#15803d','Caller is ready'],objection:['Objection','#c2570c','Caller is holding back'],upsell:['Upsell','#b4235a','Add something'],close:['Close','#0f766e','Finish the call'],action:['Action','#475569','Do something on the desk']};
 var LINKS=[['','Not linked'],['time:now','When: Today'],['time:week','When: This week'],['time:month','When: This month'],['time:browse','When: Just looking'],['budget:ok','Budget: Budget fits'],['budget:compare','Budget: Comparing prices'],['budget:disc','Budget: Asked for a discount'],['outcome:visit','Ended: Visit booked'],['outcome:quote','Ended: Quote to send'],['outcome:callback','Ended: Call back later'],['outcome:sold','Ended: Sold on the call']];
+var TIPS={say:'Say: a line the handler reads out loud.',ask:'Ask: a question. Add one rule per answer to send the call down different paths.',signal:'Buying signal: something the caller says that shows they want to buy. Usually jumps to the close.',objection:'Objection: something that holds the caller back, with the reply to give.',upsell:'Upsell: suggest an extra item to add to the sale.',close:'Close: the last step that finishes the call.',action:'Action: a button that opens the inventory or the quotation on the call sheet.'};
 var FACT=[['','No action'],['stock','Open the inventory'],['quote','Open the quotation'],['visit','Remind: book a visit']];
 function fid(){return 'n'+Math.random().toString(36).slice(2,7)}
 function seedProfile(need){
@@ -2621,7 +2624,7 @@ function flowSvg(p){
     if(l.label&&l.label!=='Then')h+='<text x="'+((x1+x2)/2)+'" y="'+((y1+y2)/2-6)+'" text-anchor="middle" class="fllab">'+esc(l.label.slice(0,28))+'</text>';
   })});
   p.nodes.forEach(function(x){var q=L.pos[x.id];if(!q)return;var sel=S.fnode===x.id;
-    h+='<g class="flnode'+(sel?' sel':'')+(can?' mv':'')+'" data-fn="'+x.id+'" tabindex="0" role="button" aria-label="'+esc(FT[x.type][0]+': '+x.title)+'"><rect x="'+q.x+'" y="'+q.y+'" width="'+L.W+'" height="'+L.H+'" rx="12" fill="var(--surface)" stroke="'+fcol(x)+'" stroke-width="'+(sel?3:1.5)+'"'+(x.glob?' stroke-dasharray="6 4"':'')+'/><rect x="'+q.x+'" y="'+q.y+'" width="6" height="'+L.H+'" rx="3" fill="'+fcol(x)+'"/><text x="'+(q.x+16)+'" y="'+(q.y+26)+'" class="fltype" fill="'+fcol(x)+'">'+esc(FT[x.type][0].toUpperCase())+(x.glob?' · ANYTIME':'')+(x.locked?' · LOCKED':'')+'</text><text x="'+(q.x+16)+'" y="'+(q.y+52)+'" class="fltitle">'+esc(x.title.length>24?x.title.slice(0,23)+'…':x.title)+'</text>'+(can&&fcanNode(x)?'<circle class="flh" data-fc="'+x.id+'" cx="'+(q.x+L.W)+'" cy="'+(q.y+L.H/2)+'" r="8" fill="var(--surface)" stroke="'+fcol(x)+'" stroke-width="2"><title>Drag to another tile to link them</title></circle>':'')+'</g>';
+    h+='<g class="flnode'+(sel?' sel':'')+(can?' mv':'')+'" data-tip="'+esc(TIPS[x.type].split(':')[0]+' tile. '+(can?'Click to edit it. Drag to move it. Drag its dot onto another tile to link them.':'Click to read it.'))+'" data-fn="'+x.id+'" tabindex="0" role="button" aria-label="'+esc(FT[x.type][0]+': '+x.title)+'"><rect x="'+q.x+'" y="'+q.y+'" width="'+L.W+'" height="'+L.H+'" rx="12" fill="var(--surface)" stroke="'+fcol(x)+'" stroke-width="'+(sel?3:1.5)+'"'+(x.glob?' stroke-dasharray="6 4"':'')+'/><rect x="'+q.x+'" y="'+q.y+'" width="6" height="'+L.H+'" rx="3" fill="'+fcol(x)+'"/><text x="'+(q.x+16)+'" y="'+(q.y+26)+'" class="fltype" fill="'+fcol(x)+'">'+esc(FT[x.type][0].toUpperCase())+(x.glob?' · ANYTIME':'')+(x.locked?' · LOCKED':'')+'</text><text x="'+(q.x+16)+'" y="'+(q.y+52)+'" class="fltitle">'+esc(x.title.length>24?x.title.slice(0,23)+'…':x.title)+'</text>'+(can&&fcanNode(x)?'<circle class="flh" data-tip="Link handle: drag this dot onto another tile to link them" data-fc="'+x.id+'" cx="'+(q.x+L.W)+'" cy="'+(q.y+L.H/2)+'" r="8" fill="var(--surface)" stroke="'+fcol(x)+'" stroke-width="2"></circle>':'')+'</g>';
   });
   return h+'<line id="flTmp" pointer-events="none" x1="0" y1="0" x2="0" y2="0" stroke="#2563a8" stroke-width="2" stroke-dasharray="4 3" visibility="hidden"/></svg>';
 }
@@ -2659,7 +2662,7 @@ function renderFlowEd(){
   $('#fpStatus').textContent=dirty?'Draft changes not yet shown to handlers':'Live version v'+live.ver+(live.hist.length?' · last change '+new Date(live.hist[live.hist.length-1].at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):' · starting script');
   $('#fpStatus').className='pill '+(dirty?'warn':'good');
   $('#fpPub').disabled=!dirty;$('#fpDiscard').disabled=!dirty;$('#fpNote').disabled=!can;
-  $('#fpAddRow').hidden=!can;$('#fpAddRow .chips').innerHTML=Object.keys(FT).map(function(k){return '<button type="button" class="paltile" style="--c:'+FT[k][1]+'" data-fadd="'+k+'"><i></i><b>'+FT[k][0]+'</b><span>'+FT[k][2]+'</span></button>'}).join('');$('#fpNewNeed').innerHTML=NEEDS.filter(function(n){return CSN[n]&&n!=='none'}).map(function(n){return '<option value="'+n+'">'+esc(CSN[n].title)+'</option>'}).join('');
+  $('#fpAddRow').hidden=!can;$('#fpAddRow .chips').innerHTML=Object.keys(FT).map(function(k){return '<button type="button" class="paltile" style="--c:'+FT[k][1]+'" data-fadd="'+k+'" data-tip="'+esc(TIPS[k]+' Click to add it after the selected tile.')+'"><i></i><b>'+FT[k][0]+'</b><span>'+FT[k][2]+'</span></button>'}).join('');$('#fpNewNeed').innerHTML=NEEDS.filter(function(n){return CSN[n]&&n!=='none'}).map(function(n){return '<option value="'+n+'">'+esc(CSN[n].title)+'</option>'}).join('');
   $('#flMap').innerHTML=flowSvg(p);$('#fzv').textContent=Math.round((S.fz||1)*100)+'%';
   if(!S.fnode||!fnode(p,S.fnode))S.fnode=p.start;
   renderNodeEd(p);
@@ -2675,7 +2678,7 @@ function renderNodeEd(p){
   if(!can&&OWNER)h+='<p class="muted small">Coreframe has locked this tile. Ask us to change it.</p>';
   if(!OWNER)h+='<p class="muted small">Only the owner edits scripts.</p>';
   h+='<div class="field"><label for="fnType">Type</label><select id="fnType"'+dis+'>'+Object.keys(FT).map(function(k){return '<option value="'+k+'"'+(k===x.type?' selected':'')+'>'+FT[k][0]+' — '+FT[k][2]+'</option>'}).join('')+'</select></div>';
-  h+='<div class="field"><label>Colour</label><div class="swatches" role="group" aria-label="Tile colour">'+PAL.map(function(c){return '<button type="button" class="sw" data-sw="'+c+'" style="background:'+c+'" aria-pressed="'+(fcol(x)===c)+'" aria-label="Colour '+c+'"'+dis+'></button>'}).join('')+'<button type="button" class="btn sm" data-sw=""'+dis+'>Default for this type</button></div></div>';
+  h+='<div class="field"><label>Colour</label><div class="swatches" role="group" aria-label="Tile colour">'+PAL.map(function(c){return '<button type="button" class="sw" data-sw="'+c+'" style="background:'+c+'" data-tip="Colour this tile" aria-pressed="'+(fcol(x)===c)+'" aria-label="Colour '+c+'"'+dis+'></button>'}).join('')+'<button type="button" class="btn sm" data-sw="" data-tip="Use the standard colour for this type of tile"'+dis+'>Default for this type</button></div></div>';
   h+='<div class="field"><label for="fnTitle">Name on the tile</label><input id="fnTitle" value="'+esc(x.title)+'"'+dis+'></div>';
   h+='<div class="field"><label for="fnText">What the handler sees and says</label><textarea id="fnText" rows="4"'+dis+'>'+esc(x.text||'')+'</textarea></div>';
   h+='<div class="field"><label for="fnAct">Button on the call sheet</label><select id="fnAct"'+dis+'>'+FACT.map(function(a){return '<option value="'+a[0]+'"'+(a[0]===(x.act||'')?' selected':'')+'>'+a[1]+'</option>'}).join('')+'</select></div>';
@@ -2683,18 +2686,20 @@ function renderNodeEd(p){
   if(x.type==='ask'&&S.fpid){var ap=profGet(S.fpid),ids=(CSN[ap.need]&&CSN[ap.need].ask)||[];h+='<div class="field"><label for="fnTick">Ticks off this question on the checklist</label><select id="fnTick"'+dis+'><option value="">None</option>'+ids.map(function(i){return '<option value="'+i+'"'+(i===x.tick?' selected':'')+'>'+esc(ASKS[i].en)+'</option>'}).join('')+'</select></div>'}
   h+='<label class="chk"><input type="checkbox" id="fnGlob"'+(x.glob?' checked':'')+dis+'> Available at any step (shown as a button the handler can tap whenever the caller says it)</label>';
   h+='<h4 style="margin:16px 0 8px">Rules: what happens next</h4><div id="fnLinks">'+x.next.map(function(l,i){
-    return '<div class="lkrow" data-li="'+i+'"><input data-lk="label" value="'+esc(l.label)+'" aria-label="If the caller does this"'+dis+'><span aria-hidden="true">→</span><select data-lk="to" aria-label="Go to"'+dis+'><option value="_back"'+(l.to==='_back'?' selected':'')+'>Back to where they were</option>'+others.map(function(y){return '<option value="'+y.id+'"'+(y.id===l.to?' selected':'')+'>'+esc(FT[y.type][0]+': '+y.title)+'</option>'}).join('')+'</select>'+(can?'<button class="btn sm" type="button" data-lkdel="'+i+'">Remove</button>':'')+'</div>'}).join('')+(x.next.length?'':'<p class="muted small">No next step. The script ends here.</p>')+'</div>';
-  if(can)h+='<button class="btn sm" type="button" id="fnAddLink" style="margin-top:8px">Add a rule</button>';
+    return '<div class="lkrow" data-li="'+i+'"><input data-lk="label" value="'+esc(l.label)+'" aria-label="If the caller does this"'+dis+'><span aria-hidden="true">→</span><select data-lk="to" aria-label="Go to"'+dis+'><option value="_back"'+(l.to==='_back'?' selected':'')+'>Back to where they were</option>'+others.map(function(y){return '<option value="'+y.id+'"'+(y.id===l.to?' selected':'')+'>'+esc(FT[y.type][0]+': '+y.title)+'</option>'}).join('')+'</select>'+(can?'<button class="btn sm" type="button" data-lkdel="'+i+'" data-tip="Remove this rule">Remove</button>':'')+'</div>'}).join('')+(x.next.length?'':'<p class="muted small">No next step. The script ends here.</p>')+'</div>';
+  if(can)h+='<button class="btn sm" type="button" id="fnAddLink" data-tip="Add a rule: choose what the caller says and which tile comes next" style="margin-top:8px">Add a rule</button>';
   if(ADMIN)h+='<label class="chk" style="margin-top:16px"><input type="checkbox" id="fnLocked"'+(x.locked?' checked':'')+'> Lock this tile (the owner cannot change or delete it)</label>';
-  if(can&&x.id!==p.start)h+='<div style="margin-top:16px"><button class="btn sm out" type="button" id="fnDel">Delete this tile</button></div>';
+  if(can&&x.id!==p.start)h+='<div style="margin-top:16px"><button class="btn sm out" type="button" id="fnDel" data-tip="Delete this tile and every rule that points to it">Delete this tile</button></div>';
   el.innerHTML=h;
 }
 function flFit(){var p=(S.fdr&&S.fdr[S.fpid])||profGet(S.fpid),el=$('#flMap');if(!p||!el)return;var L=flayout(p),w=el.clientWidth||900;S.fz=Math.max(.7,Math.min(1.2,Math.floor((w-24)/L.w*20)/20));renderFlowEd()}
+function flFullToggle(){var st=$('.studio'),on=st.classList.toggle('full');document.body.classList.toggle('noscroll',on);$('#flFull').textContent=on?'Exit full screen':'Full screen';$('#stBack').textContent=on?'← Exit full screen':'← Back';setTimeout(flFit,50)}
 function flowCommit(){renderFlowEd()}
 document.addEventListener('click',function(e){
   var t=e.target,c=t.closest?t.closest.bind(t):null;if(!c)return;var x;
   if((x=c('[data-fz]'))){var z=x.getAttribute('data-fz');if(z==='0'){flFit();return}S.fz=Math.max(.5,Math.min(1.6,(S.fz||1)+(z==='+'?.15:-.15)));renderFlowEd();return}
-  if(c('#flFull')){var w=$('#flWrap');w.classList.toggle('full');$('#flFull').textContent=w.classList.contains('full')?'Close full screen':'Full screen';return}
+  if(c('#flFull')){flFullToggle();return}
+  if(c('#stBack')){if($('.studio').classList.contains('full')){flFullToggle()}else{var pt=S.prevTab&&S.prevTab!=='scripts'?S.prevTab:'desk';showTab(pt)}return}
   if(!OWNER&&(x=c('[data-fn]'))){S.fnode=x.getAttribute('data-fn');renderFlowEd();return}
   /* live sheet */
   if((x=c('[data-fview]'))){if(S.flow){S.flow.full=x.getAttribute('data-fview')==='full';renderDeskSheet()}return}
@@ -2734,7 +2739,7 @@ document.addEventListener('change',function(e){
   else if(t.id==='fnGlob'){nd.glob=t.checked;flowCommit()}
   else if(t.getAttribute&&t.getAttribute('data-lk')){var row=t.closest('[data-li]'),l=nd.next[+row.getAttribute('data-li')];if(l){l[t.getAttribute('data-lk')]=t.value;flowCommit()}}
 });
-document.addEventListener('keydown',function(e){var g=e.target.closest&&e.target.closest('[data-fn]');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();S.fnode=g.getAttribute('data-fn');renderFlowEd()}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){var st0=$('.studio');if(st0&&st0.classList.contains('full')&&!S.pd){flFullToggle();return}}var g=e.target.closest&&e.target.closest('[data-fn]');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();S.fnode=g.getAttribute('data-fn');renderFlowEd()}});
 function renderScriptResults(){
   var rows={};
   S.calls.filter(function(c){return c.handler}).forEach(function(c){
@@ -2909,8 +2914,22 @@ document.addEventListener('input',function(e){
   if(e.target.id==='stQ')renderStock();
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.pd)closeProd()});
+/* ---------- tooltips ---------- */
+(function(){
+  var box=null,cur=null;
+  function show(el){var t=el.getAttribute('data-tip');if(!t)return;if(!box){box=document.createElement('div');box.className='tipbox';box.setAttribute('role','tooltip');document.body.appendChild(box)}
+    box.textContent=t;box.style.display='block';var r=el.getBoundingClientRect(),bw=box.offsetWidth,bh=box.offsetHeight,x=r.left+r.width/2-bw/2,y=r.bottom+8;
+    if(r.right+bw+16<window.innerWidth&&r.width>120&&r.left<260&&el.closest&&el.closest('.stl')){x=r.right+8;y=r.top+r.height/2-bh/2}
+    x=Math.max(8,Math.min(window.innerWidth-bw-8,x));if(y+bh>window.innerHeight-8)y=Math.max(8,r.top-bh-8);box.style.left=x+'px';box.style.top=y+'px';cur=el}
+  function hide(){if(box)box.style.display='none';cur=null}
+  document.addEventListener('mouseover',function(e){var el=e.target.closest?e.target.closest('[data-tip]'):null;if(el&&el!==cur)show(el);else if(!el)hide()});
+  document.addEventListener('focusin',function(e){var el=e.target.closest?e.target.closest('[data-tip]'):null;if(el)show(el)});
+  document.addEventListener('focusout',hide);document.addEventListener('pointerdown',function(e){if(!(e.target.closest&&e.target.closest('[data-tip]')))hide()});
+  document.addEventListener('scroll',hide,true);
+})();
 /* ---------- tabs ---------- */
 function showTab(t){
+  if(S.tab&&S.tab!==t)S.prevTab=S.tab;
   S.tab=t;
   var tb=$('.toolbar');if(tb)tb.hidden=(t==='desk'||t==='lab'||t==='followups'||t==='clients'||t==='data');
   $$('.tab').forEach(function(b){var on=b.getAttribute('data-tab')===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
