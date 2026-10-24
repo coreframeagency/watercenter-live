@@ -481,6 +481,10 @@ tbody tr:hover{background:var(--surface-2)}
 #stBody input,#stBody select{width:100%;min-width:72px;font:inherit}#stBody td{padding:8px}#stBody td.num input{text-align:right}.pill.warn{background:#fdf0d4;color:#7a5200}.pill.bad{background:#fbe0dc;color:#9a1f10}
 #stBody input,#stBody select{border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink);box-shadow:none;outline-offset:2px}#stBody td:first-child{min-width:240px}#stBody td:nth-child(3){min-width:128px}
 #stBody tr.sthead td{background:var(--surface-2);padding:8px 16px;border-top:1px solid var(--line)}#stBody td:first-child{min-width:160px}#deskAvail{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 16px;background:var(--surface);color:var(--ink);font:inherit}#deskAvailOut .objl li span{display:block}
+.ptile{display:grid;gap:8px;text-align:left;align-content:start;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;min-height:0}.ptile:hover{border-color:var(--brand)}.ptile.out{opacity:.78}.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:16px}.pimg{display:block;aspect-ratio:4/3;border-radius:8px;background:var(--surface-2);overflow:hidden;display:grid;place-items:center}.pimg img,.pdimg img{width:100%;height:100%;object-fit:cover;display:block}.ph{font-size:32px;font-weight:700;color:var(--ink-2)}.pname{font-weight:700;line-height:1.3}.pmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}.pprice{font-weight:700;color:var(--brand)}.psub{font-size:12px;color:var(--ink-2)}.psub.warn{color:#9a6b00}.stsearch{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.stsearch input{flex:1;min-width:200px;border:1px solid var(--line);border-radius:8px;padding:8px 16px;background:var(--surface);color:var(--ink);font:inherit}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.chip{border:1px solid var(--line);border-radius:999px;padding:8px 16px;background:var(--surface);color:var(--ink);font:inherit;font-size:13px;cursor:pointer}.chip[aria-pressed=true]{background:var(--brand);color:#fff;border-color:var(--brand)}.pdpaper{background:var(--surface);color:var(--ink);border-radius:16px;padding:24px;width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto}.pdh{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:16px}.pdtop{display:grid;grid-template-columns:160px 1fr;gap:16px;margin-bottom:16px}.pdimg{aspect-ratio:1;border-radius:8px;background:var(--surface-2);overflow:hidden;display:grid;place-items:center}.pdl{display:grid;grid-template-columns:1.2fr .7fr 1fr 1fr;gap:8px 16px;align-items:end;padding:16px 0;border-top:1px solid var(--line)}.pdl .small{grid-column:1/-1}.pdpaper input,.pdpaper select,.pdpaper textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink);font:inherit}.pdother{margin:16px 0 0}.help summary{cursor:pointer;font-weight:600}.count{display:inline-block;min-width:20px;padding:0 8px;border-radius:999px;background:var(--brand);color:#fff;font-size:12px;text-align:center}.dsw button{min-width:120px}
+@media(max-width:560px){.pdtop{grid-template-columns:1fr}.pdl{grid-template-columns:1fr 1fr}.pgrid{grid-template-columns:repeat(2,1fr);gap:8px}}
+.demotools{position:relative}.demotools summary{cursor:pointer;list-style:none;font-size:13px;color:var(--ink-2);padding:8px 16px;border:1px dashed var(--line);border-radius:999px}.demotools[open] .dtbody{position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:grid;gap:8px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 32px rgba(8,28,46,.16);min-width:240px}
+.compact .pgrid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:8px}.compact .ptile{padding:8px}.compact .pimg{aspect-ratio:16/9}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -507,9 +511,9 @@ tbody tr:hover{background:var(--surface-2)}
     <div class="top-actions">
       <span class="pill info">Demo with sample data</span>
       <span class="pill good" id="whoami" hidden></span><div class="seg" id="viewSw" role="group" aria-label="Show calls for" hidden><button type="button" data-v="all" aria-pressed="true">All calls</button><button type="button" data-v="col" aria-pressed="false">Colombo calls</button><button type="button" data-v="kur" aria-pressed="false">Kurunegala calls</button></div>
-      <button id="liveSwitch" class="switch" role="switch" aria-checked="false"><span class="track"></span><span>Live calls</span></button>
+      <details class="demotools" id="demoTools"><summary>Demo tools</summary><div class="dtbody"><button id="liveSwitch" class="switch" role="switch" aria-checked="false"><span class="track"></span><span>Live calls</span></button>
       <select id="simLang" aria-label="Language of the simulated call"><option value="any">Any language</option><option value="English">English call</option><option value="Sinhala">Sinhala call</option><option value="Tamil">Tamil call</option></select>
-      <button id="simBtn" class="btn primary" type="button">Simulate incoming call</button>
+      <button id="simBtn" class="btn primary" type="button">Simulate incoming call</button></div></details>
       <button id="themeBtn" class="btn icon" type="button" aria-label="Switch between light and dark theme"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
       <button id="logoutBtn" class="btn sm out" type="button" hidden>Sign out</button>
     </div>
@@ -519,12 +523,12 @@ tbody tr:hover{background:var(--surface-2)}
     <button class="tab" role="tab" id="tab-dash" aria-controls="panel-dash" aria-selected="false" data-tab="dash" tabindex="-1" hidden>Dashboard</button>
     <button class="tab" role="tab" id="tab-desk" aria-controls="panel-desk" aria-selected="true" data-tab="desk">Handler desk</button>
     <button class="tab" role="tab" id="tab-followups" aria-controls="panel-followups" aria-selected="false" data-tab="followups" tabindex="-1">Follow-ups</button>
-    <button class="tab" role="tab" id="tab-clients" aria-controls="panel-clients" aria-selected="false" data-tab="clients" tabindex="-1">CRM</button>
-    <button class="tab" role="tab" id="tab-calls" aria-controls="panel-calls" aria-selected="false" data-tab="calls" tabindex="-1">Call log</button>
-    <button class="tab" role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources" tabindex="-1">Sources</button>
-    <button class="tab" role="tab" id="tab-sales" aria-controls="panel-sales" aria-selected="false" data-tab="sales" tabindex="-1">Sales and review</button>
     <button class="tab" role="tab" id="tab-stock" aria-controls="panel-stock" aria-selected="false" data-tab="stock" tabindex="-1">Inventory</button>
     <button class="tab" role="tab" id="tab-scripts" aria-controls="panel-scripts" aria-selected="false" data-tab="scripts" tabindex="-1">Scripts</button>
+    <button class="tab" role="tab" id="tab-clients" aria-controls="panel-clients" aria-selected="false" data-tab="clients" tabindex="-1">Clients (CRM)</button>
+    <button class="tab" role="tab" id="tab-calls" aria-controls="panel-calls" aria-selected="false" data-tab="calls" tabindex="-1">Call log</button>
+    <button class="tab" role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources" tabindex="-1">Sources</button>
+    <button class="tab" role="tab" id="tab-sales" aria-controls="panel-sales" aria-selected="false" data-tab="sales" tabindex="-1">Sales review</button>
     <button class="tab" role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab" tabindex="-1">Model lab</button>
   </nav>
 
@@ -576,14 +580,13 @@ tbody tr:hover{background:var(--surface-2)}
 
     <section class="panel" id="panel-stock" role="tabpanel" aria-labelledby="tab-stock" hidden>
       <div class="card">
-        <h2>Inventory</h2>
-        <p class="muted" style="margin:0 0 16px;max-width:68ch">What each branch has on the shelf and what it charges. Handlers see this on the call desk before they quote. All numbers here are samples.</p>
-        <p class="msg err" id="stLock" role="note" hidden>Only the owner changes items and prices. Handlers can update the number in stock after counting.</p>
-        <div class="field" style="max-width:320px"><label for="stBr">Branch</label><select id="stBr"></select></div>
-        <h3 style="margin:16px 0 8px">Check these</h3><ul class="fulist" id="stFlags" style="margin:0 0 16px;padding:0 0 0 16px"></ul>
-        <details class="help" style="margin:0 0 24px"><summary>How to read the list</summary><p class="muted" style="max-width:68ch">Each product has one or more supplier lines. Two suppliers can sell the same product at different prices, so each gets its own line. The desk quotes the first line that still has stock. "Phone price" is only filled in when callers pay a different price from walk-in customers. Leave it as "same" otherwise.</p></details>
-        <div class="tablewrap"><table style="min-width:760px"><thead><tr><th>Supplier</th><th class="num">In stock</th><th class="num">Price (LKR)</th><th class="num">Phone price</th><th>Last counted</th><th></th></tr></thead><tbody id="stBody"></tbody></table></div>
-        <div id="stAddBox" class="stadd" style="margin-top:16px"><h3 style="margin:0 0 8px">Add a product or a supplier line</h3><div class="row2"><div class="field"><label for="stnName">Product name</label><input id="stnName" placeholder="Use the same name to add a second supplier"></div><div class="field"><label for="stnNeed">Type</label><select id="stnNeed"></select></div></div><div class="row2"><div class="field"><label for="stnSup">Supplier</label><input id="stnSup" placeholder="Supplier A"></div><div class="field"><label for="stnQty">In stock</label><input id="stnQty" type="number" min="0" value="0"></div></div><div class="field" style="max-width:320px"><label for="stnPrice">Price (LKR)</label><input id="stnPrice" type="number" min="0" step="500"></div><button class="btn" type="button" id="stAdd">Add</button></div>
+        <div class="sechead"><h2 style="margin:0">Inventory</h2><div class="seg" id="stBr" role="group" aria-label="Branch"></div></div>
+        <p class="muted" style="margin:8px 0 16px;max-width:68ch">What each branch has on the shelf and what it charges. Tap a product to see suppliers, prices and details. Handlers see the same list on the call desk. All numbers are samples.</p>
+        <div class="stsearch"><input id="stQ" type="search" placeholder="Search a product, type or supplier" aria-label="Search inventory"><button class="btn primary" type="button" id="stAddProd">Add a product</button></div>
+        <div id="stChips"></div>
+        <div id="stGrid" style="margin-top:16px"></div>
+        <details class="help" style="margin-top:24px"><summary>Check these <span class="count" id="stFlagCt"></span></summary><ul class="fulist" id="stFlags" style="margin:8px 0 0;padding:0 0 0 16px"></ul></details>
+        <p class="muted small" style="margin:16px 0 0">Two suppliers can sell the same product at different prices, so each has its own line. The desk quotes the first line with stock. Phone price is only set when callers pay a different price from walk-in customers.</p>
       </div>
     </section>
 
@@ -915,6 +918,7 @@ tbody tr:hover{background:var(--surface-2)}
 
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Call detail" hidden></aside>
+<div class="qscrim" id="pdScrim" hidden><div class="pdpaper" id="pdPaper" role="dialog" aria-modal="true" aria-label="Product details"></div></div>
 <div class="qscrim" id="qScrim" hidden><div class="qpaper" id="qPaper" role="dialog" aria-modal="true" aria-label="Quotation preview"></div></div>
 <div id="toasts" role="status" aria-live="polite"></div>
 
@@ -1803,6 +1807,8 @@ function renderDeskSheet(){
   var bn=L==='si'?br.nameN.si:L==='ta'?br.nameN.ta:br.name;
   var wk=WHEN[d.time||'none'];
   var ov=scrGet(d.need)||{};var h='<div class="sechead"><h3 style="margin:0">Call sheet: '+esc(N.title)+(d.need&&d.need!=='none'?' <span class="tag">Script v'+scrVer(d.need)+'</span>':'')+'</h3><span class="tag">'+esc(br.name)+' · '+esc(d.src?SRC[d.src].name:'Source not asked')+'</span></div>';
+  h+='<div class="seg dsw" role="group" aria-label="Call sheet view" style="margin-top:16px"><button type="button" data-dv="script" aria-pressed="'+(S.dview!=='stock')+'">Script</button><button type="button" data-dv="stock" aria-pressed="'+(S.dview==='stock')+'">Inventory</button></div>';
+  if(S.dview==='stock'){h+=deskStockHtml(d);$('#deskSheet').innerHTML=h;return}
   h+='<div class="seg" role="group" aria-label="Call sheet language" style="margin-top:16px">'+[['en','English'],['si','සිංහල'],['ta','தமிழ்']].map(function(x){return '<button type="button" data-d="lang" data-v="'+x[0]+'" aria-pressed="'+(L===x[0])+'"'+(x[0]==='en'?'':' lang="'+x[0]+'"')+'>'+x[1]+'</button>'}).join('')+'</div>';
   h+='<h4>About this caller</h4><div>'+esc(d.src?SRCNOTE[d.src]:SRCNOTE.unknown)+'</div>';
   h+='<h4>Say first</h4><div class="say" lang="'+L+'">'+esc((L==='en'&&ov.say?ov.say:GREET[L]).replace('{branch}',bn))+(nat?'<span class="en">'+esc(GREET.en.replace('{branch}',br.name))+'</span>':'')+'</div>';
@@ -1812,7 +1818,6 @@ function renderDeskSheet(){
   }).join('')+'</ul>';
   var ofr=ov.offer!==undefined?ov.offer:N.offer,crs=ov.cross!==undefined?ov.cross:N.cross;h+='<h4>Offer</h4><div>'+esc(ofr)+(crs?' <span class="muted">Also mention: '+esc(crs)+'</span>':'')+'</div>';
   h+=stDeskHtml(d);
-  h+='<h4>Check availability</h4><input id="deskAvail" type="search" placeholder="Search a product" aria-label="Check availability" value="'+esc(S.avq||'')+'"><div id="deskAvailOut" style="margin-top:8px">'+avOutHtml(S.avq)+'</div>';
   if(d.need&&d.need!=='none'){h+='<h4>If they say</h4><ul class="objl">'+scrObjs(d.need).map(function(x){return '<li><b>"'+esc(x.q)+'"</b><span>'+esc(x.a)+'</span></li>'}).join('')+'</ul>'}
   var cl=CLOSE[d.outcome&&CLOSE[d.outcome]?d.outcome:'none'];
   h+='<h4>'+(d.outcome&&CLOSE[d.outcome]?'Close with':'Before they hang up')+'</h4><div class="say" lang="'+L+'">'+esc(((L==='en'&&ov.close&&!(d.outcome&&CLOSE[d.outcome]))?ov.close:cl[L]).replace('{when}',wk[L]))+(nat?'<span class="en">'+esc(cl.en.replace('{when}',wk.en))+'</span>':'')+'</div>';
@@ -2534,7 +2539,7 @@ function renderScriptResults(){
   var list=Object.keys(rows).map(function(k){return rows[k]}).sort(function(a,b){return a.need<b.need?-1:a.need>b.need?1:a.ver-b.ver});
   $('#scResults').innerHTML=list.length?'<thead><tr><th>Need</th><th class="num">Script</th><th class="num">Calls</th><th class="num">Booked or sold</th><th class="num">Rate</th></tr></thead><tbody>'+list.map(function(r){return '<tr><td>'+esc(r.need)+'</td><td class="num">v'+r.ver+'</td><td class="num">'+r.calls+'</td><td class="num">'+r.won+'</td><td class="num">'+Math.round(r.won/r.calls*100)+'%</td></tr>'}).join('')+'</tbody>':'<tbody><tr><td class="muted">Save calls on the desk. Results by script version appear here.</td></tr></tbody>';
 }
-/* ---------- stock and prices ---------- */
+/* ---------- inventory: product tiles ---------- */
 var LOWQ=2,STALE=7*DAY;
 function seedStock(){
   var i=0;
@@ -2557,24 +2562,50 @@ function seedStock(){
    ['purifier','UV water purifier',[['C',3,41000]]]
   ];
   var out=[];
-  ['col','kur'].forEach(function(br,bi){L.forEach(function(x,xi){x[2].forEach(function(b,k){
-    var qty=b[1];if(bi===1)qty=(qty*(xi%3+1)+xi)%9; if(bi===1&&x[1].indexOf('RO ')===0)qty=4;
-    var price=b[2],phone=price;
-    if(bi===1&&x[1]==='1 HP home pump, self-priming')phone=42000;
+  ['col','kur'].forEach(function(br,bi){L.forEach(function(x,xi){x[2].forEach(function(b){
+    var qty=b[1];if(bi===1)qty=(qty*(xi%3+1)+xi)%9;if(bi===1&&x[1].indexOf('RO ')===0)qty=4;
+    var price=b[2],phone=price;if(bi===1&&x[1]==='1 HP home pump, self-priming')phone=42000;
     out.push(r(br,x[0],x[1],'Supplier '+b[0],qty,price,phone,(xi%4===0)?9:2));
   })})});
   return out;
 }
 function stockList(){if(!S.stock)S.stock=seedStock();return S.stock}
+function pmGet(n){return (S.pmeta||(S.pmeta={}))[n]||{}}
 function stItems(br,need){
   var g={},ord=[];
-  stockList().forEach(function(r){if(r.br!==br||(need&&r.need!==need))return;var k=r.need+'|'+r.name;if(!g[k]){g[k]={need:r.need,name:r.name,rows:[]};ord.push(k)}g[k].rows.push(r)});
+  stockList().forEach(function(r){if(r.br!==br||(need&&r.need!==need))return;var k=r.need+'|'+r.name;if(!g[k]){g[k]={key:k,need:r.need,name:r.name,rows:[]};ord.push(k)}g[k].rows.push(r)});
   return ord.map(function(k){var it=g[k],tot=it.rows.reduce(function(a,x){return a+(+x.qty||0)},0),act=it.rows.filter(function(x){return +x.qty>0})[0];
     it.tot=tot;it.act=act||null;it.state=tot<=0?'out':tot<=LOWQ?'low':'in';
     it.next=act?it.rows.filter(function(x){return +x.qty>0&&x!==act&&x.price!==act.price})[0]:null;
     it.stale=Date.now()-Math.min.apply(null,it.rows.map(function(x){return x.ts||0}))>STALE;return it});
 }
 function stPill(s){return '<span class="pill '+(s==='in'?'good':s==='low'?'warn':'bad')+'">'+(s==='in'?'In stock':s==='low'?'Low':'Out')+'</span>'}
+function stPrice(it){var a=it.act||it.rows[0];return a?'LKR '+qNum(+a.phone):''}
+function stMatch(it,q){q=(q||'').trim().toLowerCase();if(!q)return true;return (it.name+' '+CSN[it.need].title+' '+it.rows.map(function(r){return r.sup}).join(' ')+' '+(pmGet(it.name).note||'')).toLowerCase().indexOf(q)>-1}
+function stTile(it,ctx){
+  var m=pmGet(it.name),img=m.img?'<img src="'+m.img+'" alt="">':'<span class="ph" aria-hidden="true">'+esc(it.name.charAt(0))+'</span>';
+  return '<button type="button" class="ptile '+it.state+'" data-ptile="'+esc(it.key)+'" data-pbr="'+ctx+'"><span class="pimg">'+img+'</span><span class="pname">'+esc(it.name)+'</span><span class="pmeta">'+stPill(it.state)+'<b>'+it.tot+' in stock</b></span><span class="pprice">'+stPrice(it)+'</span>'+(it.rows.length>1?'<span class="psub">'+it.rows.length+' suppliers</span>':'')+(it.stale?'<span class="psub warn">Count due</span>':'')+'</button>';
+}
+function stChips(sel,attr){
+  var ns=['all'].concat(NEEDS.filter(function(n){return CSN[n]&&n!=='none'}));
+  return '<div class="chips" role="group" aria-label="Filter by type">'+ns.map(function(n){return '<button type="button" class="chip" '+attr+'="'+n+'" aria-pressed="'+(sel===n)+'">'+(n==='all'?'All':esc(CSN[n].title))+'</button>'}).join('')+'</div>';
+}
+function stGrid(br,q,f,ctx,first){
+  var its=stItems(br).filter(function(it){return (f==='all'||it.need===f)&&stMatch(it,q)});
+  if(first)its.sort(function(a,b){return (b.need===first)-(a.need===first)});
+  return its.length?'<div class="pgrid">'+its.map(function(it){return stTile(it,ctx)}).join('')+'</div>':'<p class="muted">Nothing matches. Try another word.</p>';
+}
+function stFlags(br){
+  var f=[];
+  stItems(br).forEach(function(it){
+    var rs=it.rows,p=rs.map(function(x){return x.price}).filter(function(v,i,a){return a.indexOf(v)===i});
+    if(p.length>1)f.push(it.name+' has '+p.length+' prices because of different suppliers. The desk quotes the first one with stock.');
+    rs.forEach(function(x){if(x.phone!==x.price)f.push(it.name+' ('+x.sup+') has a phone price of '+qNum(+x.phone)+' and a walk-in price of '+qNum(+x.price)+'.')});
+    if(it.state!=='in')f.push(it.name+(it.state==='out'?' is out of stock.':' is running low, '+it.tot+' left.'));
+    if(it.stale)f.push(it.name+' has not been counted in 7 days.');
+  });
+  return f;
+}
 function stDeskHtml(d){
   if(!d.need||d.need==='none')return '';
   var its=stItems(d.br,d.need);if(!its.length)return '<h4>Stock and price</h4><div class="muted">Nothing listed for this need at '+esc(BR[d.br].name)+'. Do not quote a price until the owner adds it.</div>';
@@ -2584,72 +2615,94 @@ function stDeskHtml(d){
     if(a){note='Quote LKR '+qNum(+a.phone)+(a.phone!==a.price?' (phone price. Walk-in is '+qNum(+a.price)+')':'')+'. '+it.tot+' left.';
       if(it.next)note+=' A second batch from '+esc(it.next.sup)+' is LKR '+qNum(+it.next.price)+'. Quote the first until it runs out.'}
     else note='Do not promise this item. Check the other branch or offer a date.';
-    h+='<li><b>'+esc(it.name)+' '+stPill(it.state)+'</b><span>'+esc(note)+(it.stale?' <em>Stock not counted this week.</em>':'')+'</span></li>';
+    h+='<li><b>'+esc(it.name)+' '+stPill(it.state)+'</b><span>'+esc(note)+'</span></li>';
   });
   return h+'</ul>';
 }
-
-function avOutHtml(q){
-  q=(q||'').trim().toLowerCase();if(q.length<2)return '<span class="muted">Type a product, for example "borewell" or "RO".</span>';
-  var m={};stockList().forEach(function(r){if(r.name.toLowerCase().indexOf(q)>-1||CSN[r.need].title.toLowerCase().indexOf(q)>-1)m[r.name]=1});
-  var names=Object.keys(m);if(!names.length)return '<span class="muted">Nothing listed with that name.</span>';
-  var me=S.desk&&S.desk.br;
-  return '<ul class="objl">'+names.slice(0,8).map(function(n){
-    var cells=['col','kur'].map(function(b){var it=stItems(b).filter(function(x){return x.name===n})[0];
-      return '<span><b>'+esc(BR[b].name)+(b===me?' (this call)':'')+':</b> '+(it?stPill(it.state)+' '+it.tot+(it.act?', LKR '+qNum(+it.act.phone):''):'not listed')+'</span>'}).join('');
-    return '<li><b>'+esc(n)+'</b>'+cells+'</li>'}).join('')+'</ul>';
-}
-function stQuoteItems(d){
-  var its=stItems(d.br,d.need),out=[];
-  its.forEach(function(it){if(it.act)out.push({n:it.name,p:+it.act.phone})});
-  return out;
-}
-function stFlags(br){
-  var f=[];
-  stItems(br).forEach(function(it){
-    var rs=it.rows,p=rs.map(function(x){return x.price}).filter(function(v,i,a){return a.indexOf(v)===i});
-    if(p.length>1)f.push(it.name+' has '+p.length+' prices because of different suppliers ('+rs.map(function(x){return x.sup+' '+qNum(+x.price)}).join(', ')+'). The desk quotes the first one with stock.');
-    rs.forEach(function(x){if(x.phone!==x.price)f.push(it.name+' ('+x.sup+') has a phone price of '+qNum(+x.phone)+' and a walk-in price of '+qNum(+x.price)+'.')});
-    if(it.state!=='in')f.push(it.name+(it.state==='out'?' is out of stock.':' is running low, '+it.tot+' left.'));
-    if(it.stale)f.push(it.name+' has not been counted in 7 days. Count it on the shelf and update the number.');
-  });
-  return f;
+function stQuoteItems(d){var out=[];stItems(d.br,d.need).forEach(function(it){if(it.act)out.push({n:it.name,p:+it.act.phone})});return out}
+function deskStockHtml(d){
+  var br=d.br;
+  return '<div class="stsearch"><input id="deskAvail" type="search" placeholder="Search a product, type or supplier" aria-label="Search inventory" value="'+esc(S.avq||'')+'"></div>'+'<div id="deskAvailOut" class="compact" style="margin-top:16px">'+stGrid(br,S.avq,'all','desk',d.need)+'</div><p class="muted small" style="margin:16px 0 0">Showing '+esc(BR[br].name)+'. Tap a tile to see the other branch.</p>';
 }
 function renderStock(){
   var bs=USER?[USER]:['col','kur'],cur=USER||S.stBr||'col';S.stBr=cur;
-  $('#stBr').innerHTML=bs.map(function(b){return '<option value="'+b+'"'+(b===cur?' selected':'')+'>'+esc(BR[b].name)+'</option>'}).join('');
-  $('#stBr').disabled=!!USER;
-  var can=!!OWNER,its=stItems(cur);
-  var nopt=NEEDS.filter(function(n){return CSN[n]&&n!=='none'});
-  var h='';
-  its.forEach(function(it){
-    h+='<tr class="sthead"><td colspan="6"><b>'+esc(it.name)+'</b> '+stPill(it.state)+' <span class="muted small">'+esc(CSN[it.need].title)+' · '+it.tot+' in stock'+(it.rows.length>1?' across '+it.rows.length+' suppliers':'')+'</span></td></tr>';
-    it.rows.forEach(function(r){
-      h+='<tr data-sid="'+r.id+'"><td>'+(can?'<input data-st="sup" value="'+esc(r.sup)+'" aria-label="Supplier">':esc(r.sup))+'</td><td class="num"><input data-st="qty" type="number" min="0" value="'+r.qty+'" aria-label="In stock"></td><td class="num">'+(can?'<input data-st="price" type="number" min="0" step="500" value="'+r.price+'" aria-label="Price">':qNum(+r.price))+'</td><td class="num">'+(can?'<input data-st="phone" type="number" min="0" step="500" value="'+(r.phone!==r.price?r.phone:'')+'" placeholder="same" aria-label="Phone price, blank if the same">':(r.phone!==r.price?qNum(+r.phone):'same'))+'</td><td class="small muted">'+Math.max(0,Math.round((Date.now()-r.ts)/DAY))+' d ago</td><td>'+(can?'<button class="btn sm" type="button" data-stdel="'+r.id+'">Remove</button>':'')+'</td></tr>';
-    });
-  });
-  $('#stBody').innerHTML=h||'<tr><td colspan="6" class="muted">No items yet.</td></tr>';
-  $('#stAddBox').hidden=!can;$('#stnNeed').innerHTML=nopt.map(function(n){return '<option value="'+n+'">'+esc(CSN[n].title)+'</option>'}).join('');$('#stLock').hidden=can;
+  $('#stBr').innerHTML=bs.map(function(b){return '<button type="button" data-stbr="'+b+'" aria-pressed="'+(b===cur)+'">'+esc(BR[b].name)+'</button>'}).join('');
+  $('#stBr').hidden=bs.length<2;
+  $('#stChips').innerHTML=stChips(S.stf||'all','data-stf');
+  $('#stGrid').innerHTML=stGrid(cur,$('#stQ').value,S.stf||'all','inv');
+  $('#stAddProd').hidden=!OWNER;
   var fl=stFlags(cur);
-  $('#stFlags').innerHTML=fl.length?fl.map(function(x){return '<li>'+esc(x)+'</li>'}).join(''):'<li class="muted">Nothing to check.</li>';
+  $('#stFlags').innerHTML=fl.length?fl.slice(0,6).map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+(fl.length>6?'<li class="muted">And '+(fl.length-6)+' more. Open a product to see its lines.</li>':''):'<li class="muted">Nothing to check.</li>';
+  $('#stFlagCt').textContent=fl.length?fl.length:'';
 }
+/* product modal */
+function pdRows(br,key){return stockList().filter(function(r){return r.br===br&&(r.need+'|'+r.name)===key})}
+function openProd(br,key){S.pd={br:br,key:key};renderProd();$('#pdScrim').hidden=false;var c=$('#pdClose');if(c)c.focus({preventScroll:true})}
+function closeProd(){$('#pdScrim').hidden=true;S.pd=null;if(S.tab==='stock')renderStock();else if(S.tab==='desk')renderDeskSheet()}
+function pdRefresh(){if(S.tab==='stock')renderStock()}
+function renderProd(){
+  var p=S.pd;if(!p)return;var can=!!OWNER,isNew=p.key==='new',rows=isNew?[]:pdRows(p.br,p.key);
+  var first=rows[0],name=isNew?(p.draft&&p.draft.name||''):first.name,need=isNew?(p.draft&&p.draft.need||'pump_home'):first.need,m=pmGet(name);
+  var ns=NEEDS.filter(function(n){return CSN[n]&&n!=='none'});
+  var h='<div class="pdh"><h2 style="margin:0">'+(isNew?'Add a product':esc(name))+'</h2><button class="btn sm" type="button" id="pdClose">Close</button></div>';
+  h+='<div class="pdtop"><div class="pdimg">'+(m.img?'<img src="'+m.img+'" alt="">':'<span class="ph">'+esc((name||'?').charAt(0))+'</span>')+'</div><div class="pdfields">';
+  if(can){
+    h+='<div class="field"><label for="pdName">Product name</label><input id="pdName" value="'+esc(name)+'"></div><div class="field"><label for="pdNeed">Type</label><select id="pdNeed">'+ns.map(function(n){return '<option value="'+n+'"'+(n===need?' selected':'')+'>'+esc(CSN[n].title)+'</option>'}).join('')+'</select></div>';
+    h+='<div class="field"><label for="pdImg">Photo</label><input id="pdImg" type="file" accept="image/*">'+(m.img?'<button class="btn sm" type="button" id="pdImgX" style="margin-top:8px">Remove photo</button>':'')+'</div>';
+  }else h+='<p class="muted" style="margin:0">'+esc(CSN[need].title)+'</p>';
+  h+='</div></div>';
+  h+='<div class="field"><label for="pdNote">Details (size, model, warranty, anything a handler should say)</label><textarea id="pdNote" rows="3"'+(can?'':' disabled')+'>'+esc(m.note||'')+'</textarea></div>';
+  if(!isNew){
+    h+='<h3 style="margin:16px 0 8px">'+esc(BR[p.br].name)+' stock</h3><div class="pdlines">'+rows.map(function(r){
+      return '<div class="pdl" data-sid="'+r.id+'"><div class="field"><label>Supplier</label>'+(can?'<input data-st="sup" value="'+esc(r.sup)+'">':'<div>'+esc(r.sup)+'</div>')+'</div><div class="field"><label>In stock</label><input data-st="qty" type="number" min="0" value="'+r.qty+'"></div><div class="field"><label>Price (LKR)</label>'+(can?'<input data-st="price" type="number" min="0" step="500" value="'+r.price+'">':'<div>'+qNum(+r.price)+'</div>')+'</div><div class="field"><label>Phone price</label>'+(can?'<input data-st="phone" type="number" min="0" step="500" value="'+(r.phone!==r.price?r.phone:'')+'" placeholder="same">':'<div>'+(r.phone!==r.price?qNum(+r.phone):'same')+'</div>')+'</div>'+(can?'<button class="btn sm" type="button" data-pdx="'+r.id+'">Remove</button>':'')+'<span class="small muted">Counted '+Math.max(0,Math.round((Date.now()-r.ts)/DAY))+' d ago</span></div>'}).join('')+'</div>';
+    if(can)h+='<button class="btn" type="button" id="pdAddLine" style="margin-top:8px">Add a supplier line</button>';
+    var other=p.br==='col'?'kur':'col',oi=stItems(other).filter(function(x){return x.key===p.key})[0];
+    h+='<p class="pdother"><b>'+esc(BR[other].name)+':</b> '+(oi?stPill(oi.state)+' '+oi.tot+' in stock, '+stPrice(oi):'not listed')+'</p>';
+  }else{
+    h+='<div class="row2"><div class="field"><label for="pdSup">Supplier</label><input id="pdSup" placeholder="Supplier A"></div><div class="field"><label for="pdQty">In stock</label><input id="pdQty" type="number" min="0" value="0"></div></div><div class="field" style="max-width:320px"><label for="pdPrice">Price (LKR)</label><input id="pdPrice" type="number" min="0" step="500"></div><button class="btn primary" type="button" id="pdCreate">Add product</button>';
+  }
+  if(can&&!isNew)h+='<div style="margin-top:24px"><button class="btn sm out" type="button" id="pdDel">Remove this product from '+esc(BR[p.br].name)+'</button></div>';
+  $('#pdPaper').innerHTML=h;
+}
+function pdImgLoad(file,cb){
+  var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){var s=360/Math.max(im.width,im.height,360),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.72))};im.src=fr.result};fr.readAsDataURL(file);
+}
+document.addEventListener('click',function(e){
+  var t=e.target,c=t.closest?t.closest.bind(t):null;if(!c)return;var x;
+  if((x=c('[data-ptile]'))){openProd(x.getAttribute('data-pbr')==='desk'?S.desk.br:(S.stBr||USER||'col'),x.getAttribute('data-ptile'));return}
+  if(t.id==='pdScrim'||c('#pdClose')){closeProd();return}
+  if((x=c('[data-dv]'))){S.dview=x.getAttribute('data-dv');renderDeskSheet();return}
+  if((x=c('[data-stbr]'))){S.stBr=x.getAttribute('data-stbr');renderStock();return}
+  if((x=c('[data-stf]'))){S.stf=x.getAttribute('data-stf');renderStock();return}
+  if((x=c('[data-avf]'))){S.avf=x.getAttribute('data-avf');renderDeskSheet();return}
+  if(c('#stAddProd')&&OWNER){S.pd={br:S.stBr,key:'new',draft:{}};renderProd();$('#pdScrim').hidden=false;return}
+  var p=S.pd;if(!p)return;
+  if(c('#pdAddLine')&&OWNER){var f=pdRows(p.br,p.key)[0];stockList().push({id:'s'+Date.now(),br:p.br,need:f.need,name:f.name,sup:'Supplier',qty:0,price:f.price,phone:f.price,ts:Date.now()});renderProd();pdRefresh();return}
+  if((x=c('[data-pdx]'))&&OWNER){var id=x.getAttribute('data-pdx');S.stock=stockList().filter(function(r){return r.id!==id});if(!pdRows(p.br,p.key).length){closeProd();return}renderProd();pdRefresh();return}
+  if(c('#pdDel')&&OWNER){var rs=pdRows(p.br,p.key).map(function(r){return r.id});S.stock=stockList().filter(function(r){return rs.indexOf(r.id)<0});closeProd();toast('Product removed');return}
+  if(c('#pdImgX')&&OWNER){var nm=pdRows(p.br,p.key)[0].name;pmGet(nm);S.pmeta[nm].img='';renderProd();pdRefresh();return}
+  if(c('#pdCreate')&&OWNER){var nm2=($('#pdName').value||'').trim();if(!nm2){toast('Enter a product name');return}var pr=+$('#pdPrice').value||0;stockList().push({id:'s'+Date.now(),br:p.br,need:$('#pdNeed').value,name:nm2,sup:($('#pdSup').value||'').trim()||'Supplier A',qty:+$('#pdQty').value||0,price:pr,phone:pr,ts:Date.now()});var pm=pmGet(nm2);S.pmeta[nm2]=pm;if(p.draft&&p.draft.img)pm.img=p.draft.img;if($('#pdNote').value)pm.note=$('#pdNote').value;closeProd();toast('Product added');return}
+});
 document.addEventListener('change',function(e){
-  var t=e.target,tr=t.closest&&t.closest('tr[data-sid]');if(!tr||!t.getAttribute('data-st'))return;
+  var t=e.target,p=S.pd;
+  if(p&&t.id==='pdImg'&&OWNER&&t.files&&t.files[0]){pdImgLoad(t.files[0],function(u){if(p.key==='new'){p.draft=p.draft||{};p.draft.img=u;p.draft.name=$('#pdName').value;p.draft.need=$('#pdNeed').value;var m=(S.pmeta||(S.pmeta={}));renderProd()}else{var nm=pdRows(p.br,p.key)[0].name;pmGet(nm);S.pmeta[nm].img=u;renderProd();pdRefresh()}});return}
+  if(p&&t.id==='pdName'&&OWNER&&p.key!=='new'){var old=pdRows(p.br,p.key),o=old[0].name,nn=t.value.trim();if(nn&&nn!==o){old.forEach(function(r){r.name=nn});if(S.pmeta&&S.pmeta[o]){S.pmeta[nn]=S.pmeta[o];delete S.pmeta[o]}p.key=old[0].need+'|'+nn;renderProd();pdRefresh()}return}
+  if(p&&t.id==='pdNeed'&&OWNER&&p.key!=='new'){var rs=pdRows(p.br,p.key),nm=rs[0].name;rs.forEach(function(r){r.need=t.value});p.key=t.value+'|'+nm;renderProd();pdRefresh();return}
+  if(p&&t.id==='pdNote'&&OWNER&&p.key!=='new'){var n2=pdRows(p.br,p.key)[0].name;pmGet(n2);S.pmeta[n2].note=t.value;pdRefresh();return}
+  var tr=t.closest&&t.closest('[data-sid]');if(!p||!tr||!t.getAttribute('data-st'))return;
   var r=stockList().filter(function(x){return x.id===tr.getAttribute('data-sid')})[0];if(!r)return;
   var f=t.getAttribute('data-st'),v=t.value;
   if(f==='qty'){r.qty=Math.max(0,+v||0);r.ts=Date.now();toast('Count saved')}
   else if(f==='price'){if(!OWNER)return;var same=r.phone===r.price;r.price=+v||0;if(same)r.phone=r.price}
-  else if(f==='phone'){r.phone=v===''?r.price:(+v||0)}
-  else r[f]=v;
-  renderStock();
+  else if(f==='phone'){if(!OWNER)return;r.phone=v===''?r.price:(+v||0)}
+  else if(OWNER)r[f]=v;
+  pdRefresh();
 });
-document.addEventListener('click',function(e){
-  var t=e.target.closest?e.target.closest('#stAdd,[data-stdel]'):null;if(!t)return;
-  if(t.id==='stAdd'&&OWNER){var l=stockList();var nm=($('#stnName').value||'').trim();if(!nm){toast('Enter a product name');return}var pr=+$('#stnPrice').value||0;l.push({id:'s'+Date.now(),br:S.stBr,need:$('#stnNeed').value,name:nm,sup:($('#stnSup').value||'').trim()||'Supplier A',qty:+$('#stnQty').value||0,price:pr,phone:pr,ts:Date.now()});$('#stnName').value='';$('#stnPrice').value='';renderStock();return}
-  var id=t.getAttribute('data-stdel');if(id&&OWNER){S.stock=stockList().filter(function(x){return x.id!==id});renderStock()}
+document.addEventListener('input',function(e){
+  if(e.target.id==='deskAvail'){S.avq=e.target.value;var o=$('#deskAvailOut');if(o)o.innerHTML=stGrid(S.desk.br,S.avq,'all','desk',S.desk.need)}
+  if(e.target.id==='stQ')renderStock();
 });
-document.addEventListener('input',function(e){if(e.target.id==='deskAvail'){S.avq=e.target.value;var o=$('#deskAvailOut');if(o)o.innerHTML=avOutHtml(S.avq)}});
-document.addEventListener('change',function(e){if(e.target.id==='stBr'){S.stBr=e.target.value;renderStock()}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.pd)closeProd()});
 /* ---------- tabs ---------- */
 function showTab(t){
   S.tab=t;
@@ -2820,7 +2873,7 @@ $('#viewSw').addEventListener('click',function(e){var b=e.target.closest&&e.targ
 function applyLogin(){
   var on=!!(USER||OWNER);
   $('#login').hidden=on;$('#whoami').hidden=!on;$('#logoutBtn').hidden=!on;
-  $('#tab-dash').hidden=!OWNER;
+  $('#tab-dash').hidden=!OWNER;['sources','sales','lab'].forEach(function(k){var b=$('#tab-'+k);if(b)b.hidden=!!(on&&!OWNER)});
   if(USER){$('#whoami').textContent=(ME?ME+' · ':'')+BR[USER].name+' · '+BR[USER].main;S.branch=USER;S.desk.br=USER;setVisitor(S.web?S.web.source:'google',USER)}
   else if(OWNER){$('#whoami').textContent='Akith · Owner, both branches';S.branch='all'}
   else{S.branch='all'}
@@ -2841,7 +2894,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'&&S.openId)closeDrawer();
   var tab=e.target.closest&&e.target.closest('.tab');
   if(tab&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){
-    var tabs=$$('.tab'),i=tabs.indexOf(tab),n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];
+    var tabs=$$('.tab').filter(function(x){return !x.hidden}),i=tabs.indexOf(tab),n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];
     showTab(n.getAttribute('data-tab'));n.focus({preventScroll:true});
   }
   if(e.key==='Tab'&&S.openId){
