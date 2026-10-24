@@ -485,6 +485,8 @@ tbody tr:hover{background:var(--surface-2)}
 @media(max-width:560px){.pdtop{grid-template-columns:1fr}.pdl{grid-template-columns:1fr 1fr}.pgrid{grid-template-columns:repeat(2,1fr);gap:8px}}
 .demotools{position:relative}.demotools summary{cursor:pointer;list-style:none;font-size:13px;color:var(--ink-2);padding:8px 16px;border:1px dashed var(--line);border-radius:999px}.demotools[open] .dtbody{position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:grid;gap:8px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 32px rgba(8,28,46,.16);min-width:240px}
 .compact .pgrid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:8px}.compact .ptile{padding:8px}.compact .pimg{aspect-ratio:16/9}
+.flcard{border:1px solid var(--line);border-left:6px solid var(--c);border-radius:16px;padding:16px;background:var(--surface);display:grid;gap:16px;margin-top:16px}.flhead{display:flex;gap:8px;align-items:center}.ftag{display:inline-block;padding:0 8px;border-radius:999px;background:var(--c);color:#fff;font-size:12px;font-weight:700;line-height:22px}.fltext{font-size:17px;line-height:1.5;white-space:pre-wrap}.flopts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.flopts .btn small{display:block;opacity:.7;font-weight:400}.flglob{margin-top:16px;display:grid;gap:8px}.flglob .chip{border-color:var(--c);color:var(--c)}.flglob>div,.flpal .chips{display:flex;gap:8px;flex-wrap:wrap}.flpal .chip{border-color:var(--c);color:var(--c)}.flnav{display:flex;gap:8px;margin-top:16px}.flfull{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:16px}.flfull li{display:grid;gap:4px;border-left:4px solid var(--line);padding-left:16px}.flwrap{margin-top:16px;border:1px solid var(--line);border-radius:16px;background:var(--surface-2);overflow:hidden}.flscroll{overflow:auto;max-height:560px;padding:8px}.flmap{display:block}.flnode{cursor:pointer}.flnode:focus{outline:none}.flnode.sel rect:first-child{filter:drop-shadow(0 2px 6px rgba(8,28,46,.3))}.fltype{font-size:10px;font-weight:700;letter-spacing:.06em;font-family:inherit}.fltitle{font-size:13px;font-weight:600;fill:var(--ink);font-family:inherit}.fllab{font-size:11px;fill:var(--ink-2);font-family:inherit}.lkrow{display:grid;grid-template-columns:1fr auto 1.4fr auto;gap:8px;align-items:center;margin-bottom:8px}.lkrow input,.lkrow select,#flEd input,#flEd select,#flEd textarea{border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink);font:inherit;width:100%}.chk{display:flex;gap:8px;align-items:flex-start}#flEd .chk input{width:auto;margin-top:4px;flex:none}.chk{align-items:flex-start}
+@media(max-width:560px){.lkrow{grid-template-columns:1fr}}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -592,19 +594,16 @@ tbody tr:hover{background:var(--surface-2)}
 
     <section class="panel" id="panel-scripts" role="tabpanel" aria-labelledby="tab-scripts" hidden>
       <div class="card">
-        <h2>Sales scripts</h2>
-        <p class="muted" style="margin:0 0 16px;max-width:68ch">One script per need. The handler sees it on the call sheet. Every change makes a new version, and each saved call records the version used, so you can see whether a change helped. The starting scripts are drafts. We rewrite them from your real calls after the diagnosis.</p>
-        <p class="msg err" id="scLock" role="note" hidden>Only the owner edits scripts. You can read them here and on the call sheet.</p>
-        <div class="row2"><div class="field"><label for="scNeed">Script for</label><select id="scNeed"></select></div><div class="field"><label>Version</label><div id="scVer" class="muted" style="padding-top:8px"></div></div></div>
-        <div class="field"><label for="scSay">Say first (English)</label><textarea id="scSay" rows="2"></textarea></div>
-        <div class="field"><label for="scOffer">Offer</label><textarea id="scOffer" rows="2"></textarea></div>
-        <div class="field"><label for="scCross">Also mention</label><textarea id="scCross" rows="2"></textarea></div>
-        <div class="field"><label for="scObj">If they say (one per line: what they say | what to reply)</label><textarea id="scObj" rows="5"></textarea></div>
-        <div class="field"><label for="scClose">Close (English)</label><textarea id="scClose" rows="2"></textarea></div>
-        <div class="field"><label for="scNote">What changed and why (optional)</label><input id="scNote" placeholder="For example: added a reply for the price objection"></div>
-        <div class="d-actions"><button class="btn primary" type="button" id="scSave">Save as new version</button></div>
-        <h3 style="margin:24px 0 8px">Version history</h3><ul class="fulist" id="scHist" style="margin:0;padding:0;list-style:none"></ul>
+        <div class="sechead"><h2 style="margin:0">Call scripts</h2><span id="fpStatus" class="pill good"></span></div>
+        <p class="muted" style="margin:8px 0 16px;max-width:72ch">Each script is a flow of tiles. Tap a tile on the map to edit it. Rules link a tile to the next one, depending on what the caller says. Buying signals and objections can sit "anytime", so the handler taps them whenever they come up. When you publish, handlers see the new version on their next call.</p>
+        <p class="msg err" id="fpLock" role="note" hidden>Only the owner edits scripts. You can read them here and use them on the call sheet.</p>
+        <div class="row2"><div class="field"><label for="fpSel">Script profile</label><select id="fpSel"></select></div>
+        <div class="field" id="fpAdmin" hidden><label for="fpNewName">Coreframe: new profile (copies the one selected)</label><div class="stsearch"><input id="fpNewName" placeholder="Name, for example Borewell, repeat client"><select id="fpNewNeed" aria-label="Used for"></select><button class="btn" type="button" id="fpNew">Create</button><button class="btn sm out" type="button" id="fpDelP">Delete profile</button></div></div></div>
+        <div id="fpAddRow" class="flpal"><span class="muted small">Add a tile after the selected one</span><div class="chips" style="margin-top:8px"></div></div>
+        <div class="flwrap"><div id="flMap" class="flscroll"></div></div>
       </div>
+      <div class="card" id="flEd"></div>
+      <div class="card"><h3 style="margin:0 0 8px">Publish</h3><div class="field"><label for="fpNote">What changed and why (optional)</label><input id="fpNote" placeholder="For example: added a reply for the price objection"></div><div class="d-actions"><button class="btn primary" type="button" id="fpPub">Publish new version</button><button class="btn" type="button" id="fpDiscard">Discard draft</button></div><h3 style="margin:24px 0 8px">Version history</h3><ul class="fulist" id="fpHist" style="margin:0;padding:0;list-style:none"></ul></div>
       <div class="card"><h2>Results by script version</h2><p class="muted" style="margin:0 0 16px">Calls saved on the desk, grouped by the script version in use. Small numbers mean little, so read this after at least 20 calls per script.</p><div class="tablewrap"><table id="scResults" style="min-width:560px"></table></div></div>
     </section>
 
@@ -943,7 +942,7 @@ var SOURCES=[
 var SRC={};SOURCES.forEach(function(s){SRC[s.id]=s});
 SRC.unknown={id:'unknown',name:'Not asked',campaigns:['Not asked'],click:null,spend:0,landing:'-'};
 var USER=null,OWNER=false,ME=null;
-var ACCOUNTS=[{user:'colombo',pass:'colombo-demo',branch:'col'},{user:'kurunegala',pass:'kurunegala-demo',branch:'kur'},{user:'akith',pass:'akith-demo',branch:null,owner:true,name:'Akith'},{user:'nimali',pass:'nimali-demo',branch:'col',name:'Nimali'},{user:'sanjaya',pass:'sanjaya-demo',branch:'col',name:'Sanjaya'},{user:'chathura',pass:'chathura-demo',branch:'kur',name:'Chathura'}];
+var ACCOUNTS=[{user:'colombo',pass:'colombo-demo',branch:'col'},{user:'kurunegala',pass:'kurunegala-demo',branch:'kur'},{user:'akith',pass:'akith-demo',branch:null,owner:true,name:'Akith'},{user:'coreframe',pass:'coreframe-demo',branch:null,owner:true,admin:true,name:'Coreframe'},{user:'nimali',pass:'nimali-demo',branch:'col',name:'Nimali'},{user:'sanjaya',pass:'sanjaya-demo',branch:'col',name:'Sanjaya'},{user:'chathura',pass:'chathura-demo',branch:'kur',name:'Chathura'}];
 var BRANCHES=[
   {id:'col',name:'Colombo',nameN:{si:'කොළඹ',ta:'கொழும்பு'},main:'071 777 4056',prefix:'011 555 01',w:60,
    locs:{en:['Nugegoda','Rajagiriya','Dehiwala','Battaramulla','Maharagama','Kottawa','Moratuwa','Kaduwela','Wattala','Piliyandala'],
@@ -1806,21 +1805,22 @@ function renderDeskSheet(){
   var d=S.desk,N=CSN[d.need||'none'],br=BR[d.br],L=d.lang,nat=L!=='en';
   var bn=L==='si'?br.nameN.si:L==='ta'?br.nameN.ta:br.name;
   var wk=WHEN[d.time||'none'];
-  var ov=scrGet(d.need)||{};var h='<div class="sechead"><h3 style="margin:0">Call sheet: '+esc(N.title)+(d.need&&d.need!=='none'?' <span class="tag">Script v'+scrVer(d.need)+'</span>':'')+'</h3><span class="tag">'+esc(br.name)+' · '+esc(d.src?SRC[d.src].name:'Source not asked')+'</span></div>';
+  var prof=d.need&&d.need!=='none'?profForNeed(d.need):null;var h='<div class="sechead"><h3 style="margin:0">Call sheet: '+esc(N.title)+(prof?' <span class="tag">Script v'+prof.ver+'</span>':'')+'</h3><span class="tag">'+esc(br.name)+' · '+esc(d.src?SRC[d.src].name:'Source not asked')+'</span></div>';
   h+='<div class="seg dsw" role="group" aria-label="Call sheet view" style="margin-top:16px"><button type="button" data-dv="script" aria-pressed="'+(S.dview!=='stock')+'">Script</button><button type="button" data-dv="stock" aria-pressed="'+(S.dview==='stock')+'">Inventory</button></div>';
   if(S.dview==='stock'){h+=deskStockHtml(d);$('#deskSheet').innerHTML=h;return}
   h+='<div class="seg" role="group" aria-label="Call sheet language" style="margin-top:16px">'+[['en','English'],['si','සිංහල'],['ta','தமிழ்']].map(function(x){return '<button type="button" data-d="lang" data-v="'+x[0]+'" aria-pressed="'+(L===x[0])+'"'+(x[0]==='en'?'':' lang="'+x[0]+'"')+'>'+x[1]+'</button>'}).join('')+'</div>';
   h+='<h4>About this caller</h4><div>'+esc(d.src?SRCNOTE[d.src]:SRCNOTE.unknown)+'</div>';
-  h+='<h4>Say first</h4><div class="say" lang="'+L+'">'+esc((L==='en'&&ov.say?ov.say:GREET[L]).replace('{branch}',bn))+(nat?'<span class="en">'+esc(GREET.en.replace('{branch}',br.name))+'</span>':'')+'</div>';
+  if(!(prof&&L==='en'))h+='<h4>Say first</h4><div class="say" lang="'+L+'">'+esc(GREET[L].replace('{branch}',bn))+(nat?'<span class="en">'+esc(GREET.en.replace('{branch}',br.name))+'</span>':'')+'</div>';
+  if(prof)h+=flowLive(d,prof);
   h+='<h4>Ask, and tap each one as you get the answer</h4><ul class="asklist">'+N.ask.map(function(id){
     var on=d.asked.indexOf(id)>-1;
     return '<li><button type="button" class="ask" data-d="ask" data-v="'+id+'" aria-pressed="'+on+'"><span class="box"></span><span lang="'+L+'">'+esc(ASKS[id][L])+(nat?'<span class="en">'+esc(ASKS[id].en)+'</span>':'')+'</span></button></li>';
   }).join('')+'</ul>';
-  var ofr=ov.offer!==undefined?ov.offer:N.offer,crs=ov.cross!==undefined?ov.cross:N.cross;h+='<h4>Offer</h4><div>'+esc(ofr)+(crs?' <span class="muted">Also mention: '+esc(crs)+'</span>':'')+'</div>';
+  if(!prof){var ofr=N.offer,crs=N.cross;h+='<h4>Offer</h4><div>'+esc(ofr)+(crs?' <span class="muted">Also mention: '+esc(crs)+'</span>':'')+'</div>'}
   h+=stDeskHtml(d);
-  if(d.need&&d.need!=='none'){h+='<h4>If they say</h4><ul class="objl">'+scrObjs(d.need).map(function(x){return '<li><b>"'+esc(x.q)+'"</b><span>'+esc(x.a)+'</span></li>'}).join('')+'</ul>'}
+  if(!prof&&d.need&&d.need!=='none'){h+='<h4>If they say</h4><ul class="objl">'+DEFOBJ.map(function(x){return '<li><b>"'+esc(x.q)+'"</b><span>'+esc(x.a)+'</span></li>'}).join('')+'</ul>'}
   var cl=CLOSE[d.outcome&&CLOSE[d.outcome]?d.outcome:'none'];
-  h+='<h4>'+(d.outcome&&CLOSE[d.outcome]?'Close with':'Before they hang up')+'</h4><div class="say" lang="'+L+'">'+esc(((L==='en'&&ov.close&&!(d.outcome&&CLOSE[d.outcome]))?ov.close:cl[L]).replace('{when}',wk[L]))+(nat?'<span class="en">'+esc(cl.en.replace('{when}',wk.en))+'</span>':'')+'</div>';
+  if(!prof||d.outcome&&CLOSE[d.outcome])h+='<h4>'+(d.outcome&&CLOSE[d.outcome]?'Close with':'Before they hang up')+'</h4><div class="say" lang="'+L+'">'+esc((cl[L]).replace('{when}',wk[L]))+(nat?'<span class="en">'+esc(cl.en.replace('{when}',wk.en))+'</span>':'')+'</div>';
   if(nat)h+='<p class="muted small" style="margin:16px 0 0">Sinhala and Tamil lines are drafts. A native speaker should review them before staff use them.</p>';
   $('#deskSheet').innerHTML=h;
 }
@@ -1878,7 +1878,7 @@ function deskSample(){
   S.desk=d;$('#deskName').value='';$('#deskPhone').value='';$('#deskCid').checked=false;$('#deskNotes').value='';
   renderDesk();toast('Incoming call on the '+BR[d.br].name+' line. The sheet is ready.');
 }
-function deskClear(){S.desk=newDesk();$('#deskName').value='';$('#deskPhone').value='';$('#deskCid').checked=false;$('#deskNotes').value='';$('#deskTimer').textContent='0:00';if($('#deskSale'))$('#deskSale').value='';if($('#deskInv'))$('#deskInv').value='';renderDesk()}
+function deskClear(){S.flow=null;S.desk=newDesk();$('#deskName').value='';$('#deskPhone').value='';$('#deskCid').checked=false;$('#deskNotes').value='';$('#deskTimer').textContent='0:00';if($('#deskSale'))$('#deskSale').value='';if($('#deskInv'))$('#deskInv').value='';renderDesk()}
 function maskPhone(p){var dg=p.replace(/\D/g,'');return dg.length>=9?dg.slice(0,3)+' *** '+dg.slice(-4):'Caller ID'}
 function taskMsgs(kind,nm,brId,need){
   var br=BR[brId],n=nm||'',e='Hello'+(n?' '+n:'')+', this is Water Center '+br.name+'. ';
@@ -2495,40 +2495,172 @@ function sendQuote(){
   toast('Opened in WhatsApp. Tap Send there. Quotation '+q.ref+'.');
   closeQuote();renderDeskStatus();
 }
-/* ---------- sales scripts (versioned) ---------- */
+/* ---------- script flows (profiles) ---------- */
+var ADMIN=false;
 var DEFOBJ=[
  {q:'It is too expensive',a:'Ask what budget they have in mind. Offer a smaller model, or a site visit so the size is right before they decide.'},
  {q:'I will call back later',a:'Offer to send the details on WhatsApp now and agree a time for you to call. Do not leave it open.'},
  {q:'I am comparing other shops',a:'Ask what they are comparing. Stress the site check, the fitting and the service after the sale.'}
 ];
-function scrGet(n){return (S.scripts||(S.scripts={}))[n]||null}
-function scrVer(n){var o=scrGet(n);return o?o.ver:1}
-function scrObjs(n){var o=scrGet(n);return (o&&o.objs)||DEFOBJ}
-function scrNeeds(){return NEEDS.filter(function(n){return n!=='none'&&CSN[n]})}
-function renderScriptEd(){
-  var cur=S.scNeed&&CSN[S.scNeed]?S.scNeed:scrNeeds()[0];S.scNeed=cur;
-  var N=CSN[cur],o=scrGet(cur)||{},ver=scrVer(cur),can=!!OWNER;
-  $('#scNeed').innerHTML=scrNeeds().map(function(n){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+esc(CSN[n].title)+' · v'+scrVer(n)+'</option>'}).join('');
-  $('#scVer').textContent='Current version: v'+ver+(o.at?' · saved '+new Date(o.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})+(o.by?' by '+o.by:''):' · starting script');
-  $('#scSay').value=o.say!==undefined?o.say:GREET.en.replace('{branch}','Colombo');
-  $('#scOffer').value=o.offer!==undefined?o.offer:N.offer;
-  $('#scCross').value=o.cross!==undefined?o.cross:(N.cross||'');
-  $('#scClose').value=o.close!==undefined?o.close:CLOSE.none.en.replace('{when}','soon');
-  $('#scObj').value=scrObjs(cur).map(function(x){return x.q+' | '+x.a}).join('\n');
-  $('#scNote').value='';
-  ['scSay','scOffer','scCross','scClose','scObj','scNote','scSave'].forEach(function(id){$('#'+id).disabled=!can});
-  $('#scLock').hidden=can;
-  var hist=(o.hist||[]).slice().reverse();
-  $('#scHist').innerHTML=hist.length?hist.map(function(h){return '<li><b>v'+h.ver+'</b> '+new Date(h.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})+(h.by?' · '+esc(h.by):'')+(h.note?' · '+esc(h.note):'')+'</li>'}).join(''):'<li class="muted">No changes yet. This is the starting script.</li>';
+var FT={say:['Say','#2563a8','What to say'],ask:['Ask','#6b46c1','A question with answers'],signal:['Buying signal','#15803d','Caller is ready'],objection:['Objection','#c2570c','Caller is holding back'],upsell:['Upsell','#b4235a','Add something'],close:['Close','#0f766e','Finish the call'],action:['Action','#475569','Do something on the desk']};
+var FACT=[['','No action'],['stock','Open the inventory'],['quote','Open the quotation'],['visit','Remind: book a visit']];
+function fid(){return 'n'+Math.random().toString(36).slice(2,7)}
+function seedProfile(need){
+  var N=CSN[need],a=N.ask&&N.ask[0]?ASKS[N.ask[0]].en:'What do you need it for?';
+  var n={o:fid(),f:fid(),p:fid(),u:fid(),c:fid(),a:fid()};
+  var nodes=[
+   {id:n.o,type:'say',title:'Opening',text:GREET.en.replace('{branch}','Colombo'),next:[{label:'Then',to:n.f}]},
+   {id:n.f,type:'ask',title:'Find out',text:a,next:[{label:'They answer',to:n.p},{label:'They ask the price first',to:n.p}]},
+   {id:n.p,type:'say',title:'Offer',text:N.offer,next:[{label:'Then',to:N.cross?n.u:n.c}]},
+   {id:n.u,type:'upsell',title:'Also mention',text:N.cross||'',next:[{label:'Then',to:n.c}]},
+   {id:n.c,type:'close',title:'Close',text:CLOSE.none.en.replace('{when}','soon'),next:[]}
+  ];
+  if(!N.cross){nodes=nodes.filter(function(x){return x.id!==n.u})}
+  DEFOBJ.forEach(function(o,i){nodes.push({id:fid(),type:'objection',title:o.q,text:o.a,glob:true,next:[{label:'Back to the call',to:'_back'}]})});
+  nodes.push({id:fid(),type:'signal',title:'Asks about installation or delivery',text:'This is a buying signal. Stop selling and move to the close.',glob:true,next:[{label:'Close now',to:n.c}]});
+  nodes.push({id:fid(),type:'signal',title:'Asks when you can visit',text:'Offer the earliest day and confirm it back to them.',glob:true,next:[{label:'Close now',to:n.c}]});
+  return {id:'p_'+need,name:N.title,need:need,ver:1,start:n.o,nodes:nodes,hist:[]};
+}
+function flowsGet(){
+  if(!S.flows){S.flows=NEEDS.filter(function(n){return CSN[n]&&n!=='none'}).map(seedProfile)}
+  return S.flows;
+}
+function profGet(id){return flowsGet().filter(function(p){return p.id===id})[0]||null}
+function profForNeed(need){var l=flowsGet();return l.filter(function(p){return p.need===need})[0]||null}
+function scrVer(n){var p=profForNeed(n);return p?p.ver:1}
+function fnode(p,id){return p.nodes.filter(function(x){return x.id===id})[0]||null}
+function fclone(o){return JSON.parse(JSON.stringify(o))}
+/* ----- live (call sheet) ----- */
+function flowLive(d,p){
+  var F=S.flow;if(!F||F.pid!==p.id||F.need!==d.need){F=S.flow={pid:p.id,need:d.need,cur:p.start,trail:[],full:false}}
+  var h='<div class="sechead" style="margin-top:24px"><h4 style="margin:0">Script: '+esc(p.name)+' <span class="tag">v'+p.ver+'</span></h4><div class="seg" role="group" aria-label="Script view"><button type="button" data-fview="step" aria-pressed="'+!F.full+'">Step by step</button><button type="button" data-fview="full" aria-pressed="'+F.full+'">Full script</button></div></div>';
+  if(F.full){
+    var seen={},ord=[];(function walk(id){var x=fnode(p,id);if(!x||seen[id]||x.glob)return;seen[id]=1;ord.push(x);x.next.forEach(function(l){walk(l.to)})})(p.start);
+    h+='<ol class="flfull">'+ord.map(function(x){return '<li><span class="ftag" style="--c:'+FT[x.type][1]+'">'+FT[x.type][0]+'</span><b>'+esc(x.title)+'</b><div>'+esc(x.text)+'</div></li>'}).join('')+'</ol>';
+    var gl=p.nodes.filter(function(x){return x.glob});
+    if(gl.length)h+='<h4>If the caller says</h4><ul class="objl">'+gl.map(function(x){return '<li><b>'+esc(x.title)+'</b><span>'+esc(x.text)+'</span></li>'}).join('')+'</ul>';
+    return h;
+  }
+  var x=fnode(p,F.cur)||fnode(p,p.start);
+  h+='<div class="flcard" style="--c:'+FT[x.type][1]+'"><div class="flhead"><span class="ftag" style="--c:'+FT[x.type][1]+'">'+FT[x.type][0]+'</span><b>'+esc(x.title)+'</b></div><div class="fltext say">'+esc(x.text||'')+'</div>';
+  if(x.act)h+='<button class="btn sm" type="button" data-fact="'+x.act+'">'+esc(FACT.filter(function(a){return a[0]===x.act})[0][1])+'</button>';
+  var nx=x.next.filter(function(l){return l.to!=='_back'});
+  if(nx.length){h+='<div class="flopts"><span class="muted small">'+(x.type==='ask'?'What did they say?':'Next')+'</span>'+nx.map(function(l){var t=fnode(p,l.to);return '<button type="button" class="btn" data-fgo="'+l.to+'">'+esc(l.label)+(t?' <small>'+esc(t.title)+'</small>':'')+'</button>'}).join('')+'</div>'}
+  if(x.next.some(function(l){return l.to==='_back'}))h+='<div class="flopts"><button type="button" class="btn primary" data-fback="1">'+esc((x.next.filter(function(l){return l.to==='_back'})[0]||{}).label||'Back to the call')+'</button></div>';
+  else if(!x.next.length)h+='<p class="muted small" style="margin:8px 0 0">End of the script. Save the call.</p>';
+  h+='</div>';
+  var g=p.nodes.filter(function(y){return y.glob&&y.id!==x.id});
+  if(g.length)h+='<div class="flglob"><span class="muted small">If the caller says</span><div>'+g.map(function(y){return '<button type="button" class="chip" style="--c:'+FT[y.type][1]+'" data-fjump="'+y.id+'">'+esc(y.title)+'</button>'}).join('')+'</div></div>';
+  h+='<div class="flnav"><button type="button" class="btn sm" data-fprev="1"'+(F.trail.length?'':' disabled')+'>Previous step</button><button type="button" class="btn sm" data-frestart="1">Start again</button></div>';
+  return h;
+}
+function flowGo(id,push){var F=S.flow;if(!F)return;if(push!==false)F.trail.push(F.cur);F.cur=id;renderDeskSheet()}
+/* ----- editor ----- */
+function fdraft(){var p=profGet(S.fpid);if(!p)return null;S.fdr=S.fdr||{};if(!S.fdr[p.id])S.fdr[p.id]=fclone(p);return S.fdr[p.id]}
+function fcanNode(x){return ADMIN||(OWNER&&!x.locked)}
+function flayout(p){
+  var depth={},q=[p.start],ord=[];depth[p.start]=0;
+  while(q.length){var id=q.shift(),x=fnode(p,id);if(!x||ord.indexOf(id)>-1)continue;ord.push(id);x.next.forEach(function(l){if(l.to!=='_back'&&depth[l.to]===undefined&&fnode(p,l.to)&&!fnode(p,l.to).glob){depth[l.to]=depth[id]+1;q.push(l.to)}})}
+  var cols={};ord.forEach(function(id){var dd=depth[id];(cols[dd]=cols[dd]||[]).push(id)});
+  var pos={},W=176,H=64,GX=56,GY=24,maxr=0;
+  Object.keys(cols).forEach(function(c){cols[c].forEach(function(id,i){pos[id]={x:16+c*(W+GX),y:16+i*(H+GY)};maxr=Math.max(maxr,i+1)})});
+  var ncol=Object.keys(cols).length,gl=p.nodes.filter(function(x){return x.glob}),gy=16+maxr*(H+GY)+32;
+  p.nodes.filter(function(x){return !pos[x.id]&&!x.glob}).forEach(function(x,i){pos[x.id]={x:16+(i%5)*(W+GX),y:gy+Math.floor(i/5)*(H+GY)};maxr=Math.max(maxr,0)});
+  var orph=p.nodes.filter(function(x){return !x.glob&&ord.indexOf(x.id)<0}).length,gy2=orph?gy+Math.ceil(orph/5)*(H+GY):gy;
+  gl.forEach(function(x,i){pos[x.id]={x:16+(i%5)*(W+GX),y:gy2+24+Math.floor(i/5)*(H+GY)}});
+  var w=Math.max(ncol,5)*(W+GX)+16,hgt=gy2+24+Math.ceil(Math.max(gl.length,1)/5)*(H+GY)+16;
+  return {pos:pos,W:W,H:H,w:w,h:hgt,gy:gy2};
+}
+function flowSvg(p){
+  var L=flayout(p),h='<svg class="flmap" viewBox="0 0 '+L.w+' '+L.h+'" width="'+L.w+'" height="'+L.h+'" role="img" aria-label="Script flow chart"><defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a97a6"/></marker></defs>';
+  h+='<text x="16" y="'+(L.gy+12)+'" class="fllab">Anytime: the handler taps these whenever the caller says them</text>';
+  p.nodes.forEach(function(x){var done={};x.next.forEach(function(l){
+    if(l.to==='_back'||!L.pos[l.to]||!L.pos[x.id]||done[l.to])return;done[l.to]=1;var a=L.pos[x.id],b=L.pos[l.to],x1=a.x+L.W,y1=a.y+L.H/2,x2=b.x,y2=b.y+L.H/2;
+    if(b.x<=a.x){x1=a.x+L.W/2;y1=a.y+L.H;x2=b.x+L.W/2;y2=b.y;h+='<path d="M'+x1+' '+y1+'C'+x1+' '+(y1+40)+' '+x2+' '+(y2-40)+' '+x2+' '+y2+'" fill="none" stroke="#8a97a6" stroke-width="1.5" stroke-dasharray="'+(x.glob?'4 4':'0')+'" marker-end="url(#fa)"/>';return}
+    var mx=(x1+x2)/2;h+='<path d="M'+x1+' '+y1+'C'+mx+' '+y1+' '+mx+' '+y2+' '+x2+' '+y2+'" fill="none" stroke="#8a97a6" stroke-width="1.5" stroke-dasharray="'+(x.glob?'4 4':'0')+'" marker-end="url(#fa)"/>';
+    if(l.label&&l.label!=='Then')h+='<text x="'+mx+'" y="'+((y1+y2)/2-4)+'" text-anchor="middle" class="fllab">'+esc(l.label.slice(0,22))+'</text>';
+  })});
+  p.nodes.forEach(function(x){var q=L.pos[x.id];if(!q)return;var sel=S.fnode===x.id;
+    h+='<g class="flnode'+(sel?' sel':'')+'" data-fn="'+x.id+'" tabindex="0" role="button" aria-label="'+esc(FT[x.type][0]+': '+x.title)+'"><rect x="'+q.x+'" y="'+q.y+'" width="'+L.W+'" height="'+L.H+'" rx="12" fill="var(--surface)" stroke="'+FT[x.type][1]+'" stroke-width="'+(sel?3:1.5)+'"/><rect x="'+q.x+'" y="'+q.y+'" width="6" height="'+L.H+'" rx="3" fill="'+FT[x.type][1]+'"/><text x="'+(q.x+16)+'" y="'+(q.y+22)+'" class="fltype" fill="'+FT[x.type][1]+'">'+esc(FT[x.type][0].toUpperCase())+(x.locked?'  · LOCKED':'')+'</text><text x="'+(q.x+16)+'" y="'+(q.y+44)+'" class="fltitle">'+esc(x.title.length>22?x.title.slice(0,21)+'…':x.title)+'</text></g>';
+  });
+  return h+'</svg>';
+}
+function renderFlowEd(){
+  var all=flowsGet(),can=!!OWNER;
+  if(!S.fpid||!profGet(S.fpid))S.fpid=all[0].id;
+  var live=profGet(S.fpid),p=(S.fdr&&S.fdr[S.fpid])||live,dirty=!!(S.fdr&&S.fdr[S.fpid]);
+  $('#fpSel').innerHTML=all.map(function(x){return '<option value="'+x.id+'"'+(x.id===S.fpid?' selected':'')+'>'+esc(x.name)+' · v'+x.ver+'</option>'}).join('');
+  $('#fpAdmin').hidden=!ADMIN;
+  $('#fpLock').hidden=can;
+  $('#fpStatus').textContent=dirty?'Draft changes not yet shown to handlers':'Live version v'+live.ver+(live.hist.length?' · last change '+new Date(live.hist[live.hist.length-1].at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):' · starting script');
+  $('#fpStatus').className='pill '+(dirty?'warn':'good');
+  $('#fpPub').disabled=!dirty;$('#fpDiscard').disabled=!dirty;$('#fpNote').disabled=!can;
+  $('#fpAddRow').hidden=!can;$('#fpAddRow .chips').innerHTML=Object.keys(FT).map(function(k){return '<button type="button" class="chip" style="--c:'+FT[k][1]+'" data-fadd="'+k+'">+ '+FT[k][0]+'</button>'}).join('');$('#fpNewNeed').innerHTML=NEEDS.filter(function(n){return CSN[n]&&n!=='none'}).map(function(n){return '<option value="'+n+'">'+esc(CSN[n].title)+'</option>'}).join('');
+  $('#flMap').innerHTML=flowSvg(p);
+  if(!S.fnode||!fnode(p,S.fnode))S.fnode=p.start;
+  renderNodeEd(p);
+  var hist=live.hist.slice().reverse();
+  $('#fpHist').innerHTML=hist.length?hist.map(function(h){return '<li><b>v'+h.ver+'</b> '+new Date(h.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})+' · '+esc(h.by||'')+(h.note?' · '+esc(h.note):'')+'</li>'}).join(''):'<li class="muted">No changes yet. This is the starting script.</li>';
   renderScriptResults();
 }
-function scrSave(){
-  if(!OWNER)return;
-  var n=S.scNeed,o=scrGet(n)||{ver:1,hist:[]},objs=$('#scObj').value.split('\n').map(function(l){var i=l.indexOf('|');return i<0?null:{q:l.slice(0,i).trim(),a:l.slice(i+1).trim()}}).filter(function(x){return x&&x.q&&x.a});
-  var nv={ver:o.ver+1,say:$('#scSay').value.trim(),offer:$('#scOffer').value.trim(),cross:$('#scCross').value.trim(),close:$('#scClose').value.trim(),objs:objs,at:Date.now(),by:'Akith',hist:(o.hist||[]).concat([{ver:o.ver+1,at:Date.now(),by:'Akith',note:($('#scNote').value||'').trim()}])};
-  S.scripts[n]=nv;renderScriptEd();if(S.tab==='desk')renderDeskSheet();
-  toast('Saved as v'+nv.ver+'. Handlers see it on the next call.');
+function renderNodeEd(p){
+  var x=fnode(p,S.fnode),el=$('#flEd');if(!x){el.innerHTML='';return}
+  var can=fcanNode(x),dis=can?'':' disabled';
+  var others=p.nodes.filter(function(y){return y.id!==x.id});
+  var h='<div class="sechead"><h3 style="margin:0">'+esc(FT[x.type][0])+' tile</h3>'+(x.locked?'<span class="pill info">Locked by Coreframe</span>':'')+'</div>';
+  if(!can&&OWNER)h+='<p class="muted small">Coreframe has locked this tile. Ask us to change it.</p>';
+  if(!OWNER)h+='<p class="muted small">Only the owner edits scripts.</p>';
+  h+='<div class="field"><label for="fnType">Type</label><select id="fnType"'+dis+'>'+Object.keys(FT).map(function(k){return '<option value="'+k+'"'+(k===x.type?' selected':'')+'>'+FT[k][0]+' — '+FT[k][2]+'</option>'}).join('')+'</select></div>';
+  h+='<div class="field"><label for="fnTitle">Name on the tile</label><input id="fnTitle" value="'+esc(x.title)+'"'+dis+'></div>';
+  h+='<div class="field"><label for="fnText">What the handler sees and says</label><textarea id="fnText" rows="4"'+dis+'>'+esc(x.text||'')+'</textarea></div>';
+  h+='<div class="field"><label for="fnAct">Button on the call sheet</label><select id="fnAct"'+dis+'>'+FACT.map(function(a){return '<option value="'+a[0]+'"'+(a[0]===(x.act||'')?' selected':'')+'>'+a[1]+'</option>'}).join('')+'</select></div>';
+  h+='<label class="chk"><input type="checkbox" id="fnGlob"'+(x.glob?' checked':'')+dis+'> Available at any step (shown as a button the handler can tap whenever the caller says it)</label>';
+  h+='<h4 style="margin:16px 0 8px">Rules: what happens next</h4><div id="fnLinks">'+x.next.map(function(l,i){
+    return '<div class="lkrow" data-li="'+i+'"><input data-lk="label" value="'+esc(l.label)+'" aria-label="If the caller does this"'+dis+'><span aria-hidden="true">→</span><select data-lk="to" aria-label="Go to"'+dis+'><option value="_back"'+(l.to==='_back'?' selected':'')+'>Back to where they were</option>'+others.map(function(y){return '<option value="'+y.id+'"'+(y.id===l.to?' selected':'')+'>'+esc(FT[y.type][0]+': '+y.title)+'</option>'}).join('')+'</select>'+(can?'<button class="btn sm" type="button" data-lkdel="'+i+'">Remove</button>':'')+'</div>'}).join('')+(x.next.length?'':'<p class="muted small">No next step. The script ends here.</p>')+'</div>';
+  if(can)h+='<button class="btn sm" type="button" id="fnAddLink" style="margin-top:8px">Add a rule</button>';
+  if(ADMIN)h+='<label class="chk" style="margin-top:16px"><input type="checkbox" id="fnLocked"'+(x.locked?' checked':'')+'> Lock this tile (the owner cannot change or delete it)</label>';
+  if(can&&x.id!==p.start)h+='<div style="margin-top:16px"><button class="btn sm out" type="button" id="fnDel">Delete this tile</button></div>';
+  el.innerHTML=h;
 }
+function flowCommit(){renderFlowEd()}
+document.addEventListener('click',function(e){
+  var t=e.target,c=t.closest?t.closest.bind(t):null;if(!c)return;var x;
+  /* live sheet */
+  if((x=c('[data-fview]'))){if(S.flow){S.flow.full=x.getAttribute('data-fview')==='full';renderDeskSheet()}return}
+  if((x=c('[data-fgo]'))){flowGo(x.getAttribute('data-fgo'));return}
+  if(c('[data-fback]')){var F=S.flow;if(F&&F.trail.length){F.cur=F.trail.pop();renderDeskSheet()}return}
+  if(c('[data-fprev]')){var F2=S.flow;if(F2&&F2.trail.length){F2.cur=F2.trail.pop();renderDeskSheet()}return}
+  if(c('[data-frestart]')){var p0=profForNeed(S.desk.need);if(S.flow&&p0){S.flow.cur=p0.start;S.flow.trail=[];renderDeskSheet()}return}
+  if((x=c('[data-fjump]'))){flowGo(x.getAttribute('data-fjump'));return}
+  if((x=c('[data-fact]'))){var a=x.getAttribute('data-fact');if(a==='stock'){S.dview='stock';renderDeskSheet()}else if(a==='quote'){openQuote()}else toast('Remember to book the visit before they hang up');return}
+  /* editor */
+  if((x=c('[data-fn]'))){S.fnode=x.getAttribute('data-fn');renderFlowEd();return}
+  if(!OWNER)return;
+  var p=fdraft();if(!p&&!c('#fpNew'))return;var nd=p?fnode(p,S.fnode):null;
+  if((x=c('[data-fadd]'))){var ty=x.getAttribute('data-fadd'),nn={id:fid(),type:ty,title:'New '+FT[ty][0].toLowerCase(),text:'',next:[],glob:(ty==='objection'||ty==='signal')};p.nodes.push(nn);if(nd&&!nd.glob&&fcanNode(nd)&&!nn.glob)nd.next.push({label:'Then',to:nn.id});S.fnode=nn.id;flowCommit();return}
+  if(c('#fnAddLink')&&nd&&fcanNode(nd)){var o=p.nodes.filter(function(y){return y.id!==nd.id})[0];nd.next.push({label:'If they say…',to:o?o.id:'_back'});flowCommit();return}
+  if((x=c('[data-lkdel]'))&&nd&&fcanNode(nd)){nd.next.splice(+x.getAttribute('data-lkdel'),1);flowCommit();return}
+  if(c('#fnDel')&&nd&&fcanNode(nd)&&nd.id!==p.start){p.nodes=p.nodes.filter(function(y){return y.id!==nd.id});p.nodes.forEach(function(y){y.next=y.next.filter(function(l){return l.to!==nd.id})});S.fdr[p.id]=p;S.fnode=p.start;flowCommit();return}
+  if(c('#fpPub')){var live=profGet(S.fpid),note=($('#fpNote').value||'').trim();var nv=fclone(S.fdr[S.fpid]);nv.ver=live.ver+1;nv.hist=live.hist.concat([{ver:nv.ver,at:Date.now(),by:ADMIN?'Coreframe':'Akith',note:note}]);S.flows[S.flows.indexOf(live)]=nv;delete S.fdr[S.fpid];$('#fpNote').value='';renderFlowEd();toast('Published as v'+nv.ver+'. Handlers see it on the next call.');return}
+  if(c('#fpDiscard')){delete S.fdr[S.fpid];renderFlowEd();toast('Draft discarded');return}
+  if(c('#fpNew')&&ADMIN){var nm=($('#fpNewName').value||'').trim();if(!nm){toast('Name the profile');return}var base=fclone(profGet(S.fpid)),id='p_'+Date.now();base.id=id;base.name=nm;base.ver=1;base.hist=[];base.need=$('#fpNewNeed').value;S.flows.push(base);S.fpid=id;$('#fpNewName').value='';renderFlowEd();return}
+  if(c('#fpDelP')&&ADMIN&&S.flows.length>1){S.flows=S.flows.filter(function(y){return y.id!==S.fpid});delete (S.fdr||{})[S.fpid];S.fpid=S.flows[0].id;renderFlowEd();return}
+});
+document.addEventListener('change',function(e){
+  var t=e.target;
+  if(t.id==='fpSel'){S.fpid=t.value;S.fnode=null;renderFlowEd();return}
+  if(!OWNER||S.tab!=='scripts')return;
+  var p=fdraft();if(!p)return;var nd=fnode(p,S.fnode);if(!nd)return;
+  if(t.id==='fnLocked'&&ADMIN){nd.locked=t.checked;flowCommit();return}
+  if(!fcanNode(nd))return;
+  if(t.id==='fnType'){nd.type=t.value;flowCommit()}
+  else if(t.id==='fnTitle'){nd.title=t.value.trim()||nd.title;flowCommit()}
+  else if(t.id==='fnText'){nd.text=t.value;renderFlowEd()}
+  else if(t.id==='fnAct'){nd.act=t.value;renderFlowEd()}
+  else if(t.id==='fnGlob'){nd.glob=t.checked;flowCommit()}
+  else if(t.getAttribute&&t.getAttribute('data-lk')){var row=t.closest('[data-li]'),l=nd.next[+row.getAttribute('data-li')];if(l){l[t.getAttribute('data-lk')]=t.value;flowCommit()}}
+});
+document.addEventListener('keydown',function(e){var g=e.target.closest&&e.target.closest('[data-fn]');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();S.fnode=g.getAttribute('data-fn');renderFlowEd()}});
 function renderScriptResults(){
   var rows={};
   S.calls.filter(function(c){return c.handler}).forEach(function(c){
@@ -2711,7 +2843,7 @@ function showTab(t){
   ['dash','desk','followups','clients','calls','coaching','sources','numbers','data','web','sales','scripts','stock','lab'].forEach(function(p){$('#panel-'+p).hidden=p!==t});
   if(t==='desk')renderDesk();
   if(t==='sales')renderSales();
-  if(t==='scripts')renderScriptEd();
+  if(t==='scripts')renderFlowEd();
   if(t==='stock')renderStock();
   if(t==='followups')renderFollowups();
   if(t==='lab')renderLab();
@@ -2746,7 +2878,6 @@ document.addEventListener('click',function(e){
   var t=e.target;
   var tab=t.closest('[data-tab]');if(tab){showTab(tab.getAttribute('data-tab'));return}
   var dk=t.closest('[data-d]');if(dk){deskTap(dk.getAttribute('data-d'),dk.getAttribute('data-v'));return}
-  if(t.closest&&t.closest('#scSave')){scrSave();return}
   if(t.closest&&t.closest('[data-usehist]')){useHist();return}
   var fk=t.closest('[data-fukpi]');if(fk){var kv=fk.getAttribute('data-fukpi');S.fu.kf=(S.fu.kf===kv||kv==='open')?null:kv;if(kv==='open')S.fu.view='open';renderFollowups();return}
   var fv=t.closest('[data-fuview]');if(fv){S.fu.view=fv.getAttribute('data-fuview');S.fu.kf=null;renderFollowups();return}
@@ -2802,7 +2933,7 @@ document.addEventListener('click',function(e){
   if(t.closest&&t.closest('[data-qdel]')){S.qd.items.splice(+t.closest('[data-qdel]').getAttribute('data-qdel'),1);renderQuote();return}
   if(t.closest&&t.closest('#qClose')||t.id==='qScrim'){closeQuote();return}
   if(t.id==='scrim'){closeDrawer();return}
-  if(t.closest('#logoutBtn')){closeDrawer();USER=null;OWNER=false;ME=null;applyLogin();return}
+  if(t.closest('#logoutBtn')){closeDrawer();USER=null;OWNER=false;ADMIN=false;ME=null;applyLogin();return}
   if(t.closest('#simBtn')){simulateCall();return}
   if(t.closest('#themeBtn')){
     var root=document.documentElement,dark=root.getAttribute('data-theme')==='dark',nx=dark?'light':'dark';
@@ -2836,7 +2967,6 @@ document.addEventListener('change',function(e){
   if(t.name==='vbranch'){setVisitor(S.web.source,t.value);renderWeb();return}
   if(t.id==='fuBranch'){S.fu.branch=t.value;renderFollowups();return}
   if(t.id==='deskCid'){renderDeskStatus();return}
-  if(t.id==='scNeed'){S.scNeed=t.value;renderScriptEd();return}
   if(t.id==='deskArea'){S.desk.area=t.value||null;renderDeskStatus();renderDeskSheet();return}
   if(t.id==='deskSrc'){S.desk.src=t.value||null;S.srcOk=false;renderDeskSheet();return}
   if(t.id==='deskBr'){deskTap('br',t.value);return}
@@ -2875,7 +3005,7 @@ function applyLogin(){
   $('#login').hidden=on;$('#whoami').hidden=!on;$('#logoutBtn').hidden=!on;
   $('#tab-dash').hidden=!OWNER;['sources','sales','lab'].forEach(function(k){var b=$('#tab-'+k);if(b)b.hidden=!!(on&&!OWNER)});
   if(USER){$('#whoami').textContent=(ME?ME+' · ':'')+BR[USER].name+' · '+BR[USER].main;S.branch=USER;S.desk.br=USER;setVisitor(S.web?S.web.source:'google',USER)}
-  else if(OWNER){$('#whoami').textContent='Akith · Owner, both branches';S.branch='all'}
+  else if(OWNER){$('#whoami').textContent=ADMIN?'Coreframe · Admin, both branches':'Akith · Owner, both branches';S.branch='all'}
   else{S.branch='all'}
   $('#viewSw').hidden=!OWNER;if(OWNER)setView('all');
   renderFilters();showTab(OWNER?'dash':on?'desk':S.tab);
@@ -2886,7 +3016,7 @@ $('#loginForm').addEventListener('submit',function(e){
   var u=($('#loginUser').value||'').trim().toLowerCase(),p=$('#loginPass').value||'',msg=$('#loginMsg');
   var a=ACCOUNTS.filter(function(x){return x.user===u&&x.pass===p})[0];
   if(!a){msg.className='msg err';msg.textContent='That username and password do not match. Check the demo logins below.';return}
-  msg.className='msg';msg.textContent='';USER=a.branch;OWNER=!!a.owner;ME=(a.name&&!a.owner)?a.name:null;applyLogin();
+  msg.className='msg';msg.textContent='';USER=a.branch;OWNER=!!a.owner;ADMIN=!!a.admin;ME=(a.name&&!a.owner)?a.name:null;applyLogin();
 });
 document.addEventListener('keydown',function(e){
   if(S.tab==='desk'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^[1-9]$/.test(e.key)&&e.target&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName||'')){deskTap('need',NEEDS[+e.key-1]);return}
