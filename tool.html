@@ -487,6 +487,7 @@ tbody tr:hover{background:var(--surface-2)}
 .compact .pgrid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:8px}.compact .ptile{padding:8px}.compact .pimg{aspect-ratio:16/9}
 .flcard{border:1px solid var(--line);border-left:6px solid var(--c);border-radius:16px;padding:16px;background:var(--surface);display:grid;gap:16px;margin-top:16px}.flhead{display:flex;gap:8px;align-items:center}.ftag{display:inline-block;padding:0 8px;border-radius:999px;background:var(--c);color:#fff;font-size:12px;font-weight:700;line-height:22px}.fltext{font-size:17px;line-height:1.5;white-space:pre-wrap}.flopts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.flopts .btn small{display:block;opacity:.7;font-weight:400}.flglob{margin-top:16px;display:grid;gap:8px}.flglob .chip{border-color:var(--c);color:var(--c)}.flglob>div,.flpal .chips{display:flex;gap:8px;flex-wrap:wrap}.flpal .chip{border-color:var(--c);color:var(--c)}.flnav{display:flex;gap:8px;margin-top:16px}.flfull{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:16px}.flfull li{display:grid;gap:4px;border-left:4px solid var(--line);padding-left:16px}.flwrap{margin-top:16px;border:1px solid var(--line);border-radius:16px;background:var(--surface-2);overflow:hidden}.flscroll{overflow:auto;max-height:560px;padding:8px}.flmap{display:block}.flnode{cursor:pointer}.flnode:focus{outline:none}.flnode.sel rect:first-child{filter:drop-shadow(0 2px 6px rgba(8,28,46,.3))}.fltype{font-size:10px;font-weight:700;letter-spacing:.06em;font-family:inherit}.fltitle{font-size:13px;font-weight:600;fill:var(--ink);font-family:inherit}.fllab{font-size:11px;fill:var(--ink-2);font-family:inherit}.lkrow{display:grid;grid-template-columns:1fr auto 1.4fr auto;gap:8px;align-items:center;margin-bottom:8px}.lkrow input,.lkrow select,#flEd input,#flEd select,#flEd textarea{border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink);font:inherit;width:100%}.chk{display:flex;gap:8px;align-items:flex-start}#flEd .chk input{width:auto;margin-top:4px;flex:none}.chk{align-items:flex-start}
 @media(max-width:560px){.lkrow{grid-template-columns:1fr}}
+.tap.lnk{position:relative}.tap.lnk::after{content:'';position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--brand);opacity:.55}.tap.lnkon{box-shadow:0 0 0 3px rgba(37,99,168,.35);border-color:var(--brand)}.linkkey{font-size:12px;color:var(--ink-2);margin:8px 0 0}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -1807,7 +1808,7 @@ function renderDeskSheet(){
   var wk=WHEN[d.time||'none'];
   var prof=d.need&&d.need!=='none'?profForNeed(d.need):null;var h='<div class="sechead"><h3 style="margin:0">Call sheet: '+esc(N.title)+(prof?' <span class="tag">Script v'+prof.ver+'</span>':'')+'</h3><span class="tag">'+esc(br.name)+' · '+esc(d.src?SRC[d.src].name:'Source not asked')+'</span></div>';
   h+='<div class="seg dsw" role="group" aria-label="Call sheet view" style="margin-top:16px"><button type="button" data-dv="script" aria-pressed="'+(S.dview!=='stock')+'">Script</button><button type="button" data-dv="stock" aria-pressed="'+(S.dview==='stock')+'">Inventory</button></div>';
-  if(S.dview==='stock'){h+=deskStockHtml(d);$('#deskSheet').innerHTML=h;return}
+  if(S.dview==='stock'){h+=deskStockHtml(d);$('#deskSheet').innerHTML=h;decorateDesk();return}
   h+='<div class="seg" role="group" aria-label="Call sheet language" style="margin-top:16px">'+[['en','English'],['si','සිංහල'],['ta','தமிழ்']].map(function(x){return '<button type="button" data-d="lang" data-v="'+x[0]+'" aria-pressed="'+(L===x[0])+'"'+(x[0]==='en'?'':' lang="'+x[0]+'"')+'>'+x[1]+'</button>'}).join('')+'</div>';
   h+='<h4>About this caller</h4><div>'+esc(d.src?SRCNOTE[d.src]:SRCNOTE.unknown)+'</div>';
   if(!(prof&&L==='en'))h+='<h4>Say first</h4><div class="say" lang="'+L+'">'+esc(GREET[L].replace('{branch}',bn))+(nat?'<span class="en">'+esc(GREET.en.replace('{branch}',br.name))+'</span>':'')+'</div>';
@@ -1822,7 +1823,7 @@ function renderDeskSheet(){
   var cl=CLOSE[d.outcome&&CLOSE[d.outcome]?d.outcome:'none'];
   if(!prof||d.outcome&&CLOSE[d.outcome])h+='<h4>'+(d.outcome&&CLOSE[d.outcome]?'Close with':'Before they hang up')+'</h4><div class="say" lang="'+L+'">'+esc((cl[L]).replace('{when}',wk[L]))+(nat?'<span class="en">'+esc(cl.en.replace('{when}',wk.en))+'</span>':'')+'</div>';
   if(nat)h+='<p class="muted small" style="margin:16px 0 0">Sinhala and Tamil lines are drafts. A native speaker should review them before staff use them.</p>';
-  $('#deskSheet').innerHTML=h;
+  $('#deskSheet').innerHTML=h;decorateDesk();
 }
 function histFor(ph){
   var dg=String(ph||'').replace(/\D/g,'');if(dg.length<7)return [];
@@ -1867,8 +1868,10 @@ function deskTap(f,v){
   else if(f==='ask')toggleIn(d.asked,v);
   else if(f==='budget'||f==='time'||f==='area'||f==='outcome')d[f]=d[f]===v?null:v;
   if(!d.started&&(f==='need'||f==='lang'))d.started=Date.now();
+  var __f=f,__v=v;
   var fo=document.activeElement&&document.activeElement.getAttribute?document.activeElement.getAttribute('data-d')+'|'+document.activeElement.getAttribute('data-v'):null;
   renderDesk();
+  if(__f==='budget'||__f==='time'||__f==='outcome')flowFromDesk(__f,__v);
   if(fo){var b=$('[data-d="'+fo.split('|')[0]+'"][data-v="'+fo.split('|')[1]+'"]');if(b&&b.focus)b.focus({preventScroll:true})}
 }
 function deskStart(){S.desk.started=Date.now();$('#deskTimer').textContent='0:00'}
@@ -2503,6 +2506,7 @@ var DEFOBJ=[
  {q:'I am comparing other shops',a:'Ask what they are comparing. Stress the site check, the fitting and the service after the sale.'}
 ];
 var FT={say:['Say','#2563a8','What to say'],ask:['Ask','#6b46c1','A question with answers'],signal:['Buying signal','#15803d','Caller is ready'],objection:['Objection','#c2570c','Caller is holding back'],upsell:['Upsell','#b4235a','Add something'],close:['Close','#0f766e','Finish the call'],action:['Action','#475569','Do something on the desk']};
+var LINKS=[['','Not linked'],['time:now','When: Today'],['time:week','When: This week'],['time:month','When: This month'],['time:browse','When: Just looking'],['budget:ok','Budget: Budget fits'],['budget:compare','Budget: Comparing prices'],['budget:disc','Budget: Asked for a discount'],['outcome:visit','Ended: Visit booked'],['outcome:quote','Ended: Quote to send'],['outcome:callback','Ended: Call back later'],['outcome:sold','Ended: Sold on the call']];
 var FACT=[['','No action'],['stock','Open the inventory'],['quote','Open the quotation'],['visit','Remind: book a visit']];
 function fid(){return 'n'+Math.random().toString(36).slice(2,7)}
 function seedProfile(need){
@@ -2510,15 +2514,16 @@ function seedProfile(need){
   var n={o:fid(),f:fid(),p:fid(),u:fid(),c:fid(),a:fid()};
   var nodes=[
    {id:n.o,type:'say',title:'Opening',text:GREET.en.replace('{branch}','Colombo'),next:[{label:'Then',to:n.f}]},
-   {id:n.f,type:'ask',title:'Find out',text:a,next:[{label:'They answer',to:n.p},{label:'They ask the price first',to:n.p}]},
+   {id:n.f,type:'ask',title:'Find out',text:a,tick:(N.ask&&N.ask[0])||'',next:[{label:'They answer',to:n.p},{label:'They ask the price first',to:n.p}]},
    {id:n.p,type:'say',title:'Offer',text:N.offer,next:[{label:'Then',to:N.cross?n.u:n.c}]},
    {id:n.u,type:'upsell',title:'Also mention',text:N.cross||'',next:[{label:'Then',to:n.c}]},
-   {id:n.c,type:'close',title:'Close',text:CLOSE.none.en.replace('{when}','soon'),next:[]}
+   {id:n.c,type:'close',title:'Close',text:CLOSE.none.en.replace('{when}','soon'),link:'outcome:visit',next:[]}
   ];
   if(!N.cross){nodes=nodes.filter(function(x){return x.id!==n.u})}
-  DEFOBJ.forEach(function(o,i){nodes.push({id:fid(),type:'objection',title:o.q,text:o.a,glob:true,next:[{label:'Back to the call',to:'_back'}]})});
-  nodes.push({id:fid(),type:'signal',title:'Asks about installation or delivery',text:'This is a buying signal. Stop selling and move to the close.',glob:true,next:[{label:'Close now',to:n.c}]});
-  nodes.push({id:fid(),type:'signal',title:'Asks when you can visit',text:'Offer the earliest day and confirm it back to them.',glob:true,next:[{label:'Close now',to:n.c}]});
+  var OL=['budget:disc','time:browse','budget:compare'];
+  DEFOBJ.forEach(function(o,i){nodes.push({id:fid(),type:'objection',title:o.q,text:o.a,glob:true,link:OL[i]||'',next:[{label:'Back to the call',to:'_back'}]})});
+  nodes.push({id:fid(),type:'signal',title:'Asks about installation or delivery',text:'This is a buying signal. Stop selling and move to the close.',glob:true,link:'budget:ok',next:[{label:'Close now',to:n.c}]});
+  nodes.push({id:fid(),type:'signal',title:'Asks when you can visit',text:'Offer the earliest day and confirm it back to them.',glob:true,link:'time:now',next:[{label:'Close now',to:n.c}]});
   return {id:'p_'+need,name:N.title,need:need,ver:1,start:n.o,nodes:nodes,hist:[]};
 }
 function flowsGet(){
@@ -2542,7 +2547,8 @@ function flowLive(d,p){
     return h;
   }
   var x=fnode(p,F.cur)||fnode(p,p.start);
-  h+='<div class="flcard" style="--c:'+FT[x.type][1]+'"><div class="flhead"><span class="ftag" style="--c:'+FT[x.type][1]+'">'+FT[x.type][0]+'</span><b>'+esc(x.title)+'</b></div><div class="fltext say">'+esc(x.text||'')+'</div>';
+  h+='<p class="linkkey">Buttons on the left with a dot are linked to this script. Tap one and the script jumps. Tap a script button and the desk fills in.</p>';
+  h+='<div class="flcard" style="--c:'+FT[x.type][1]+'"><div class="flhead"><span class="ftag" style="--c:'+FT[x.type][1]+'">'+FT[x.type][0]+'</span><b>'+esc(x.title)+'</b>'+(x.link?'<span class="tag">Desk: '+esc((LINKS.filter(function(a){return a[0]===x.link})[0]||['',''])[1])+'</span>':'')+'</div><div class="fltext say">'+esc(x.text||'')+'</div>';
   if(x.act)h+='<button class="btn sm" type="button" data-fact="'+x.act+'">'+esc(FACT.filter(function(a){return a[0]===x.act})[0][1])+'</button>';
   var nx=x.next.filter(function(l){return l.to!=='_back'});
   if(nx.length){h+='<div class="flopts"><span class="muted small">'+(x.type==='ask'?'What did they say?':'Next')+'</span>'+nx.map(function(l){var t=fnode(p,l.to);return '<button type="button" class="btn" data-fgo="'+l.to+'">'+esc(l.label)+(t?' <small>'+esc(t.title)+'</small>':'')+'</button>'}).join('')+'</div>'}
@@ -2554,7 +2560,20 @@ function flowLive(d,p){
   h+='<div class="flnav"><button type="button" class="btn sm" data-fprev="1"'+(F.trail.length?'':' disabled')+'>Previous step</button><button type="button" class="btn sm" data-frestart="1">Start again</button></div>';
   return h;
 }
-function flowGo(id,push){var F=S.flow;if(!F)return;if(push!==false)F.trail.push(F.cur);F.cur=id;renderDeskSheet()}
+function flowGo(id,push,fromDesk){var F=S.flow,p=profForNeed(S.desk.need);if(!F||!p)return;var cur=fnode(p,F.cur),nx=fnode(p,id),d=S.desk;
+  if(cur&&cur.tick&&d.asked.indexOf(cur.tick)<0&&cur.id!==id)d.asked.push(cur.tick);
+  if(push!==false&&F.cur!==id)F.trail.push(F.cur);F.cur=id;
+  if(!fromDesk&&nx&&nx.link){var kv=nx.link.split(':');if(d[kv[0]]!==kv[1]){d[kv[0]]=kv[1];if(!d.started)d.started=Date.now()}}
+  renderDesk()}
+function flowFromDesk(f,v){
+  var d=S.desk;if(!d.need||d.need==='none'||!S.flow)return;var p=profForNeed(d.need);if(!p||d[f]!==v)return;
+  var n=p.nodes.filter(function(x){return x.link===f+':'+v})[0];if(n&&S.flow.cur!==n.id)flowGo(n.id,true,true)
+}
+function decorateDesk(){
+  var d=S.desk,p=d.need&&d.need!=='none'?profForNeed(d.need):null,cur=p&&S.flow?fnode(p,S.flow.cur):null;
+  $$('#deskTaps [data-d]').forEach(function(b){var f=b.getAttribute('data-d'),v=b.getAttribute('data-v');b.classList.remove('lnk','lnkon');if(!p||['time','budget','outcome'].indexOf(f)<0)return;
+    var k=f+':'+v;if(p.nodes.some(function(x){return x.link===k}))b.classList.add('lnk');if(cur&&cur.link===k)b.classList.add('lnkon')});
+}
 /* ----- editor ----- */
 function fdraft(){var p=profGet(S.fpid);if(!p)return null;S.fdr=S.fdr||{};if(!S.fdr[p.id])S.fdr[p.id]=fclone(p);return S.fdr[p.id]}
 function fcanNode(x){return ADMIN||(OWNER&&!x.locked)}
@@ -2614,6 +2633,8 @@ function renderNodeEd(p){
   h+='<div class="field"><label for="fnTitle">Name on the tile</label><input id="fnTitle" value="'+esc(x.title)+'"'+dis+'></div>';
   h+='<div class="field"><label for="fnText">What the handler sees and says</label><textarea id="fnText" rows="4"'+dis+'>'+esc(x.text||'')+'</textarea></div>';
   h+='<div class="field"><label for="fnAct">Button on the call sheet</label><select id="fnAct"'+dis+'>'+FACT.map(function(a){return '<option value="'+a[0]+'"'+(a[0]===(x.act||'')?' selected':'')+'>'+a[1]+'</option>'}).join('')+'</select></div>';
+  h+='<div class="field"><label for="fnLink">Linked desk button (tapping it on the desk opens this tile, and opening this tile taps it)</label><select id="fnLink"'+dis+'>'+LINKS.map(function(a){return '<option value="'+a[0]+'"'+(a[0]===(x.link||'')?' selected':'')+'>'+a[1]+'</option>'}).join('')+'</select></div>';
+  if(x.type==='ask'&&S.fpid){var ap=profGet(S.fpid),ids=(CSN[ap.need]&&CSN[ap.need].ask)||[];h+='<div class="field"><label for="fnTick">Ticks off this question on the checklist</label><select id="fnTick"'+dis+'><option value="">None</option>'+ids.map(function(i){return '<option value="'+i+'"'+(i===x.tick?' selected':'')+'>'+esc(ASKS[i].en)+'</option>'}).join('')+'</select></div>'}
   h+='<label class="chk"><input type="checkbox" id="fnGlob"'+(x.glob?' checked':'')+dis+'> Available at any step (shown as a button the handler can tap whenever the caller says it)</label>';
   h+='<h4 style="margin:16px 0 8px">Rules: what happens next</h4><div id="fnLinks">'+x.next.map(function(l,i){
     return '<div class="lkrow" data-li="'+i+'"><input data-lk="label" value="'+esc(l.label)+'" aria-label="If the caller does this"'+dis+'><span aria-hidden="true">→</span><select data-lk="to" aria-label="Go to"'+dis+'><option value="_back"'+(l.to==='_back'?' selected':'')+'>Back to where they were</option>'+others.map(function(y){return '<option value="'+y.id+'"'+(y.id===l.to?' selected':'')+'>'+esc(FT[y.type][0]+': '+y.title)+'</option>'}).join('')+'</select>'+(can?'<button class="btn sm" type="button" data-lkdel="'+i+'">Remove</button>':'')+'</div>'}).join('')+(x.next.length?'':'<p class="muted small">No next step. The script ends here.</p>')+'</div>';
@@ -2657,6 +2678,8 @@ document.addEventListener('change',function(e){
   else if(t.id==='fnTitle'){nd.title=t.value.trim()||nd.title;flowCommit()}
   else if(t.id==='fnText'){nd.text=t.value;renderFlowEd()}
   else if(t.id==='fnAct'){nd.act=t.value;renderFlowEd()}
+  else if(t.id==='fnLink'){nd.link=t.value;flowCommit()}
+  else if(t.id==='fnTick'){nd.tick=t.value;flowCommit()}
   else if(t.id==='fnGlob'){nd.glob=t.checked;flowCommit()}
   else if(t.getAttribute&&t.getAttribute('data-lk')){var row=t.closest('[data-li]'),l=nd.next[+row.getAttribute('data-li')];if(l){l[t.getAttribute('data-lk')]=t.value;flowCommit()}}
 });
