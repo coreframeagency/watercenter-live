@@ -475,6 +475,9 @@ tbody tr:hover{background:var(--surface-2)}
 .btn.out{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);font-weight:600}.btn.out:hover{background:var(--bad);color:#fff}.btn.out[hidden]{display:none}
 .qedit{display:grid;gap:16px}.qedit .qgrid{margin:0}.qrows{display:grid;gap:8px}.qrow{display:grid;grid-template-columns:1fr 120px auto;gap:8px;align-items:center}.qrow input,.qedit input,.qedit textarea{width:100%;min-width:0}@media(max-width:560px){.qrow{grid-template-columns:1fr 96px}.qrow .btn{grid-column:1/-1;justify-self:start}}
 .qlogo{display:flex;align-items:center;gap:16px}.qlogo img{width:56px;height:56px;border-radius:12px;object-fit:cover}
+.objl{list-style:none;margin:0;padding:0;display:grid;gap:8px}.objl li{display:grid;gap:2px;padding:8px 16px;border-left:3px solid var(--brand);background:var(--surface-2);border-radius:8px}.objl span{color:var(--ink-2)}
+#scHist li{padding:8px 0;border-bottom:1px solid var(--line)}
+#panel-scripts .field{margin-bottom:16px}#panel-scripts .field label{display:block;margin-bottom:8px}#panel-scripts .d-actions{margin-top:8px}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -517,6 +520,7 @@ tbody tr:hover{background:var(--surface-2)}
     <button class="tab" role="tab" id="tab-calls" aria-controls="panel-calls" aria-selected="false" data-tab="calls" tabindex="-1">Call log</button>
     <button class="tab" role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources" tabindex="-1">Sources</button>
     <button class="tab" role="tab" id="tab-sales" aria-controls="panel-sales" aria-selected="false" data-tab="sales" tabindex="-1">Sales and review</button>
+    <button class="tab" role="tab" id="tab-scripts" aria-controls="panel-scripts" aria-selected="false" data-tab="scripts" tabindex="-1">Scripts</button>
     <button class="tab" role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab" tabindex="-1">Model lab</button>
   </nav>
 
@@ -564,6 +568,24 @@ tbody tr:hover{background:var(--surface-2)}
         <pre class="pack" id="reviewOut"></pre>
         <div class="d-actions"><button class="btn" type="button" id="reviewCopy">Copy the review pack</button></div>
       </div>
+    </section>
+
+    <section class="panel" id="panel-scripts" role="tabpanel" aria-labelledby="tab-scripts" hidden>
+      <div class="card">
+        <h2>Sales scripts</h2>
+        <p class="muted" style="margin:0 0 16px;max-width:68ch">One script per need. The handler sees it on the call sheet. Every change makes a new version, and each saved call records the version used, so you can see whether a change helped. The starting scripts are drafts. We rewrite them from your real calls after the diagnosis.</p>
+        <p class="msg err" id="scLock" role="note" hidden>Only the owner edits scripts. You can read them here and on the call sheet.</p>
+        <div class="row2"><div class="field"><label for="scNeed">Script for</label><select id="scNeed"></select></div><div class="field"><label>Version</label><div id="scVer" class="muted" style="padding-top:8px"></div></div></div>
+        <div class="field"><label for="scSay">Say first (English)</label><textarea id="scSay" rows="2"></textarea></div>
+        <div class="field"><label for="scOffer">Offer</label><textarea id="scOffer" rows="2"></textarea></div>
+        <div class="field"><label for="scCross">Also mention</label><textarea id="scCross" rows="2"></textarea></div>
+        <div class="field"><label for="scObj">If they say (one per line: what they say | what to reply)</label><textarea id="scObj" rows="5"></textarea></div>
+        <div class="field"><label for="scClose">Close (English)</label><textarea id="scClose" rows="2"></textarea></div>
+        <div class="field"><label for="scNote">What changed and why (optional)</label><input id="scNote" placeholder="For example: added a reply for the price objection"></div>
+        <div class="d-actions"><button class="btn primary" type="button" id="scSave">Save as new version</button></div>
+        <h3 style="margin:24px 0 8px">Version history</h3><ul class="fulist" id="scHist" style="margin:0;padding:0;list-style:none"></ul>
+      </div>
+      <div class="card"><h2>Results by script version</h2><p class="muted" style="margin:0 0 16px">Calls saved on the desk, grouped by the script version in use. Small numbers mean little, so read this after at least 20 calls per script.</p><div class="tablewrap"><table id="scResults" style="min-width:560px"></table></div></div>
     </section>
 
     <section class="panel" id="panel-desk" role="tabpanel" aria-labelledby="tab-desk">
@@ -1763,17 +1785,18 @@ function renderDeskSheet(){
   var d=S.desk,N=CSN[d.need||'none'],br=BR[d.br],L=d.lang,nat=L!=='en';
   var bn=L==='si'?br.nameN.si:L==='ta'?br.nameN.ta:br.name;
   var wk=WHEN[d.time||'none'];
-  var h='<div class="sechead"><h3 style="margin:0">Call sheet: '+esc(N.title)+'</h3><span class="tag">'+esc(br.name)+' · '+esc(d.src?SRC[d.src].name:'Source not asked')+'</span></div>';
+  var ov=scrGet(d.need)||{};var h='<div class="sechead"><h3 style="margin:0">Call sheet: '+esc(N.title)+(d.need&&d.need!=='none'?' <span class="tag">Script v'+scrVer(d.need)+'</span>':'')+'</h3><span class="tag">'+esc(br.name)+' · '+esc(d.src?SRC[d.src].name:'Source not asked')+'</span></div>';
   h+='<div class="seg" role="group" aria-label="Call sheet language" style="margin-top:16px">'+[['en','English'],['si','සිංහල'],['ta','தமிழ்']].map(function(x){return '<button type="button" data-d="lang" data-v="'+x[0]+'" aria-pressed="'+(L===x[0])+'"'+(x[0]==='en'?'':' lang="'+x[0]+'"')+'>'+x[1]+'</button>'}).join('')+'</div>';
   h+='<h4>About this caller</h4><div>'+esc(d.src?SRCNOTE[d.src]:SRCNOTE.unknown)+'</div>';
-  h+='<h4>Say first</h4><div class="say" lang="'+L+'">'+esc(GREET[L].replace('{branch}',bn))+(nat?'<span class="en">'+esc(GREET.en.replace('{branch}',br.name))+'</span>':'')+'</div>';
+  h+='<h4>Say first</h4><div class="say" lang="'+L+'">'+esc((L==='en'&&ov.say?ov.say:GREET[L]).replace('{branch}',bn))+(nat?'<span class="en">'+esc(GREET.en.replace('{branch}',br.name))+'</span>':'')+'</div>';
   h+='<h4>Ask, and tap each one as you get the answer</h4><ul class="asklist">'+N.ask.map(function(id){
     var on=d.asked.indexOf(id)>-1;
     return '<li><button type="button" class="ask" data-d="ask" data-v="'+id+'" aria-pressed="'+on+'"><span class="box"></span><span lang="'+L+'">'+esc(ASKS[id][L])+(nat?'<span class="en">'+esc(ASKS[id].en)+'</span>':'')+'</span></button></li>';
   }).join('')+'</ul>';
-  h+='<h4>Offer</h4><div>'+esc(N.offer)+(N.cross?' <span class="muted">Also mention: '+esc(N.cross)+'</span>':'')+'</div>';
+  var ofr=ov.offer!==undefined?ov.offer:N.offer,crs=ov.cross!==undefined?ov.cross:N.cross;h+='<h4>Offer</h4><div>'+esc(ofr)+(crs?' <span class="muted">Also mention: '+esc(crs)+'</span>':'')+'</div>';
+  if(d.need&&d.need!=='none'){h+='<h4>If they say</h4><ul class="objl">'+scrObjs(d.need).map(function(x){return '<li><b>"'+esc(x.q)+'"</b><span>'+esc(x.a)+'</span></li>'}).join('')+'</ul>'}
   var cl=CLOSE[d.outcome&&CLOSE[d.outcome]?d.outcome:'none'];
-  h+='<h4>'+(d.outcome&&CLOSE[d.outcome]?'Close with':'Before they hang up')+'</h4><div class="say" lang="'+L+'">'+esc(cl[L].replace('{when}',wk[L]))+(nat?'<span class="en">'+esc(cl.en.replace('{when}',wk.en))+'</span>':'')+'</div>';
+  h+='<h4>'+(d.outcome&&CLOSE[d.outcome]?'Close with':'Before they hang up')+'</h4><div class="say" lang="'+L+'">'+esc(((L==='en'&&ov.close&&!(d.outcome&&CLOSE[d.outcome]))?ov.close:cl[L]).replace('{when}',wk[L]))+(nat?'<span class="en">'+esc(cl.en.replace('{when}',wk.en))+'</span>':'')+'</div>';
   if(nat)h+='<p class="muted small" style="margin:16px 0 0">Sinhala and Tamil lines are drafts. A native speaker should review them before staff use them.</p>';
   $('#deskSheet').innerHTML=h;
 }
@@ -1867,6 +1890,7 @@ function saveDeskCall(){
     summary:N.title+' enquiry from '+area+'. '+(d.time?deskLabel(TIMES,d.time)+'. ':'')+(d.budget?deskLabel(BUDGETS,d.budget)+'. ':'')+'Outcome: '+deskLabel(OUTS,d.outcome)+'. Captured: '+got.join(', ')+'.'+(miss.length?' Missing: '+miss.join(', ')+'.':'')+(f.notes?' Note: '+f.notes:''),
     intent:N.title,score:heat,tags:[N.title,deskLabel(OUTS,d.outcome)],signals:d.quals.concat(d.time==='now'?['Needs it today']:[],d.budget==='ok'?['Budget fits']:[]),
     lang:lang,conf:100,outcome:OUTMAP[d.outcome],notes:f.notes,callback:false,handler:true,phoneFull:f.phone||'',sold:d.outcome==='sold',chk:k,by:ME||((HANDLERS[br.id]||['Desk'])[0]),stage:({visit:'visit',quote:'quoted',sold:'won',callback:'new',info:'new',support:'none',wrong:'none'})[d.outcome]||'new'};
+  c.scriptVer=scrVer(d.need);c.scriptNeed=N.title;
   if(d.quote){c.quoteRef=d.quote.ref;c.tags.push('Quotation sent');c.summary+=' Quotation '+d.quote.ref+' sent on WhatsApp.'}
   if(d.outcome==='sold'){c.saleAmt=+($('#deskSale').value||0)||0;c.invoice=($('#deskInv').value||'').trim()}
   S.calls.unshift(c);
@@ -2447,14 +2471,59 @@ function sendQuote(){
   toast('Opened in WhatsApp. Tap Send there. Quotation '+q.ref+'.');
   closeQuote();renderDeskStatus();
 }
+/* ---------- sales scripts (versioned) ---------- */
+var DEFOBJ=[
+ {q:'It is too expensive',a:'Ask what budget they have in mind. Offer a smaller model, or a site visit so the size is right before they decide.'},
+ {q:'I will call back later',a:'Offer to send the details on WhatsApp now and agree a time for you to call. Do not leave it open.'},
+ {q:'I am comparing other shops',a:'Ask what they are comparing. Stress the site check, the fitting and the service after the sale.'}
+];
+function scrGet(n){return (S.scripts||(S.scripts={}))[n]||null}
+function scrVer(n){var o=scrGet(n);return o?o.ver:1}
+function scrObjs(n){var o=scrGet(n);return (o&&o.objs)||DEFOBJ}
+function scrNeeds(){return NEEDS.filter(function(n){return n!=='none'&&CSN[n]})}
+function renderScriptEd(){
+  var cur=S.scNeed&&CSN[S.scNeed]?S.scNeed:scrNeeds()[0];S.scNeed=cur;
+  var N=CSN[cur],o=scrGet(cur)||{},ver=scrVer(cur),can=!!OWNER;
+  $('#scNeed').innerHTML=scrNeeds().map(function(n){return '<option value="'+n+'"'+(n===cur?' selected':'')+'>'+esc(CSN[n].title)+' · v'+scrVer(n)+'</option>'}).join('');
+  $('#scVer').textContent='Current version: v'+ver+(o.at?' · saved '+new Date(o.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})+(o.by?' by '+o.by:''):' · starting script');
+  $('#scSay').value=o.say!==undefined?o.say:GREET.en.replace('{branch}','Colombo');
+  $('#scOffer').value=o.offer!==undefined?o.offer:N.offer;
+  $('#scCross').value=o.cross!==undefined?o.cross:(N.cross||'');
+  $('#scClose').value=o.close!==undefined?o.close:CLOSE.none.en.replace('{when}','soon');
+  $('#scObj').value=scrObjs(cur).map(function(x){return x.q+' | '+x.a}).join('\n');
+  $('#scNote').value='';
+  ['scSay','scOffer','scCross','scClose','scObj','scNote','scSave'].forEach(function(id){$('#'+id).disabled=!can});
+  $('#scLock').hidden=can;
+  var hist=(o.hist||[]).slice().reverse();
+  $('#scHist').innerHTML=hist.length?hist.map(function(h){return '<li><b>v'+h.ver+'</b> '+new Date(h.at).toLocaleDateString(undefined,{day:'numeric',month:'short'})+(h.by?' · '+esc(h.by):'')+(h.note?' · '+esc(h.note):'')+'</li>'}).join(''):'<li class="muted">No changes yet. This is the starting script.</li>';
+  renderScriptResults();
+}
+function scrSave(){
+  if(!OWNER)return;
+  var n=S.scNeed,o=scrGet(n)||{ver:1,hist:[]},objs=$('#scObj').value.split('\n').map(function(l){var i=l.indexOf('|');return i<0?null:{q:l.slice(0,i).trim(),a:l.slice(i+1).trim()}}).filter(function(x){return x&&x.q&&x.a});
+  var nv={ver:o.ver+1,say:$('#scSay').value.trim(),offer:$('#scOffer').value.trim(),cross:$('#scCross').value.trim(),close:$('#scClose').value.trim(),objs:objs,at:Date.now(),by:'Akith',hist:(o.hist||[]).concat([{ver:o.ver+1,at:Date.now(),by:'Akith',note:($('#scNote').value||'').trim()}])};
+  S.scripts[n]=nv;renderScriptEd();if(S.tab==='desk')renderDeskSheet();
+  toast('Saved as v'+nv.ver+'. Handlers see it on the next call.');
+}
+function renderScriptResults(){
+  var rows={};
+  S.calls.filter(function(c){return c.handler}).forEach(function(c){
+    var k=(c.scriptNeed||c.intent||'Other')+'|'+(c.scriptVer||1);
+    var r=rows[k]||(rows[k]={need:c.scriptNeed||c.intent||'Other',ver:c.scriptVer||1,calls:0,won:0});
+    r.calls++;if(c.outcome==='booked'||c.outcome==='quote'&&false||c.sold)r.won++;
+  });
+  var list=Object.keys(rows).map(function(k){return rows[k]}).sort(function(a,b){return a.need<b.need?-1:a.need>b.need?1:a.ver-b.ver});
+  $('#scResults').innerHTML=list.length?'<thead><tr><th>Need</th><th class="num">Script</th><th class="num">Calls</th><th class="num">Booked or sold</th><th class="num">Rate</th></tr></thead><tbody>'+list.map(function(r){return '<tr><td>'+esc(r.need)+'</td><td class="num">v'+r.ver+'</td><td class="num">'+r.calls+'</td><td class="num">'+r.won+'</td><td class="num">'+Math.round(r.won/r.calls*100)+'%</td></tr>'}).join('')+'</tbody>':'<tbody><tr><td class="muted">Save calls on the desk. Results by script version appear here.</td></tr></tbody>';
+}
 /* ---------- tabs ---------- */
 function showTab(t){
   S.tab=t;
   var tb=$('.toolbar');if(tb)tb.hidden=(t==='desk'||t==='lab'||t==='followups'||t==='clients'||t==='data');
   $$('.tab').forEach(function(b){var on=b.getAttribute('data-tab')===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  ['dash','desk','followups','clients','calls','coaching','sources','numbers','data','web','sales','lab'].forEach(function(p){$('#panel-'+p).hidden=p!==t});
+  ['dash','desk','followups','clients','calls','coaching','sources','numbers','data','web','sales','scripts','lab'].forEach(function(p){$('#panel-'+p).hidden=p!==t});
   if(t==='desk')renderDesk();
   if(t==='sales')renderSales();
+  if(t==='scripts')renderScriptEd();
   if(t==='followups')renderFollowups();
   if(t==='lab')renderLab();
   if(t==='clients')renderClients();
@@ -2488,6 +2557,7 @@ document.addEventListener('click',function(e){
   var t=e.target;
   var tab=t.closest('[data-tab]');if(tab){showTab(tab.getAttribute('data-tab'));return}
   var dk=t.closest('[data-d]');if(dk){deskTap(dk.getAttribute('data-d'),dk.getAttribute('data-v'));return}
+  if(t.closest&&t.closest('#scSave')){scrSave();return}
   if(t.closest&&t.closest('[data-usehist]')){useHist();return}
   var fk=t.closest('[data-fukpi]');if(fk){var kv=fk.getAttribute('data-fukpi');S.fu.kf=(S.fu.kf===kv||kv==='open')?null:kv;if(kv==='open')S.fu.view='open';renderFollowups();return}
   var fv=t.closest('[data-fuview]');if(fv){S.fu.view=fv.getAttribute('data-fuview');S.fu.kf=null;renderFollowups();return}
@@ -2577,6 +2647,7 @@ document.addEventListener('change',function(e){
   if(t.name==='vbranch'){setVisitor(S.web.source,t.value);renderWeb();return}
   if(t.id==='fuBranch'){S.fu.branch=t.value;renderFollowups();return}
   if(t.id==='deskCid'){renderDeskStatus();return}
+  if(t.id==='scNeed'){S.scNeed=t.value;renderScriptEd();return}
   if(t.id==='deskArea'){S.desk.area=t.value||null;renderDeskStatus();renderDeskSheet();return}
   if(t.id==='deskSrc'){S.desk.src=t.value||null;S.srcOk=false;renderDeskSheet();return}
   if(t.id==='deskBr'){deskTap('br',t.value);return}
