@@ -611,7 +611,7 @@ tbody tr:hover{background:var(--surface-2)}
           <h3 class="stlab">View</h3>
           <div class="stbtns"><button type="button" class="btn sm" data-fz="-" aria-label="Zoom out" data-tip="Zoom out: make the map smaller">−</button><span id="fzv" class="muted small">100%</span><button type="button" class="btn sm" data-fz="+" aria-label="Zoom in" data-tip="Zoom in: make the map bigger">+</button></div>
           <div class="stbtns"><button type="button" class="btn sm" data-fz="0" data-tip="Fit to width: shrink or grow the map to fit this window">Fit to width</button><button type="button" class="btn sm" id="fpTidy" data-tip="Tidy up: put every tile back in neat columns. Your own positions are lost.">Tidy up</button><button type="button" class="btn sm" id="flFull" data-tip="Full screen: the whole editor fills the window, with the tools kept">Full screen</button></div>
-          <p class="muted small" style="margin:0">Drag empty space to move around the map. Drag a tile to move it. Drag from the dot on its right edge onto another tile to link them.</p>
+          <p class="muted small" style="margin:0">Scroll the mouse wheel to zoom. Drag empty space to move around the map. Drag a tile to move it. Drag from the dot on its right edge onto another tile to link them.</p>
           <h3 class="stlab">Publish</h3>
           <div class="field"><label for="fpNote">What changed (optional)</label><input id="fpNote" placeholder="For example: new price reply"></div>
           <div class="stbtns"><button class="btn primary" type="button" id="fpPub" data-tip="Publish: save your changes as a new version. Handlers see it on their next call.">Publish</button><button class="btn" type="button" id="fpDiscard" data-tip="Discard draft: throw away changes you have not published">Discard draft</button></div>
@@ -2702,7 +2702,7 @@ function flFullToggle(){var st=$('.studio'),on=st.classList.toggle('full');docum
 function flowCommit(){renderFlowEd()}
 document.addEventListener('click',function(e){
   var t=e.target,c=t.closest?t.closest.bind(t):null;if(!c)return;var x;
-  if((x=c('[data-fz]'))){var z=x.getAttribute('data-fz');if(z==='0'){flFit();return}S.fz=Math.max(.5,Math.min(1.6,(S.fz||1)+(z==='+'?.15:-.15)));renderFlowEd();return}
+  if((x=c('[data-fz]'))){var z=x.getAttribute('data-fz');if(z==='0'){flFit();return}S.fz=Math.max(.4,Math.min(2,(S.fz||1)+(z==='+'?.15:-.15)));renderFlowEd();return}
   if(c('#flFull')){flFullToggle();return}
   if(c('#stBack')){if($('.studio').classList.contains('full')){flFullToggle()}else{var pt=S.prevTab&&S.prevTab!=='scripts'?S.prevTab:'desk';showTab(pt)}return}
   if(!OWNER&&(x=c('[data-fn]'))){S.fnode=x.getAttribute('data-fn');renderFlowEd();return}
@@ -2744,7 +2744,7 @@ document.addEventListener('change',function(e){
   else if(t.id==='fnGlob'){nd.glob=t.checked;flowCommit()}
   else if(t.getAttribute&&t.getAttribute('data-lk')){var row=t.closest('[data-li]'),l=nd.next[+row.getAttribute('data-li')];if(l){l[t.getAttribute('data-lk')]=t.value;flowCommit()}}
 });
-document.addEventListener('wheel',function(e){if(S.tab==='scripts'&&e.ctrlKey&&e.target.closest&&e.target.closest('#flMap')){e.preventDefault();S.fz=Math.max(.5,Math.min(1.6,(S.fz||1)+(e.deltaY<0?.1:-.1)));renderFlowEd()}},{passive:false});
+document.addEventListener('wheel',function(e){if(S.tab==='scripts'&&e.target.closest&&e.target.closest('#flMap')){e.preventDefault();var m=$('#flMap'),r=m.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,z=S.fz||1,z2=Math.max(.4,Math.min(2,z*(e.deltaY<0?1.1:1/1.1)));if(z2===z)return;var cx=(m.scrollLeft+mx)/z,cy=(m.scrollTop+my)/z;S.fz=z2;var p=(S.fdr&&S.fdr[S.fpid])||profGet(S.fpid);$('#flMap').innerHTML=flowSvg(p);$('#fzv').textContent=Math.round(z2*100)+'%';m.scrollLeft=cx*z2-mx;m.scrollTop=cy*z2-my}},{passive:false});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){var st0=$('.studio');if(st0&&st0.classList.contains('full')&&!S.pd){flFullToggle();return}}var g=e.target.closest&&e.target.closest('[data-fn]');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();S.fnode=g.getAttribute('data-fn');renderFlowEd()}});
 function renderScriptResults(){
   var rows={};
