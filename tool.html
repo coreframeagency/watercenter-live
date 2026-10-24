@@ -480,6 +480,7 @@ tbody tr:hover{background:var(--surface-2)}
 #panel-scripts .field{margin-bottom:16px}#panel-scripts .field label{display:block;margin-bottom:8px}#panel-scripts .d-actions{margin-top:8px}
 #stBody input,#stBody select{width:100%;min-width:72px;font:inherit}#stBody td{padding:8px}#stBody td.num input{text-align:right}.pill.warn{background:#fdf0d4;color:#7a5200}.pill.bad{background:#fbe0dc;color:#9a1f10}
 #stBody input,#stBody select{border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink);box-shadow:none;outline-offset:2px}#stBody td:first-child{min-width:240px}#stBody td:nth-child(3){min-width:128px}
+#stBody tr.sthead td{background:var(--surface-2);padding:8px 16px;border-top:1px solid var(--line)}#stBody td:first-child{min-width:160px}#deskAvail{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 16px;background:var(--surface);color:var(--ink);font:inherit}#deskAvailOut .objl li span{display:block}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -522,7 +523,7 @@ tbody tr:hover{background:var(--surface-2)}
     <button class="tab" role="tab" id="tab-calls" aria-controls="panel-calls" aria-selected="false" data-tab="calls" tabindex="-1">Call log</button>
     <button class="tab" role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources" tabindex="-1">Sources</button>
     <button class="tab" role="tab" id="tab-sales" aria-controls="panel-sales" aria-selected="false" data-tab="sales" tabindex="-1">Sales and review</button>
-    <button class="tab" role="tab" id="tab-stock" aria-controls="panel-stock" aria-selected="false" data-tab="stock" tabindex="-1">Stock and prices</button>
+    <button class="tab" role="tab" id="tab-stock" aria-controls="panel-stock" aria-selected="false" data-tab="stock" tabindex="-1">Inventory</button>
     <button class="tab" role="tab" id="tab-scripts" aria-controls="panel-scripts" aria-selected="false" data-tab="scripts" tabindex="-1">Scripts</button>
     <button class="tab" role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab" tabindex="-1">Model lab</button>
   </nav>
@@ -575,13 +576,14 @@ tbody tr:hover{background:var(--surface-2)}
 
     <section class="panel" id="panel-stock" role="tabpanel" aria-labelledby="tab-stock" hidden>
       <div class="card">
-        <h2>Stock and prices</h2>
-        <p class="muted" style="margin:0 0 16px;max-width:68ch">One list per branch, and the same list the call desk reads. Each line is one batch from one supplier. Batches sell in the order listed, so the desk quotes the first batch that still has stock. The phone price matches the walk-in price unless the owner sets it differently. Quantities and prices below are samples.</p>
-        <p class="msg err" id="stLock" role="note" hidden>Only the owner changes items and prices. Handlers update the counted quantity.</p>
+        <h2>Inventory</h2>
+        <p class="muted" style="margin:0 0 16px;max-width:68ch">What each branch has on the shelf and what it charges. Handlers see this on the call desk before they quote. All numbers here are samples.</p>
+        <p class="msg err" id="stLock" role="note" hidden>Only the owner changes items and prices. Handlers can update the number in stock after counting.</p>
         <div class="field" style="max-width:320px"><label for="stBr">Branch</label><select id="stBr"></select></div>
-        <h3 style="margin:16px 0 8px">Needs attention</h3><ul class="fulist" id="stFlags" style="margin:0 0 24px;padding:0 0 0 16px"></ul>
-        <div class="tablewrap"><table style="min-width:900px"><thead><tr><th>Item</th><th>Need</th><th>Supplier</th><th class="num">Counted</th><th class="num">Walk-in LKR</th><th class="num">Phone LKR</th><th>Last count</th><th></th></tr></thead><tbody id="stBody"></tbody></table></div>
-        <div class="d-actions" style="margin-top:16px"><button class="btn" type="button" id="stAdd">Add a line</button></div>
+        <h3 style="margin:16px 0 8px">Check these</h3><ul class="fulist" id="stFlags" style="margin:0 0 16px;padding:0 0 0 16px"></ul>
+        <details class="help" style="margin:0 0 24px"><summary>How to read the list</summary><p class="muted" style="max-width:68ch">Each product has one or more supplier lines. Two suppliers can sell the same product at different prices, so each gets its own line. The desk quotes the first line that still has stock. "Phone price" is only filled in when callers pay a different price from walk-in customers. Leave it as "same" otherwise.</p></details>
+        <div class="tablewrap"><table style="min-width:760px"><thead><tr><th>Supplier</th><th class="num">In stock</th><th class="num">Price (LKR)</th><th class="num">Phone price</th><th>Last counted</th><th></th></tr></thead><tbody id="stBody"></tbody></table></div>
+        <div id="stAddBox" class="stadd" style="margin-top:16px"><h3 style="margin:0 0 8px">Add a product or a supplier line</h3><div class="row2"><div class="field"><label for="stnName">Product name</label><input id="stnName" placeholder="Use the same name to add a second supplier"></div><div class="field"><label for="stnNeed">Type</label><select id="stnNeed"></select></div></div><div class="row2"><div class="field"><label for="stnSup">Supplier</label><input id="stnSup" placeholder="Supplier A"></div><div class="field"><label for="stnQty">In stock</label><input id="stnQty" type="number" min="0" value="0"></div></div><div class="field" style="max-width:320px"><label for="stnPrice">Price (LKR)</label><input id="stnPrice" type="number" min="0" step="500"></div><button class="btn" type="button" id="stAdd">Add</button></div>
       </div>
     </section>
 
@@ -1810,6 +1812,7 @@ function renderDeskSheet(){
   }).join('')+'</ul>';
   var ofr=ov.offer!==undefined?ov.offer:N.offer,crs=ov.cross!==undefined?ov.cross:N.cross;h+='<h4>Offer</h4><div>'+esc(ofr)+(crs?' <span class="muted">Also mention: '+esc(crs)+'</span>':'')+'</div>';
   h+=stDeskHtml(d);
+  h+='<h4>Check availability</h4><input id="deskAvail" type="search" placeholder="Search a product" aria-label="Check availability" value="'+esc(S.avq||'')+'"><div id="deskAvailOut" style="margin-top:8px">'+avOutHtml(S.avq)+'</div>';
   if(d.need&&d.need!=='none'){h+='<h4>If they say</h4><ul class="objl">'+scrObjs(d.need).map(function(x){return '<li><b>"'+esc(x.q)+'"</b><span>'+esc(x.a)+'</span></li>'}).join('')+'</ul>'}
   var cl=CLOSE[d.outcome&&CLOSE[d.outcome]?d.outcome:'none'];
   h+='<h4>'+(d.outcome&&CLOSE[d.outcome]?'Close with':'Before they hang up')+'</h4><div class="say" lang="'+L+'">'+esc(((L==='en'&&ov.close&&!(d.outcome&&CLOSE[d.outcome]))?ov.close:cl[L]).replace('{when}',wk[L]))+(nat?'<span class="en">'+esc(cl.en.replace('{when}',wk.en))+'</span>':'')+'</div>';
@@ -2430,11 +2433,11 @@ function buildQuote(){
   if(!items.length)items.push({n:N.title,p:null,after:d.need==='pump_service'?L.after2:L.after});
   var area=d.area&&d.area!=='out'?d.area:'',tm=d.time?deskLabel(TIMES,d.time):'';
   var det=d.quals.slice();if(tm)det.push(tm);
-  return {ref:d.quoteRef,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),name:f.name,phone:f.phone,area:area,need:N.title,det:det,items:items,notes:[L.n1,L.n2,L.n3],br:br,L:L,lang:d.lang};
+  return {ref:d.quoteRef,date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),name:f.name,phone:f.phone,area:area,need:N.title,det:det,items:items,notes:[L.n1,L.n2,L.n3],br:br,L:L,lang:d.lang,opts:items.length>1&&items.every(function(x){return x.p})};
 }
 function qLbl(q){var pr=q.items.filter(function(x){return x.p});return pr.length&&pr.every(function(x){return x.exact})?({si:'එකතුව',ta:'மொத்தம்'})[q.lang]||'Total':q.L.est}
 function qLogo(){var l=document.querySelector('.logo');return l?l.getAttribute('src'):''}
-function qTotal(q){return q.items.reduce(function(a,x){return a+(+x.p||0)},0)}
+function qTotal(q){if(q.opts)return 0;return q.items.reduce(function(a,x){return a+(+x.p||0)},0)}
 function quoteHtml(q){
   var L=q.L,tot=qTotal(q),h='<div class="qh"><div class="qlogo">'+(qLogo()?'<img src="'+qLogo()+'" alt="Water Center logo" width="56" height="56">':'')+'<div><b class="qbrand">Water Center</b><span>'+esc(q.br.name)+' · '+esc(q.br.main)+'</span></div></div><div class="qmeta"><b>'+esc(L.h)+'</b><span>'+esc(L.ref)+' '+esc(q.ref)+'</span><span>'+esc(L.date)+' '+esc(q.date)+'</span></div></div>';
   h+='<div class="qgrid"><div><small>'+esc(L.cust)+'</small><b>'+esc(q.name||'Customer')+'</b><span>'+esc(q.phone||'')+'</span><span>'+esc(q.area?L.area+': '+q.area:'')+'</span></div><div><small>'+esc(L.need)+'</small><b>'+esc(q.need)+'</b>'+(q.det.length?'<span>'+q.det.map(esc).join(' · ')+'</span>':'')+'</div></div>';
@@ -2534,19 +2537,33 @@ function renderScriptResults(){
 /* ---------- stock and prices ---------- */
 var LOWQ=2,STALE=7*DAY;
 function seedStock(){
-  var t=Date.now()-2*DAY,i=0;
+  var i=0;
   function r(br,need,name,sup,qty,price,phone,age){return {id:'s'+(++i),br:br,need:need,name:name,sup:sup,qty:qty,price:price,phone:phone||price,ts:Date.now()-(age||2)*DAY}}
-  return [
-   r('col','pump_home','1 HP home pump, self-priming','Supplier A',6,45000),
-   r('col','borewell','Borewell submersible pump','Supplier A',2,118000),
-   r('col','borewell','Borewell submersible pump','Supplier B',5,124000),
-   r('col','filter','Whole-house water filter','Supplier A',1,38000),
-   r('col','purifier','RO water purifier','Supplier C',0,68500),
-   r('kur','pump_home','1 HP home pump, self-priming','Supplier A',3,45000,42000,9),
-   r('kur','borewell','Borewell submersible pump','Supplier A',4,118000),
-   r('kur','filter','Whole-house water filter','Supplier A',5,38000),
-   r('kur','purifier','RO water purifier','Supplier C',4,68500)
+  var L=[
+   ['pump_home','0.5 HP home pump, self-priming',[['A',5,32000],['B',2,34500]]],
+   ['pump_home','1 HP home pump, self-priming',[['A',6,45000]]],
+   ['pump_home','1.5 HP home pump, self-priming',[['A',3,58000]]],
+   ['pump_home','Pressure booster pump, 1 HP',[['B',4,52000]]],
+   ['pump_home','Pressure tank, 24 litre',[['B',7,21500]]],
+   ['borewell','Borewell submersible pump, 1 HP',[['A',2,118000],['B',5,124000]]],
+   ['borewell','Borewell submersible pump, 1.5 HP',[['A',3,142000]]],
+   ['borewell','Borewell submersible pump, 2 HP',[['A',1,168000]]],
+   ['commercial','Commercial transfer pump, 3 HP',[['B',2,235000]]],
+   ['pump_service','Pump seal and impeller kit',[['A',12,6500]]],
+   ['pump_service','Pump control switch',[['A',9,4200]]],
+   ['filter','Whole-house water filter',[['A',1,38000]]],
+   ['filter','Sediment filter cartridge',[['A',20,2800]]],
+   ['purifier','RO water purifier',[['C',0,68500]]],
+   ['purifier','UV water purifier',[['C',3,41000]]]
   ];
+  var out=[];
+  ['col','kur'].forEach(function(br,bi){L.forEach(function(x,xi){x[2].forEach(function(b,k){
+    var qty=b[1];if(bi===1)qty=(qty*(xi%3+1)+xi)%9; if(bi===1&&x[1].indexOf('RO ')===0)qty=4;
+    var price=b[2],phone=price;
+    if(bi===1&&x[1]==='1 HP home pump, self-priming')phone=42000;
+    out.push(r(br,x[0],x[1],'Supplier '+b[0],qty,price,phone,(xi%4===0)?9:2));
+  })})});
+  return out;
 }
 function stockList(){if(!S.stock)S.stock=seedStock();return S.stock}
 function stItems(br,need){
@@ -2571,6 +2588,17 @@ function stDeskHtml(d){
   });
   return h+'</ul>';
 }
+
+function avOutHtml(q){
+  q=(q||'').trim().toLowerCase();if(q.length<2)return '<span class="muted">Type a product, for example "borewell" or "RO".</span>';
+  var m={};stockList().forEach(function(r){if(r.name.toLowerCase().indexOf(q)>-1||CSN[r.need].title.toLowerCase().indexOf(q)>-1)m[r.name]=1});
+  var names=Object.keys(m);if(!names.length)return '<span class="muted">Nothing listed with that name.</span>';
+  var me=S.desk&&S.desk.br;
+  return '<ul class="objl">'+names.slice(0,8).map(function(n){
+    var cells=['col','kur'].map(function(b){var it=stItems(b).filter(function(x){return x.name===n})[0];
+      return '<span><b>'+esc(BR[b].name)+(b===me?' (this call)':'')+':</b> '+(it?stPill(it.state)+' '+it.tot+(it.act?', LKR '+qNum(+it.act.phone):''):'not listed')+'</span>'}).join('');
+    return '<li><b>'+esc(n)+'</b>'+cells+'</li>'}).join('')+'</ul>';
+}
 function stQuoteItems(d){
   var its=stItems(d.br,d.need),out=[];
   its.forEach(function(it){if(it.act)out.push({n:it.name,p:+it.act.phone})});
@@ -2580,10 +2608,10 @@ function stFlags(br){
   var f=[];
   stItems(br).forEach(function(it){
     var rs=it.rows,p=rs.map(function(x){return x.price}).filter(function(v,i,a){return a.indexOf(v)===i});
-    if(p.length>1)f.push(it.name+': '+p.length+' prices in stock ('+rs.map(function(x){return x.sup+' '+qNum(+x.price)}).join(', ')+')');
-    rs.forEach(function(x){if(x.phone!==x.price)f.push(it.name+' ('+x.sup+'): phone price '+qNum(+x.phone)+' differs from walk-in '+qNum(+x.price))});
-    if(it.state!=='in')f.push(it.name+': '+(it.state==='out'?'out of stock':'low, '+it.tot+' left'));
-    if(it.stale)f.push(it.name+': not counted in the last 7 days');
+    if(p.length>1)f.push(it.name+' has '+p.length+' prices because of different suppliers ('+rs.map(function(x){return x.sup+' '+qNum(+x.price)}).join(', ')+'). The desk quotes the first one with stock.');
+    rs.forEach(function(x){if(x.phone!==x.price)f.push(it.name+' ('+x.sup+') has a phone price of '+qNum(+x.phone)+' and a walk-in price of '+qNum(+x.price)+'.')});
+    if(it.state!=='in')f.push(it.name+(it.state==='out'?' is out of stock.':' is running low, '+it.tot+' left.'));
+    if(it.stale)f.push(it.name+' has not been counted in 7 days. Count it on the shelf and update the number.');
   });
   return f;
 }
@@ -2591,31 +2619,36 @@ function renderStock(){
   var bs=USER?[USER]:['col','kur'],cur=USER||S.stBr||'col';S.stBr=cur;
   $('#stBr').innerHTML=bs.map(function(b){return '<option value="'+b+'"'+(b===cur?' selected':'')+'>'+esc(BR[b].name)+'</option>'}).join('');
   $('#stBr').disabled=!!USER;
-  var rows=stockList().filter(function(r){return r.br===cur}),can=!!OWNER;
+  var can=!!OWNER,its=stItems(cur);
   var nopt=NEEDS.filter(function(n){return CSN[n]&&n!=='none'});
-  $('#stBody').innerHTML=rows.map(function(r){
-    var ro=can?'':' disabled';
-    return '<tr data-sid="'+r.id+'"><td>'+(can?'<input data-st="name" value="'+esc(r.name)+'" aria-label="Item">':esc(r.name))+'</td><td>'+(can?'<select data-st="need" aria-label="Need">'+nopt.map(function(n){return '<option value="'+n+'"'+(n===r.need?' selected':'')+'>'+esc(CSN[n].title)+'</option>'}).join('')+'</select>':esc(CSN[r.need].title))+'</td><td>'+(can?'<input data-st="sup" value="'+esc(r.sup)+'" aria-label="Supplier">':esc(r.sup))+'</td><td class="num"><input data-st="qty" type="number" min="0" value="'+r.qty+'" aria-label="Quantity counted"></td><td class="num">'+(can?'<input data-st="price" type="number" min="0" step="500" value="'+r.price+'" aria-label="Walk-in price">':qNum(+r.price))+'</td><td class="num">'+(can?'<input data-st="phone" type="number" min="0" step="500" value="'+r.phone+'" aria-label="Phone price">':qNum(+r.phone))+'</td><td class="small muted">'+Math.max(0,Math.round((Date.now()-r.ts)/DAY))+' d ago</td><td>'+(can?'<button class="btn sm" type="button" data-stdel="'+r.id+'">Remove</button>':'')+'</td></tr>';
-  }).join('')||'<tr><td colspan="8" class="muted">No items yet.</td></tr>';
-  $('#stAdd').hidden=!can;$('#stLock').hidden=can;
+  var h='';
+  its.forEach(function(it){
+    h+='<tr class="sthead"><td colspan="6"><b>'+esc(it.name)+'</b> '+stPill(it.state)+' <span class="muted small">'+esc(CSN[it.need].title)+' · '+it.tot+' in stock'+(it.rows.length>1?' across '+it.rows.length+' suppliers':'')+'</span></td></tr>';
+    it.rows.forEach(function(r){
+      h+='<tr data-sid="'+r.id+'"><td>'+(can?'<input data-st="sup" value="'+esc(r.sup)+'" aria-label="Supplier">':esc(r.sup))+'</td><td class="num"><input data-st="qty" type="number" min="0" value="'+r.qty+'" aria-label="In stock"></td><td class="num">'+(can?'<input data-st="price" type="number" min="0" step="500" value="'+r.price+'" aria-label="Price">':qNum(+r.price))+'</td><td class="num">'+(can?'<input data-st="phone" type="number" min="0" step="500" value="'+(r.phone!==r.price?r.phone:'')+'" placeholder="same" aria-label="Phone price, blank if the same">':(r.phone!==r.price?qNum(+r.phone):'same'))+'</td><td class="small muted">'+Math.max(0,Math.round((Date.now()-r.ts)/DAY))+' d ago</td><td>'+(can?'<button class="btn sm" type="button" data-stdel="'+r.id+'">Remove</button>':'')+'</td></tr>';
+    });
+  });
+  $('#stBody').innerHTML=h||'<tr><td colspan="6" class="muted">No items yet.</td></tr>';
+  $('#stAddBox').hidden=!can;$('#stnNeed').innerHTML=nopt.map(function(n){return '<option value="'+n+'">'+esc(CSN[n].title)+'</option>'}).join('');$('#stLock').hidden=can;
   var fl=stFlags(cur);
-  $('#stFlags').innerHTML=fl.length?fl.map(function(x){return '<li>'+esc(x)+'</li>'}).join(''):'<li class="muted">No price or stock issues.</li>';
+  $('#stFlags').innerHTML=fl.length?fl.map(function(x){return '<li>'+esc(x)+'</li>'}).join(''):'<li class="muted">Nothing to check.</li>';
 }
 document.addEventListener('change',function(e){
   var t=e.target,tr=t.closest&&t.closest('tr[data-sid]');if(!tr||!t.getAttribute('data-st'))return;
   var r=stockList().filter(function(x){return x.id===tr.getAttribute('data-sid')})[0];if(!r)return;
   var f=t.getAttribute('data-st'),v=t.value;
   if(f==='qty'){r.qty=Math.max(0,+v||0);r.ts=Date.now();toast('Count saved')}
-  else if(f==='price'){r.price=+v||0;if(!OWNER)return;r.phone=r.phone===undefined?r.price:r.phone}
-  else if(f==='phone'){r.phone=+v||0}
+  else if(f==='price'){if(!OWNER)return;var same=r.phone===r.price;r.price=+v||0;if(same)r.phone=r.price}
+  else if(f==='phone'){r.phone=v===''?r.price:(+v||0)}
   else r[f]=v;
   renderStock();
 });
 document.addEventListener('click',function(e){
   var t=e.target.closest?e.target.closest('#stAdd,[data-stdel]'):null;if(!t)return;
-  if(t.id==='stAdd'&&OWNER){var l=stockList();l.push({id:'s'+Date.now(),br:S.stBr,need:'pump_home',name:'New item',sup:'Supplier',qty:0,price:0,phone:0,ts:Date.now()});renderStock();return}
+  if(t.id==='stAdd'&&OWNER){var l=stockList();var nm=($('#stnName').value||'').trim();if(!nm){toast('Enter a product name');return}var pr=+$('#stnPrice').value||0;l.push({id:'s'+Date.now(),br:S.stBr,need:$('#stnNeed').value,name:nm,sup:($('#stnSup').value||'').trim()||'Supplier A',qty:+$('#stnQty').value||0,price:pr,phone:pr,ts:Date.now()});$('#stnName').value='';$('#stnPrice').value='';renderStock();return}
   var id=t.getAttribute('data-stdel');if(id&&OWNER){S.stock=stockList().filter(function(x){return x.id!==id});renderStock()}
 });
+document.addEventListener('input',function(e){if(e.target.id==='deskAvail'){S.avq=e.target.value;var o=$('#deskAvailOut');if(o)o.innerHTML=avOutHtml(S.avq)}});
 document.addEventListener('change',function(e){if(e.target.id==='stBr'){S.stBr=e.target.value;renderStock()}});
 /* ---------- tabs ---------- */
 function showTab(t){
