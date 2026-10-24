@@ -107,6 +107,7 @@ h1{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.02em;margin:0
 .seg button{height:32px;padding:0 16px;border:0;border-radius:4px;background:none;cursor:pointer;font-weight:500;color:var(--ink-2)}
 .seg button[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand);font-weight:600}
 .muted{color:var(--ink-2)}
+.fllab.hal{paint-order:stroke;stroke:var(--bg,#fff);stroke-width:5px;stroke-linejoin:round}
 body:not(.isadmin) #fpTidy,body:not(.isadmin) #fpPub,body:not(.isadmin) #fpDiscard{display:none}
 .devgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media(max-width:800px){.devgrid{grid-template-columns:minmax(0,1fr)}}.devgrid .card{min-width:0}.devt td{word-break:break-word}.devwide{grid-column:1/-1}.devt{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed}.devt td:first-child{width:45%}.devt td.num{width:45%}.devt td{padding:8px 0;border-top:1px solid var(--line);font-size:14px}.devt td.num{text-align:right}.devbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}#devJson{width:100%;margin-top:16px;font:13px/1.5 ui-monospace,Menlo,monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:16px}.devlog{list-style:none;margin:16px 0 0;padding:0;max-height:240px;overflow:auto}.devlog li{padding:8px 0;border-top:1px solid var(--line);font-size:13px}.devlog li.error b{color:#E5484D}
 .small{font-size:12px}
@@ -2644,7 +2645,7 @@ function flayout(p){
   return {pos:pos,W:W,H:H,w:w,h:hgt,gy:gy2,cust:cust};
 }
 function flowSvg(p){
-  var L=flayout(p),can=!!ADMIN,h='<svg class="flmap" viewBox="0 0 '+L.w+' '+L.h+'" width="'+Math.round(L.w*(S.fz||1))+'" height="'+Math.round(L.h*(S.fz||1))+'" role="img" aria-label="Script flow chart"><defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a97a6"/></marker><pattern id="fdots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#8a97a6" opacity=".35"/></pattern></defs><rect width="100%" height="100%" fill="url(#fdots)"/>';
+  var L=flayout(p),can=!!ADMIN,labs=[],h='<svg class="flmap" viewBox="0 0 '+L.w+' '+L.h+'" width="'+Math.round(L.w*(S.fz||1))+'" height="'+Math.round(L.h*(S.fz||1))+'" role="img" aria-label="Script flow chart"><defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a97a6"/></marker><pattern id="fdots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#8a97a6" opacity=".35"/></pattern></defs><rect width="100%" height="100%" fill="url(#fdots)"/>';
   if(!L.cust)h+='<text x="16" y="'+(L.gy+12)+'" class="fllab">Anytime: the handler taps these whenever the caller says them</text>';
   p.nodes.forEach(function(x){var done={};x.next.forEach(function(l){
     if(l.to==='_back'||!L.pos[l.to]||!L.pos[x.id]||done[l.to])return;done[l.to]=1;var a=L.pos[x.id],b=L.pos[l.to],x1,y1,x2,y2,d;
@@ -2653,8 +2654,9 @@ function flowSvg(p){
     else if(b.y>=a.y){x1=a.x+L.W/2;y1=a.y+L.H;x2=b.x+L.W/2;y2=b.y;var m2=Math.max(40,(y2-y1)/2);d='M'+x1+' '+y1+'C'+x1+' '+(y1+m2)+' '+x2+' '+(y2-m2)+' '+x2+' '+y2}
     else{x1=a.x+L.W/2;y1=a.y;x2=b.x+L.W/2;y2=b.y+L.H;var m3=Math.max(40,(y1-y2)/2);d='M'+x1+' '+y1+'C'+x1+' '+(y1-m3)+' '+x2+' '+(y2+m3)+' '+x2+' '+y2}
     h+='<path d="'+d+'" fill="none" stroke="#8a97a6" stroke-width="1.6"'+dash+' marker-end="url(#fa)"/>';
-    if(l.label&&l.label!=='Then')h+='<text x="'+((x1+x2)/2)+'" y="'+((y1+y2)/2-6)+'" text-anchor="middle" class="fllab">'+esc(l.label.slice(0,28))+'</text>';
+    if(l.label&&l.label!=='Then'){var cp=d.match(/-?[\d.]+/g).map(Number);labs.push({t:l.label.slice(0,28),c:cp})}
   })});
+  labs.forEach(function(lb){var c=lb.c,best=null;[.5,.42,.58,.34,.66,.26,.74].some(function(t){var u=1-t,px=u*u*u*c[0]+3*u*u*t*c[2]+3*u*t*t*c[4]+t*t*t*c[6],py=u*u*u*c[1]+3*u*u*t*c[3]+3*u*t*t*c[5]+t*t*t*c[7],w=lb.t.length*6.4/2+8,hit=Object.keys(L.pos).some(function(k){var r=L.pos[k];return px+w>r.x-4&&px-w<r.x+L.W+4&&py+10>r.y-4&&py-14<r.y+L.H+4});if(!hit||!best)best=[px,py];return !hit});h+='<text x="'+best[0]+'" y="'+(best[1]+4)+'" text-anchor="middle" class="fllab hal">'+esc(lb.t)+'</text>'});
   p.nodes.forEach(function(x){var q=L.pos[x.id];if(!q)return;var sel=S.fnode===x.id;
     h+='<g class="flnode'+(sel?' sel':'')+(can?' mv':'')+'" data-tip="'+esc(TIPS[x.type].split(':')[0]+' tile. '+(can?'Click to edit it. Drag to move it. Drag its dot onto another tile to link them.':'Click to read it.'))+'" data-fn="'+x.id+'" tabindex="0" role="button" aria-label="'+esc(FT[x.type][0]+': '+x.title)+'"><rect x="'+q.x+'" y="'+q.y+'" width="'+L.W+'" height="'+L.H+'" rx="12" fill="var(--surface)" stroke="'+fcol(x)+'" stroke-width="'+(sel?3:1.5)+'"'+(x.glob?' stroke-dasharray="6 4"':'')+'/><rect x="'+q.x+'" y="'+q.y+'" width="6" height="'+L.H+'" rx="3" fill="'+fcol(x)+'"/><text x="'+(q.x+16)+'" y="'+(q.y+26)+'" class="fltype" fill="'+fcol(x)+'">'+esc(FT[x.type][0].toUpperCase())+(x.glob?' · ANYTIME':'')+(x.locked?' · LOCKED':'')+'</text><text x="'+(q.x+16)+'" y="'+(q.y+52)+'" class="fltitle">'+esc(x.title.length>24?x.title.slice(0,23)+'…':x.title)+'</text>'+(can&&fcanNode(x)?'<circle class="flh" data-tip="Link handle: drag this dot onto another tile to link them" data-fc="'+x.id+'" cx="'+(q.x+L.W)+'" cy="'+(q.y+L.H/2)+'" r="8" fill="var(--surface)" stroke="'+fcol(x)+'" stroke-width="2"></circle>':'')+'</g>';
   });
@@ -3035,6 +3037,20 @@ document.addEventListener('change',function(e){
   if(t.id==='devKey'){S.devKey=t.value;renderDev();return}
   if(t.getAttribute&&t.getAttribute('data-flag')){devFlags()[t.getAttribute('data-flag')]=t.checked;applyFlags();devLog('info','Flag '+t.getAttribute('data-flag')+' = '+t.checked);return}
   if(t.id==='devImport'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var o=JSON.parse(fr.result),d=o.data||o;['calls','tasks','stock','pmeta','flows','crm','flags'].forEach(function(k){if(d[k]!==undefined)S[k]=d[k]});toast('Imported');devLog('info','Imported a data file');renderDev();applyFlags()}catch(err){toast('Could not read that file: '+err.message)}};fr.readAsText(t.files[0]);t.value=''}
+});
+
+/* ---------- script undo and delete key ---------- */
+var UNDO=[];
+function undoSnap(){if(!ADMIN||S.tab!=='scripts'||!S.fpid)return;var d=S.fdr&&S.fdr[S.fpid],j=d?JSON.stringify(d):JSON.stringify(profGet(S.fpid));if(UNDO.length&&UNDO[UNDO.length-1].j===j&&UNDO[UNDO.length-1].id===S.fpid)return;UNDO.push({id:S.fpid,j:j});if(UNDO.length>60)UNDO.shift()}
+['pointerdown','click','change','input'].forEach(function(ev){document.addEventListener(ev,function(e){if(e.target.closest&&e.target.closest('#panel-scripts'))undoSnap()},true)});
+document.addEventListener('keydown',function(e){
+  if(!ADMIN||S.tab!=='scripts'||S.pd)return;
+  var tg=e.target,typing=tg&&(tg.tagName==='INPUT'||tg.tagName==='TEXTAREA'||tg.tagName==='SELECT'||tg.isContentEditable);
+  if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&(e.key==='z'||e.key==='Z')&&!typing){
+    e.preventDefault();var cur=S.fdr&&S.fdr[S.fpid]?JSON.stringify(S.fdr[S.fpid]):JSON.stringify(profGet(S.fpid));
+    while(UNDO.length){var u=UNDO.pop();if(u.id===S.fpid&&u.j!==cur){S.fdr=S.fdr||{};S.fdr[S.fpid]=JSON.parse(u.j);if(!fnode(S.fdr[S.fpid],S.fnode))S.fnode=null;renderFlowEd();toast('Undone');return}}
+    toast('Nothing to undo');return}
+  if((e.key==='Backspace'||e.key==='Delete')&&!typing&&S.fnode){var b=$('#fnDel');if(b){e.preventDefault();b.click()}}
 });
 /* ---------- tabs ---------- */
 function showTab(t){
