@@ -107,6 +107,8 @@ h1{font-size:24px;line-height:1.2;font-weight:700;letter-spacing:-.02em;margin:0
 .seg button{height:32px;padding:0 16px;border:0;border-radius:4px;background:none;cursor:pointer;font-weight:500;color:var(--ink-2)}
 .seg button[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand);font-weight:600}
 .muted{color:var(--ink-2)}
+body:not(.isadmin) #fpTidy,body:not(.isadmin) #fpPub,body:not(.isadmin) #fpDiscard{display:none}
+.devgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media(max-width:800px){.devgrid{grid-template-columns:minmax(0,1fr)}}.devgrid .card{min-width:0}.devt td{word-break:break-word}.devwide{grid-column:1/-1}.devt{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed}.devt td:first-child{width:45%}.devt td.num{width:45%}.devt td{padding:8px 0;border-top:1px solid var(--line);font-size:14px}.devt td.num{text-align:right}.devbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}#devJson{width:100%;margin-top:16px;font:13px/1.5 ui-monospace,Menlo,monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:16px}.devlog{list-style:none;margin:16px 0 0;padding:0;max-height:240px;overflow:auto}.devlog li{padding:8px 0;border-top:1px solid var(--line);font-size:13px}.devlog li.error b{color:#E5484D}
 .small{font-size:12px}
 h2{font-size:18px;line-height:1.3;font-weight:700;margin:0 0 8px;letter-spacing:-.01em}
 h3{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);margin:0 0 8px}
@@ -535,7 +537,7 @@ tbody tr:hover{background:var(--surface-2)}
     </div>
     <div class="top-actions">
       <span class="pill info">Demo with sample data</span>
-      <span class="pill good" id="whoami" hidden></span><div class="seg" id="viewSw" role="group" aria-label="Show calls for" hidden><button type="button" data-v="all" aria-pressed="true">All calls</button><button type="button" data-v="col" aria-pressed="false">Colombo calls</button><button type="button" data-v="kur" aria-pressed="false">Kurunegala calls</button></div>
+      <span class="pill good" id="whoami" hidden></span><label id="viewAsBox" class="small" hidden>View as <select id="viewAs"><option value="admin">Coreframe (admin)</option><option value="owner">Akith (owner)</option><option value="col">Colombo manager</option><option value="kur">Kurunegala manager</option><option value="nimali">Nimali (Colombo handler)</option><option value="chathura">Chathura (Kurunegala handler)</option></select></label><div class="seg" id="viewSw" role="group" aria-label="Show calls for" hidden><button type="button" data-v="all" aria-pressed="true">All calls</button><button type="button" data-v="col" aria-pressed="false">Colombo calls</button><button type="button" data-v="kur" aria-pressed="false">Kurunegala calls</button></div>
       <details class="demotools" id="demoTools"><summary>Demo tools</summary><div class="dtbody"><button id="liveSwitch" class="switch" role="switch" aria-checked="false"><span class="track"></span><span>Live calls</span></button>
       <select id="simLang" aria-label="Language of the simulated call"><option value="any">Any language</option><option value="English">English call</option><option value="Sinhala">Sinhala call</option><option value="Tamil">Tamil call</option></select>
       <button id="simBtn" class="btn primary" type="button">Simulate incoming call</button></div></details>
@@ -554,6 +556,7 @@ tbody tr:hover{background:var(--surface-2)}
     <button class="tab" role="tab" id="tab-calls" aria-controls="panel-calls" aria-selected="false" data-tab="calls" tabindex="-1">Call log</button>
     <button class="tab" role="tab" id="tab-sources" aria-controls="panel-sources" aria-selected="false" data-tab="sources" tabindex="-1">Sources</button>
     <button class="tab" role="tab" id="tab-sales" aria-controls="panel-sales" aria-selected="false" data-tab="sales" tabindex="-1">Sales review</button>
+    <button class="tab" role="tab" id="tab-dev" aria-controls="panel-dev" aria-selected="false" data-tab="dev" tabindex="-1" hidden>Developer</button>
     <button class="tab" role="tab" id="tab-lab" aria-controls="panel-lab" aria-selected="false" data-tab="lab" tabindex="-1">Model lab</button>
   </nav>
 
@@ -619,7 +622,7 @@ tbody tr:hover{background:var(--surface-2)}
       <div class="studio">
         <aside class="stl" aria-label="Script tools">
           <div class="sttop"><button type="button" class="btn sm" id="stBack" data-tip="Go back to where you were">← Back</button><h2 style="margin:0">Script editor</h2><span id="fpStatus" class="pill good"></span></div>
-          <p class="msg err" id="fpLock" role="note" hidden>Only the owner edits scripts. You can read them here.</p>
+          <p class="msg err" id="fpLock" role="note" hidden>Scripts are managed by Coreframe. You can read them here and use them on the call sheet.</p>
           <div class="field"><label for="fpSel">Script profile</label><select id="fpSel"></select></div>
           <div class="field" id="fpAdmin" hidden><label for="fpNewName">Coreframe: new profile</label><input id="fpNewName" placeholder="Name"><select id="fpNewNeed" aria-label="Used for"></select><div class="stbtns"><button class="btn" type="button" id="fpNew" data-tip="Create copy: make a new profile from the one selected">Create copy</button><button class="btn sm out" type="button" id="fpDelP" data-tip="Delete the selected profile">Delete</button></div></div>
           <div id="fpAddRow" class="flpal"><h3 class="stlab">Add a tile</h3><div class="chips"></div></div>
@@ -871,6 +874,19 @@ tbody tr:hover{background:var(--surface-2)}
       </div>
     </section>
 
+    <section class="panel" id="panel-dev" role="tabpanel" aria-labelledby="tab-dev" hidden>
+      <div class="devgrid">
+        <div class="card"><h3>Environment</h3><table class="devt" id="devEnv"></table></div>
+        <div class="card"><h3>Feature flags</h3><p class="muted small">Switch parts of the tool on or off to test how a client sees it.</p><div id="devFlags"></div></div>
+        <div class="card"><h3>Data</h3><table class="devt" id="devCounts"></table>
+          <div class="devbtns"><button class="btn" id="devExport" type="button">Export everything</button><button class="btn" id="devExpScripts" type="button">Export scripts</button><button class="btn" id="devExpStock" type="button">Export inventory</button><label class="btn">Import file<input type="file" id="devImport" accept=".json" hidden></label></div>
+          <div class="devbtns"><button class="btn" id="devResetScripts" type="button">Reset scripts</button><button class="btn" id="devResetStock" type="button">Reset inventory</button></div></div>
+        <div class="card"><h3>Handoff</h3><p class="muted small">Copies the data model, roles and fields, ready to paste into the real build.</p><button class="btn" id="devModelCopy" type="button">Copy data model</button>
+          <h3 style="margin-top:24px">Integrations to build</h3><table class="devt"><tr><td>Telephony and call events</td><td>Simulated</td></tr><tr><td>Call recording</td><td>Simulated</td></tr><tr><td>Transcription</td><td>Model lab only</td></tr><tr><td>WhatsApp send</td><td>Link only</td></tr><tr><td>Invoice match</td><td>Simulated</td></tr><tr><td>Calendar and visits</td><td>Not started</td></tr><tr><td>Real sign-in and roles</td><td>Demo logins</td></tr></table></div>
+        <div class="card devwide"><h3>State inspector</h3><div class="devbtns"><select id="devKey"></select><button class="btn primary" id="devApply" type="button">Apply edit</button></div><textarea id="devJson" spellcheck="false" rows="14"></textarea></div>
+        <div class="card devwide"><h3>Event log</h3><div class="devbtns"><button class="btn" id="devTestErr" type="button">Add test entry</button><button class="btn" id="devClearLog" type="button">Clear</button></div><ul id="devLog" class="devlog"></ul></div>
+      </div>
+    </section>
     <section class="panel lab" id="panel-lab" role="tabpanel" aria-labelledby="tab-lab" hidden>
       <div class="card" style="display:flex;flex-direction:column;gap:8px">
         <h3 style="margin:0">Try the free and paid speech models on your own calls</h3>
@@ -2611,7 +2627,7 @@ function decorateDesk(){
 }
 /* ----- editor ----- */
 function fdraft(){var p=profGet(S.fpid);if(!p)return null;S.fdr=S.fdr||{};if(!S.fdr[p.id])S.fdr[p.id]=fclone(p);return S.fdr[p.id]}
-function fcanNode(x){return ADMIN||(OWNER&&!x.locked)}
+function fcanNode(x){return !!ADMIN}
 function flayout(p){
   var depth={},q=[p.start],ord=[];depth[p.start]=0;
   while(q.length){var id=q.shift(),x=fnode(p,id);if(!x||ord.indexOf(id)>-1)continue;ord.push(id);x.next.forEach(function(l){if(l.to!=='_back'&&depth[l.to]===undefined&&fnode(p,l.to)&&!fnode(p,l.to).glob){depth[l.to]=depth[id]+1;q.push(l.to)}})}
@@ -2628,7 +2644,7 @@ function flayout(p){
   return {pos:pos,W:W,H:H,w:w,h:hgt,gy:gy2,cust:cust};
 }
 function flowSvg(p){
-  var L=flayout(p),can=!!OWNER,h='<svg class="flmap" viewBox="0 0 '+L.w+' '+L.h+'" width="'+Math.round(L.w*(S.fz||1))+'" height="'+Math.round(L.h*(S.fz||1))+'" role="img" aria-label="Script flow chart"><defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a97a6"/></marker><pattern id="fdots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#8a97a6" opacity=".35"/></pattern></defs><rect width="100%" height="100%" fill="url(#fdots)"/>';
+  var L=flayout(p),can=!!ADMIN,h='<svg class="flmap" viewBox="0 0 '+L.w+' '+L.h+'" width="'+Math.round(L.w*(S.fz||1))+'" height="'+Math.round(L.h*(S.fz||1))+'" role="img" aria-label="Script flow chart"><defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a97a6"/></marker><pattern id="fdots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#8a97a6" opacity=".35"/></pattern></defs><rect width="100%" height="100%" fill="url(#fdots)"/>';
   if(!L.cust)h+='<text x="16" y="'+(L.gy+12)+'" class="fllab">Anytime: the handler taps these whenever the caller says them</text>';
   p.nodes.forEach(function(x){var done={};x.next.forEach(function(l){
     if(l.to==='_back'||!L.pos[l.to]||!L.pos[x.id]||done[l.to])return;done[l.to]=1;var a=L.pos[x.id],b=L.pos[l.to],x1,y1,x2,y2,d;
@@ -2650,7 +2666,7 @@ function flPt(ev){var m=$('#flMap'),r=m.querySelector('svg').getBoundingClientRe
 var FPAN=null;
 document.addEventListener('pointerdown',function(e){
   if(S.tab==='scripts'&&e.button<=0&&e.target.closest&&e.target.closest('#flMap')&&!e.target.closest('[data-fn]')){var sc=$('#flMap');FPAN={x:e.clientX,y:e.clientY,l:sc.scrollLeft,t:sc.scrollTop};sc.classList.add('panning');e.preventDefault();return}
-  if(!OWNER||S.tab!=='scripts'||e.button>0)return;var t=e.target.closest?e.target.closest('[data-fn]'):null;if(!t)return;
+  if(!ADMIN||S.tab!=='scripts'||e.button>0)return;var t=e.target.closest?e.target.closest('[data-fn]'):null;if(!t)return;
   var id=t.getAttribute('data-fn'),rp=(S.fdr&&S.fdr[S.fpid])||profGet(S.fpid),nd=fnode(rp,id),hd=e.target.closest('[data-fc]');
   if(!nd||(hd&&!fcanNode(nd)))return;
   var pt=flPt(e);FDRAG={id:id,mode:hd?'link':'move',sx:pt.x,sy:pt.y,moved:false,p:null};e.preventDefault();
@@ -2673,7 +2689,7 @@ document.addEventListener('pointerup',function(e){
   S.fnode=D.id;renderFlowEd();
 });
 function renderFlowEd(){
-  var all=flowsGet(),can=!!OWNER;
+  var all=flowsGet(),can=!!ADMIN;
   if(!S.fpid||!profGet(S.fpid))S.fpid=all[0].id;
   var live=profGet(S.fpid),p=(S.fdr&&S.fdr[S.fpid])||live,dirty=!!(S.fdr&&S.fdr[S.fpid]);
   $('#fpSel').innerHTML=all.map(function(x){return '<option value="'+x.id+'"'+(x.id===S.fpid?' selected':'')+'>'+esc(x.name)+' · v'+x.ver+'</option>'}).join('');
@@ -2695,8 +2711,7 @@ function renderNodeEd(p){
   var can=fcanNode(x),dis=can?'':' disabled';
   var others=p.nodes.filter(function(y){return y.id!==x.id});
   var h='<div class="sechead"><h3 style="margin:0">'+esc(FT[x.type][0])+' tile</h3>'+(x.locked?'<span class="pill info">Locked by Coreframe</span>':'')+'</div>';
-  if(!can&&OWNER)h+='<p class="muted small">Coreframe has locked this tile. Ask us to change it.</p>';
-  if(!OWNER)h+='<p class="muted small">Only the owner edits scripts.</p>';
+  if(!can)h+='<p class="muted small">View only. Coreframe manages the scripts. Ask us for a change and we will publish it.</p>';
   h+='<div class="field"><label for="fnType">Type</label><select id="fnType"'+dis+'>'+Object.keys(FT).map(function(k){return '<option value="'+k+'"'+(k===x.type?' selected':'')+'>'+FT[k][0]+' — '+FT[k][2]+'</option>'}).join('')+'</select></div>';
   h+='<div class="field"><label>Colour</label><div class="swatches" role="group" aria-label="Tile colour">'+PAL.map(function(c){return '<button type="button" class="sw" data-sw="'+c+'" style="background:'+c+'" data-tip="Colour this tile" aria-pressed="'+(fcol(x)===c)+'" aria-label="Colour '+c+'"'+dis+'></button>'}).join('')+'<button type="button" class="btn sm" data-sw="" data-tip="Use the standard colour for this type of tile"'+dis+'>Default for this type</button></div></div>';
   h+='<div class="field"><label for="fnTitle">Name on the tile</label><input id="fnTitle" value="'+esc(x.title)+'"'+dis+'></div>';
@@ -2720,7 +2735,7 @@ document.addEventListener('click',function(e){
   if((x=c('[data-fz]'))){var z=x.getAttribute('data-fz');if(z==='0'){flFit();return}S.fz=Math.max(.4,Math.min(2,(S.fz||1)+(z==='+'?.15:-.15)));renderFlowEd();return}
   if(c('#flFull')){flFullToggle();return}
   if(c('#stBack')){if($('.studio').classList.contains('full')){flFullToggle()}else{var pt=S.prevTab&&S.prevTab!=='scripts'?S.prevTab:'desk';showTab(pt)}return}
-  if(!OWNER&&(x=c('[data-fn]'))){S.fnode=x.getAttribute('data-fn');renderFlowEd();return}
+  if(!ADMIN&&(x=c('[data-fn]'))){S.fnode=x.getAttribute('data-fn');renderFlowEd();return}
   /* live sheet */
   if((x=c('[data-fview]'))){if(S.flow){S.flow.full=x.getAttribute('data-fview')==='full';renderDeskSheet()}return}
   if((x=c('[data-fgo]'))){flowGo(x.getAttribute('data-fgo'));return}
@@ -2730,7 +2745,7 @@ document.addEventListener('click',function(e){
   if((x=c('[data-fjump]'))){flowGo(x.getAttribute('data-fjump'));return}
   if((x=c('[data-fact]'))){var a=x.getAttribute('data-fact');if(a==='stock'){S.dview='stock';renderDeskSheet()}else if(a==='quote'){openQuote()}else toast('Remember to book the visit before they hang up');return}
   /* editor */
-  if(!OWNER)return;
+  if(!ADMIN)return;
   var p=fdraft();if(!p&&!c('#fpNew'))return;var nd=p?fnode(p,S.fnode):null;
   if((x=c('[data-fadd]'))){var ty=x.getAttribute('data-fadd'),nn={id:fid(),type:ty,title:'New '+FT[ty][0].toLowerCase(),text:'',next:[],glob:(ty==='objection'||ty==='signal')};p.nodes.push(nn);if(nd&&!nd.glob&&fcanNode(nd)&&!nn.glob)nd.next.push({label:'Then',to:nn.id});S.fnode=nn.id;flowCommit();return}
   if(c('#fnAddLink')&&nd&&fcanNode(nd)){var o=p.nodes.filter(function(y){return y.id!==nd.id})[0];nd.next.push({label:'If they say…',to:o?o.id:'_back'});flowCommit();return}
@@ -2746,7 +2761,7 @@ document.addEventListener('click',function(e){
 document.addEventListener('change',function(e){
   var t=e.target;
   if(t.id==='fpSel'){S.fpid=t.value;S.fnode=null;renderFlowEd();flFit();return}
-  if(!OWNER||S.tab!=='scripts')return;
+  if(!ADMIN||S.tab!=='scripts')return;
   var p=fdraft();if(!p)return;var nd=fnode(p,S.fnode);if(!nd)return;
   if(t.id==='fnLocked'&&ADMIN){nd.locked=t.checked;flowCommit();return}
   if(!fcanNode(nd))return;
@@ -2948,19 +2963,93 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.pd)closeP
   document.addEventListener('focusout',hide);document.addEventListener('pointerdown',function(e){if(!(e.target.closest&&e.target.closest('[data-tip]')))hide()});
   document.addEventListener('scroll',hide,true);
 })();
+/* ---------- developer tools (Coreframe admin only) ---------- */
+var REAL=false,BUILD='2026-10-25 prototype';
+var VIEWS=[['admin','Coreframe (admin)'],['owner','Akith (owner)'],['col','Colombo manager'],['kur','Kurunegala manager'],['nimali','Nimali (Colombo handler)'],['chathura','Chathura (Kurunegala handler)']];
+var DEVLOG=[];
+function devLog(kind,msg){DEVLOG.push({t:Date.now(),k:kind,m:String(msg).slice(0,300)});if(DEVLOG.length>80)DEVLOG.shift();if(S&&S.tab==='dev'&&$('#devLog'))renderDevLog()}
+window.addEventListener('error',function(e){devLog('error',e.message+(e.lineno?' (line '+e.lineno+')':''))});
+window.addEventListener('unhandledrejection',function(e){devLog('error','Promise: '+(e.reason&&e.reason.message||e.reason))});
+function setViewAs(v){
+  S.viewAs=v;
+  if(v==='admin'){USER=null;OWNER=true;ADMIN=true;ME=null}
+  else if(v==='owner'){USER=null;OWNER=true;ADMIN=false;ME=null}
+  else if(v==='col'||v==='kur'){USER=v;OWNER=false;ADMIN=false;ME=null}
+  else if(v==='nimali'){USER='col';OWNER=false;ADMIN=false;ME='Nimali'}
+  else if(v==='chathura'){USER='kur';OWNER=false;ADMIN=false;ME='Chathura'}
+  applyLogin();devLog('info','Viewing as '+v);
+}
+function devFlags(){return S.flags||(S.flags={inv:true,scr:true,quote:true,demo:true,tips:true})}
+function applyFlags(){
+  var f=devFlags(),on=!!(USER||OWNER);
+  var t=$('#tab-stock');if(t)t.hidden=!f.inv;t=$('#tab-scripts');if(t)t.hidden=!f.scr;
+  var d=$('#demoTools');if(d)d.hidden=!f.demo;var q=$('#deskQuote');if(q)q.style.display=f.quote?'':'none';
+  document.body.classList.toggle('notips',!f.tips);
+  var dv=$('#tab-dev');if(dv)dv.hidden=!REAL;
+  var vs=$('#viewAsBox');if(vs)vs.hidden=!REAL;
+}
+function devDownload(name,text){
+  try{var b=new Blob([text],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);toast('Saved '+name)}catch(e){copyText(text,'Download is blocked here. Copied to the clipboard instead.')}
+}
+function devSnapshot(){
+  var o={};['calls','tasks','stock','pmeta','flows','crm','flags','scripts','qseq','spend'].forEach(function(k){if(S[k]!==undefined)o[k]=S[k]});
+  return {build:BUILD,exported:new Date().toISOString(),data:o};
+}
+function devCounts(){
+  var rows=[['Calls',(S.calls||[]).length],['Follow-up tasks',(S.tasks||[]).length],['Stock lines',stockList().length],['Product notes and photos',Object.keys(S.pmeta||{}).length],['Script profiles',flowsGet().length],['Script tiles',flowsGet().reduce(function(a,p){return a+p.nodes.length},0)],['CRM overrides',Object.keys((S.crm&&S.crm.ov)||{}).length],['Quotations made',S.qseq||0]];
+  return rows.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td class="num">'+r[1]+'</td></tr>'}).join('');
+}
+function devModel(){
+  function shape(o){return Object.keys(o||{}).map(function(k){var v=o[k];return '- '+k+': '+(Array.isArray(v)?'list':v===null?'empty':typeof v)}).join('\n')}
+  var c=(S.calls||[])[0]||{},t=(S.tasks||[])[0]||{},st=stockList()[0]||{},p=flowsGet()[0]||{},n=(p.nodes||[])[0]||{};
+  return '# Water Center data model (from the prototype)\n\n## Call\n'+shape(c)+'\n\n## Follow-up task\n'+shape(t)+'\n\n## Stock line (one supplier batch)\n'+shape(st)+'\n\n## Script profile\n'+shape(p)+'\n\n## Script tile\n'+shape(n)+'\n\n## Roles\n- admin (Coreframe): everything, including script editing and developer tools\n- owner (Akith): all tabs, scripts read-only\n- manager (per branch): own branch only\n- handler (per branch): desk, follow-ups, inventory, scripts (read), clients, call log\n';
+}
+function renderDevLog(){$('#devLog').innerHTML=DEVLOG.length?DEVLOG.slice().reverse().map(function(x){return '<li class="'+x.k+'"><span class="mono small">'+new Date(x.t).toLocaleTimeString()+'</span> <b>'+esc(x.k)+'</b> '+esc(x.m)+'</li>'}).join(''):'<li class="muted">Nothing logged yet.</li>'}
+function renderDev(){
+  var f=devFlags();
+  $('#devEnv').innerHTML=[['Build',BUILD],['Signed in as','Coreframe (admin)'],['Viewing as',(VIEWS.filter(function(v){return v[0]===(S.viewAs||'admin')})[0]||['',''])[1]],['Screen',innerWidth+' x '+innerHeight],['Theme',document.documentElement.getAttribute('data-theme')||'system'],['Browser',navigator.userAgent.replace(/\(.*?\)/,'').slice(0,80)]].map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td></tr>'}).join('');
+  $('#devFlags').innerHTML=[['inv','Inventory tab'],['scr','Scripts tab'],['quote','Send quotation button on the desk'],['demo','Demo tools menu'],['tips','Hover tooltips']].map(function(x){return '<label class="chk"><input type="checkbox" data-flag="'+x[0]+'"'+(f[x[0]]?' checked':'')+'> '+x[1]+'</label>'}).join('');
+  $('#devCounts').innerHTML=devCounts();
+  var keys=Object.keys(S).filter(function(k){return typeof S[k]!=='function'});
+  $('#devKey').innerHTML=keys.map(function(k){return '<option value="'+k+'"'+(k===S.devKey?' selected':'')+'>'+k+'</option>'}).join('');
+  var k=S.devKey||keys[0];S.devKey=k;var j='';try{j=JSON.stringify(S[k],function(a,b){return typeof b==='string'&&b.length>200&&b.indexOf('data:')===0?b.slice(0,40)+'…(image)':b},2)}catch(e){j='(cannot show)'}
+  $('#devJson').value=j.length>40000?j.slice(0,40000)+'\n…(cut)':j;
+  $('#devApply').disabled=['flows','stock','pmeta','flags'].indexOf(k)<0;
+  renderDevLog();
+}
+document.addEventListener('click',function(e){
+  var t=e.target,c=t.closest?t.closest.bind(t):null;if(!c||!REAL)return;
+  if(c('#devExport')){devDownload('water-center-data-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(devSnapshot(),null,2));return}
+  if(c('#devExpScripts')){devDownload('water-center-scripts.json',JSON.stringify(flowsGet(),null,2));return}
+  if(c('#devExpStock')){devDownload('water-center-inventory.json',JSON.stringify({stock:stockList(),pmeta:S.pmeta||{}},null,2));return}
+  if(c('#devModelCopy')){copyText(devModel(),'Data model copied');return}
+  if(c('#devClearLog')){DEVLOG.length=0;renderDevLog();return}
+  if(c('#devResetScripts')){S.flows=null;S.fdr={};flowsGet();renderDev();toast('Scripts reset to the starting set');devLog('info','Scripts reset');return}
+  if(c('#devResetStock')){S.stock=null;S.pmeta={};stockList();renderDev();toast('Inventory reset to the sample list');devLog('info','Inventory reset');return}
+  if(c('#devApply')){var k=S.devKey;try{S[k]=JSON.parse($('#devJson').value);toast('Applied to '+k);devLog('info','Edited '+k+' in the inspector');renderDev()}catch(err){toast('Not valid JSON: '+err.message)}return}
+  if(c('#devTestErr')){devLog('error','Test error: this is a sample entry');renderDevLog();return}
+});
+document.addEventListener('change',function(e){
+  var t=e.target;if(!REAL)return;
+  if(t.id==='viewAs'){setViewAs(t.value);return}
+  if(t.id==='devKey'){S.devKey=t.value;renderDev();return}
+  if(t.getAttribute&&t.getAttribute('data-flag')){devFlags()[t.getAttribute('data-flag')]=t.checked;applyFlags();devLog('info','Flag '+t.getAttribute('data-flag')+' = '+t.checked);return}
+  if(t.id==='devImport'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){try{var o=JSON.parse(fr.result),d=o.data||o;['calls','tasks','stock','pmeta','flows','crm','flags'].forEach(function(k){if(d[k]!==undefined)S[k]=d[k]});toast('Imported');devLog('info','Imported a data file');renderDev();applyFlags()}catch(err){toast('Could not read that file: '+err.message)}};fr.readAsText(t.files[0]);t.value=''}
+});
 /* ---------- tabs ---------- */
 function showTab(t){
   if(S.tab&&S.tab!==t)S.prevTab=S.tab;
   S.tab=t;
-  var tb=$('.toolbar');if(tb)tb.hidden=(t==='desk'||t==='lab'||t==='followups'||t==='clients'||t==='data');
+  var tb=$('.toolbar');if(tb)tb.hidden=(t==='desk'||t==='lab'||t==='dev'||t==='followups'||t==='clients'||t==='data');
   $$('.tab').forEach(function(b){var on=b.getAttribute('data-tab')===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
-  ['dash','desk','followups','clients','calls','coaching','sources','numbers','data','web','sales','scripts','stock','lab'].forEach(function(p){$('#panel-'+p).hidden=p!==t});
+  ['dash','desk','followups','clients','calls','coaching','sources','numbers','data','web','sales','scripts','stock','dev','lab'].forEach(function(p){$('#panel-'+p).hidden=p!==t});
   if(t==='desk')renderDesk();
   if(t==='sales')renderSales();
   if(t==='scripts')renderFlowEd();
   if(t==='stock')renderStock();
   if(t==='followups')renderFollowups();
   if(t==='lab')renderLab();
+  if(t==='dev'&&REAL)renderDev();
   if(t==='clients')renderClients();
   if(t==='dash')renderDash();
   if(t==='data')renderData();
@@ -3047,7 +3136,7 @@ document.addEventListener('click',function(e){
   if(t.closest&&t.closest('[data-qdel]')){S.qd.items.splice(+t.closest('[data-qdel]').getAttribute('data-qdel'),1);renderQuote();return}
   if(t.closest&&t.closest('#qClose')||t.id==='qScrim'){closeQuote();return}
   if(t.id==='scrim'){closeDrawer();return}
-  if(t.closest('#logoutBtn')){closeDrawer();USER=null;OWNER=false;ADMIN=false;ME=null;applyLogin();return}
+  if(t.closest('#logoutBtn')){closeDrawer();USER=null;OWNER=false;ADMIN=false;REAL=false;S.viewAs='admin';ME=null;applyLogin();return}
   if(t.closest('#simBtn')){simulateCall();return}
   if(t.closest('#themeBtn')){
     var root=document.documentElement,dark=root.getAttribute('data-theme')==='dark',nx=dark?'light':'dark';
@@ -3118,11 +3207,11 @@ function applyLogin(){
   var on=!!(USER||OWNER);
   $('#login').hidden=on;$('#whoami').hidden=!on;$('#logoutBtn').hidden=!on;
   $('#tab-dash').hidden=!OWNER;['sources','sales','lab'].forEach(function(k){var b=$('#tab-'+k);if(b)b.hidden=!!(on&&!OWNER)});
-  if(USER){$('#whoami').textContent=(ME?ME+' · ':'')+BR[USER].name+' · '+BR[USER].main;S.branch=USER;S.desk.br=USER;setVisitor(S.web?S.web.source:'google',USER)}
-  else if(OWNER){$('#whoami').textContent=ADMIN?'Coreframe · Admin, both branches':'Akith · Owner, both branches';S.branch='all'}
+  if(USER){$('#whoami').textContent=(REAL?'Coreframe viewing as ':'')+(ME?ME+' · ':'')+BR[USER].name+' · '+BR[USER].main;S.branch=USER;S.desk.br=USER;setVisitor(S.web?S.web.source:'google',USER)}
+  else if(OWNER){$('#whoami').textContent=ADMIN?'Coreframe · Admin, both branches':(REAL?'Coreframe viewing as Akith · Owner':'Akith · Owner, both branches');S.branch='all'}
   else{S.branch='all'}
   $('#viewSw').hidden=!OWNER;if(OWNER)setView('all');
-  renderFilters();showTab(OWNER?'dash':on?'desk':S.tab);
+  document.body.classList.toggle('isadmin',!!ADMIN);renderFilters();applyFlags();showTab(OWNER?'dash':on?'desk':S.tab);var vb=$('#viewAs');if(vb)vb.value=S.viewAs||'admin';
   if(!on){$('#loginUser').value='';$('#loginPass').value=''}
 }
 $('#loginForm').addEventListener('submit',function(e){
@@ -3130,7 +3219,7 @@ $('#loginForm').addEventListener('submit',function(e){
   var u=($('#loginUser').value||'').trim().toLowerCase(),p=$('#loginPass').value||'',msg=$('#loginMsg');
   var a=ACCOUNTS.filter(function(x){return x.user===u&&x.pass===p})[0];
   if(!a){msg.className='msg err';msg.textContent='That username and password do not match. Check the demo logins below.';return}
-  msg.className='msg';msg.textContent='';USER=a.branch;OWNER=!!a.owner;ADMIN=!!a.admin;ME=(a.name&&!a.owner)?a.name:null;applyLogin();
+  msg.className='msg';msg.textContent='';USER=a.branch;OWNER=!!a.owner;ADMIN=!!a.admin;REAL=!!a.admin;S.viewAs='admin';ME=(a.name&&!a.owner)?a.name:null;applyLogin();
 });
 document.addEventListener('keydown',function(e){
   if(S.tab==='desk'&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&/^[1-9]$/.test(e.key)&&e.target&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName||'')){deskTap('need',NEEDS[+e.key-1]);return}
