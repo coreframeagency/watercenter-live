@@ -488,6 +488,7 @@ tbody tr:hover{background:var(--surface-2)}
 .flcard{border:1px solid var(--line);border-left:6px solid var(--c);border-radius:16px;padding:16px;background:var(--surface);display:grid;gap:16px;margin-top:16px}.flhead{display:flex;gap:8px;align-items:center}.ftag{display:inline-block;padding:0 8px;border-radius:999px;background:var(--c);color:#fff;font-size:12px;font-weight:700;line-height:22px}.fltext{font-size:17px;line-height:1.5;white-space:pre-wrap}.flopts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.flopts .btn small{display:block;opacity:.7;font-weight:400}.flglob{margin-top:16px;display:grid;gap:8px}.flglob .chip{border-color:var(--c);color:var(--c)}.flglob>div,.flpal .chips{display:flex;gap:8px;flex-wrap:wrap}.flpal .chip{border-color:var(--c);color:var(--c)}.flnav{display:flex;gap:8px;margin-top:16px}.flfull{margin:16px 0 0;padding:0;list-style:none;display:grid;gap:16px}.flfull li{display:grid;gap:4px;border-left:4px solid var(--line);padding-left:16px}.flwrap{margin-top:16px;border:1px solid var(--line);border-radius:16px;background:var(--surface-2);overflow:hidden}.flscroll{overflow:auto;max-height:560px;padding:8px}.flmap{display:block}.flnode{cursor:pointer}.flnode:focus{outline:none}.flnode.sel rect:first-child{filter:drop-shadow(0 2px 6px rgba(8,28,46,.3))}.fltype{font-size:10px;font-weight:700;letter-spacing:.06em;font-family:inherit}.fltitle{font-size:13px;font-weight:600;fill:var(--ink);font-family:inherit}.fllab{font-size:11px;fill:var(--ink-2);font-family:inherit}.lkrow{display:grid;grid-template-columns:1fr auto 1.4fr auto;gap:8px;align-items:center;margin-bottom:8px}.lkrow input,.lkrow select,#flEd input,#flEd select,#flEd textarea{border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink);font:inherit;width:100%}.chk{display:flex;gap:8px;align-items:flex-start}#flEd .chk input{width:auto;margin-top:4px;flex:none}.chk{align-items:flex-start}
 @media(max-width:560px){.lkrow{grid-template-columns:1fr}}
 .tap.lnk{position:relative}.tap.lnk::after{content:'';position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--brand);opacity:.55}.tap.lnkon{box-shadow:0 0 0 3px rgba(37,99,168,.35);border-color:var(--brand)}.linkkey{font-size:12px;color:var(--ink-2);margin:8px 0 0}
+.flnode.mv{cursor:grab}.flnode.mv:active{cursor:grabbing}.flnode{touch-action:none}.flh{cursor:crosshair}.flscroll{background:var(--surface-2)}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -600,7 +601,7 @@ tbody tr:hover{background:var(--surface-2)}
         <p class="msg err" id="fpLock" role="note" hidden>Only the owner edits scripts. You can read them here and use them on the call sheet.</p>
         <div class="row2"><div class="field"><label for="fpSel">Script profile</label><select id="fpSel"></select></div>
         <div class="field" id="fpAdmin" hidden><label for="fpNewName">Coreframe: new profile (copies the one selected)</label><div class="stsearch"><input id="fpNewName" placeholder="Name, for example Borewell, repeat client"><select id="fpNewNeed" aria-label="Used for"></select><button class="btn" type="button" id="fpNew">Create</button><button class="btn sm out" type="button" id="fpDelP">Delete profile</button></div></div></div>
-        <div id="fpAddRow" class="flpal"><span class="muted small">Add a tile after the selected one</span><div class="chips" style="margin-top:8px"></div></div>
+        <div id="fpAddRow" class="flpal"><span class="muted small">Add a tile after the selected one. Drag tiles to move them. Drag from the dot on a tile's right edge to another tile to link them. <button type="button" class="btn sm" id="fpTidy">Tidy up</button></span><div class="chips" style="margin-top:8px"></div></div>
         <div class="flwrap"><div id="flMap" class="flscroll"></div></div>
       </div>
       <div class="card" id="flEd"></div>
@@ -2587,23 +2588,52 @@ function flayout(p){
   p.nodes.filter(function(x){return !pos[x.id]&&!x.glob}).forEach(function(x,i){pos[x.id]={x:16+(i%5)*(W+GX),y:gy+Math.floor(i/5)*(H+GY)};maxr=Math.max(maxr,0)});
   var orph=p.nodes.filter(function(x){return !x.glob&&ord.indexOf(x.id)<0}).length,gy2=orph?gy+Math.ceil(orph/5)*(H+GY):gy;
   gl.forEach(function(x,i){pos[x.id]={x:16+(i%5)*(W+GX),y:gy2+24+Math.floor(i/5)*(H+GY)}});
-  var w=Math.max(ncol,5)*(W+GX)+16,hgt=gy2+24+Math.ceil(Math.max(gl.length,1)/5)*(H+GY)+16;
-  return {pos:pos,W:W,H:H,w:w,h:hgt,gy:gy2};
+  var w=Math.max(ncol,5)*(W+GX)+16,hgt=gy2+24+Math.ceil(Math.max(gl.length,1)/5)*(H+GY)+16,cust=false;
+  p.nodes.forEach(function(x){if(x.x!==undefined&&x.y!==undefined){pos[x.id]={x:x.x,y:x.y};cust=true}});
+  if(cust){w=0;hgt=0;Object.keys(pos).forEach(function(k){w=Math.max(w,pos[k].x+W+48);hgt=Math.max(hgt,pos[k].y+H+48)});w=Math.max(w,720);hgt=Math.max(hgt,320)}
+  return {pos:pos,W:W,H:H,w:w,h:hgt,gy:gy2,cust:cust};
 }
 function flowSvg(p){
-  var L=flayout(p),h='<svg class="flmap" viewBox="0 0 '+L.w+' '+L.h+'" width="'+L.w+'" height="'+L.h+'" role="img" aria-label="Script flow chart"><defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a97a6"/></marker></defs>';
-  h+='<text x="16" y="'+(L.gy+12)+'" class="fllab">Anytime: the handler taps these whenever the caller says them</text>';
+  var L=flayout(p),can=!!OWNER,h='<svg class="flmap" viewBox="0 0 '+L.w+' '+L.h+'" width="'+L.w+'" height="'+L.h+'" role="img" aria-label="Script flow chart"><defs><marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8a97a6"/></marker><pattern id="fdots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1" fill="#8a97a6" opacity=".35"/></pattern></defs><rect width="100%" height="100%" fill="url(#fdots)"/>';
+  if(!L.cust)h+='<text x="16" y="'+(L.gy+12)+'" class="fllab">Anytime: the handler taps these whenever the caller says them</text>';
   p.nodes.forEach(function(x){var done={};x.next.forEach(function(l){
-    if(l.to==='_back'||!L.pos[l.to]||!L.pos[x.id]||done[l.to])return;done[l.to]=1;var a=L.pos[x.id],b=L.pos[l.to],x1=a.x+L.W,y1=a.y+L.H/2,x2=b.x,y2=b.y+L.H/2;
-    if(b.x<=a.x){x1=a.x+L.W/2;y1=a.y+L.H;x2=b.x+L.W/2;y2=b.y;h+='<path d="M'+x1+' '+y1+'C'+x1+' '+(y1+40)+' '+x2+' '+(y2-40)+' '+x2+' '+y2+'" fill="none" stroke="#8a97a6" stroke-width="1.5" stroke-dasharray="'+(x.glob?'4 4':'0')+'" marker-end="url(#fa)"/>';return}
-    var mx=(x1+x2)/2;h+='<path d="M'+x1+' '+y1+'C'+mx+' '+y1+' '+mx+' '+y2+' '+x2+' '+y2+'" fill="none" stroke="#8a97a6" stroke-width="1.5" stroke-dasharray="'+(x.glob?'4 4':'0')+'" marker-end="url(#fa)"/>';
-    if(l.label&&l.label!=='Then')h+='<text x="'+mx+'" y="'+((y1+y2)/2-4)+'" text-anchor="middle" class="fllab">'+esc(l.label.slice(0,22))+'</text>';
+    if(l.to==='_back'||!L.pos[l.to]||!L.pos[x.id]||done[l.to])return;done[l.to]=1;var a=L.pos[x.id],b=L.pos[l.to],x1,y1,x2,y2,d;
+    var dash=x.glob?' stroke-dasharray="5 4"':'';
+    if(b.x>=a.x+L.W+8){x1=a.x+L.W;y1=a.y+L.H/2;x2=b.x;y2=b.y+L.H/2;var m=Math.max(40,(x2-x1)/2);d='M'+x1+' '+y1+'C'+(x1+m)+' '+y1+' '+(x2-m)+' '+y2+' '+x2+' '+y2}
+    else if(b.y>=a.y){x1=a.x+L.W/2;y1=a.y+L.H;x2=b.x+L.W/2;y2=b.y;var m2=Math.max(40,(y2-y1)/2);d='M'+x1+' '+y1+'C'+x1+' '+(y1+m2)+' '+x2+' '+(y2-m2)+' '+x2+' '+y2}
+    else{x1=a.x+L.W/2;y1=a.y;x2=b.x+L.W/2;y2=b.y+L.H;var m3=Math.max(40,(y1-y2)/2);d='M'+x1+' '+y1+'C'+x1+' '+(y1-m3)+' '+x2+' '+(y2+m3)+' '+x2+' '+y2}
+    h+='<path d="'+d+'" fill="none" stroke="#8a97a6" stroke-width="1.6"'+dash+' marker-end="url(#fa)"/>';
+    if(l.label&&l.label!=='Then')h+='<text x="'+((x1+x2)/2)+'" y="'+((y1+y2)/2-6)+'" text-anchor="middle" class="fllab">'+esc(l.label.slice(0,24))+'</text>';
   })});
   p.nodes.forEach(function(x){var q=L.pos[x.id];if(!q)return;var sel=S.fnode===x.id;
-    h+='<g class="flnode'+(sel?' sel':'')+'" data-fn="'+x.id+'" tabindex="0" role="button" aria-label="'+esc(FT[x.type][0]+': '+x.title)+'"><rect x="'+q.x+'" y="'+q.y+'" width="'+L.W+'" height="'+L.H+'" rx="12" fill="var(--surface)" stroke="'+FT[x.type][1]+'" stroke-width="'+(sel?3:1.5)+'"/><rect x="'+q.x+'" y="'+q.y+'" width="6" height="'+L.H+'" rx="3" fill="'+FT[x.type][1]+'"/><text x="'+(q.x+16)+'" y="'+(q.y+22)+'" class="fltype" fill="'+FT[x.type][1]+'">'+esc(FT[x.type][0].toUpperCase())+(x.locked?'  · LOCKED':'')+'</text><text x="'+(q.x+16)+'" y="'+(q.y+44)+'" class="fltitle">'+esc(x.title.length>22?x.title.slice(0,21)+'…':x.title)+'</text></g>';
+    h+='<g class="flnode'+(sel?' sel':'')+(can?' mv':'')+'" data-fn="'+x.id+'" tabindex="0" role="button" aria-label="'+esc(FT[x.type][0]+': '+x.title)+'"><rect x="'+q.x+'" y="'+q.y+'" width="'+L.W+'" height="'+L.H+'" rx="12" fill="var(--surface)" stroke="'+FT[x.type][1]+'" stroke-width="'+(sel?3:1.5)+'"'+(x.glob?' stroke-dasharray="6 4"':'')+'/><rect x="'+q.x+'" y="'+q.y+'" width="6" height="'+L.H+'" rx="3" fill="'+FT[x.type][1]+'"/><text x="'+(q.x+16)+'" y="'+(q.y+22)+'" class="fltype" fill="'+FT[x.type][1]+'">'+esc(FT[x.type][0].toUpperCase())+(x.glob?' · ANYTIME':'')+(x.locked?' · LOCKED':'')+'</text><text x="'+(q.x+16)+'" y="'+(q.y+44)+'" class="fltitle">'+esc(x.title.length>22?x.title.slice(0,21)+'…':x.title)+'</text>'+(can&&fcanNode(x)?'<circle class="flh" data-fc="'+x.id+'" cx="'+(q.x+L.W)+'" cy="'+(q.y+L.H/2)+'" r="8" fill="var(--surface)" stroke="'+FT[x.type][1]+'" stroke-width="2"><title>Drag to another tile to link them</title></circle>':'')+'</g>';
   });
-  return h+'</svg>';
+  return h+'<line id="flTmp" pointer-events="none" x1="0" y1="0" x2="0" y2="0" stroke="#2563a8" stroke-width="2" stroke-dasharray="4 3" visibility="hidden"/></svg>';
 }
+function flFreeze(p){var L=flayout(p);p.nodes.forEach(function(x){if(x.x===undefined&&L.pos[x.id]){x.x=L.pos[x.id].x;x.y=L.pos[x.id].y}})}
+var FDRAG=null;
+function flPt(ev){var m=$('#flMap'),sc=$('.flscroll'),r=m.querySelector('svg').getBoundingClientRect();return {x:ev.clientX-r.left,y:ev.clientY-r.top}}
+document.addEventListener('pointerdown',function(e){
+  if(!OWNER||S.tab!=='scripts'||e.button>0)return;var t=e.target.closest?e.target.closest('[data-fn]'):null;if(!t)return;
+  var id=t.getAttribute('data-fn'),rp=(S.fdr&&S.fdr[S.fpid])||profGet(S.fpid),nd=fnode(rp,id),hd=e.target.closest('[data-fc]');
+  if(!nd||(hd&&!fcanNode(nd)))return;
+  var pt=flPt(e);FDRAG={id:id,mode:hd?'link':'move',sx:pt.x,sy:pt.y,moved:false,p:null};e.preventDefault();
+});
+document.addEventListener('pointermove',function(e){
+  if(!FDRAG)return;var pt=flPt(e),D=FDRAG,dx=pt.x-D.sx,dy=pt.y-D.sy;
+  if(Math.abs(dx)+Math.abs(dy)>4)D.moved=true;if(!D.moved)return;
+  if(!D.p){D.p=fdraft();flFreeze(D.p);var n0=fnode(D.p,D.id);D.ox=n0.x;D.oy=n0.y}
+  if(D.mode==='move'){var nd=fnode(D.p,D.id);nd.x=Math.max(8,Math.round((D.ox+dx)/8)*8);nd.y=Math.max(8,Math.round((D.oy+dy)/8)*8);S.fnode=D.id;$('#flMap').innerHTML=flowSvg(D.p)}
+  else{var tm=$('#flTmp');if(tm){var a=fnode(D.p,D.id);tm.setAttribute('x1',a.x+176);tm.setAttribute('y1',a.y+32);tm.setAttribute('x2',pt.x);tm.setAttribute('y2',pt.y);tm.setAttribute('visibility','visible')}}
+});
+document.addEventListener('pointerup',function(e){
+  if(!FDRAG)return;var D=FDRAG;FDRAG=null;
+  if(D.mode==='link'&&D.moved){var el=document.elementFromPoint(e.clientX,e.clientY),tg=el&&el.closest?el.closest('[data-fn]'):null;
+    if(tg&&tg.getAttribute('data-fn')!==D.id){var nd=fnode(D.p,D.id),to=tg.getAttribute('data-fn');if(!nd.next.some(function(l){return l.to===to})){nd.next.push({label:nd.type==='ask'?'If they say…':'Then',to:to});toast('Linked. Rename the rule below.')}S.fnode=D.id}
+    renderFlowEd();return}
+  if(D.mode==='move'&&D.moved){renderFlowEd();return}
+  S.fnode=D.id;renderFlowEd();
+});
 function renderFlowEd(){
   var all=flowsGet(),can=!!OWNER;
   if(!S.fpid||!profGet(S.fpid))S.fpid=all[0].id;
@@ -2646,6 +2676,7 @@ function renderNodeEd(p){
 function flowCommit(){renderFlowEd()}
 document.addEventListener('click',function(e){
   var t=e.target,c=t.closest?t.closest.bind(t):null;if(!c)return;var x;
+  if(!OWNER&&(x=c('[data-fn]'))){S.fnode=x.getAttribute('data-fn');renderFlowEd();return}
   /* live sheet */
   if((x=c('[data-fview]'))){if(S.flow){S.flow.full=x.getAttribute('data-fview')==='full';renderDeskSheet()}return}
   if((x=c('[data-fgo]'))){flowGo(x.getAttribute('data-fgo'));return}
@@ -2655,13 +2686,13 @@ document.addEventListener('click',function(e){
   if((x=c('[data-fjump]'))){flowGo(x.getAttribute('data-fjump'));return}
   if((x=c('[data-fact]'))){var a=x.getAttribute('data-fact');if(a==='stock'){S.dview='stock';renderDeskSheet()}else if(a==='quote'){openQuote()}else toast('Remember to book the visit before they hang up');return}
   /* editor */
-  if((x=c('[data-fn]'))){S.fnode=x.getAttribute('data-fn');renderFlowEd();return}
   if(!OWNER)return;
   var p=fdraft();if(!p&&!c('#fpNew'))return;var nd=p?fnode(p,S.fnode):null;
   if((x=c('[data-fadd]'))){var ty=x.getAttribute('data-fadd'),nn={id:fid(),type:ty,title:'New '+FT[ty][0].toLowerCase(),text:'',next:[],glob:(ty==='objection'||ty==='signal')};p.nodes.push(nn);if(nd&&!nd.glob&&fcanNode(nd)&&!nn.glob)nd.next.push({label:'Then',to:nn.id});S.fnode=nn.id;flowCommit();return}
   if(c('#fnAddLink')&&nd&&fcanNode(nd)){var o=p.nodes.filter(function(y){return y.id!==nd.id})[0];nd.next.push({label:'If they say…',to:o?o.id:'_back'});flowCommit();return}
   if((x=c('[data-lkdel]'))&&nd&&fcanNode(nd)){nd.next.splice(+x.getAttribute('data-lkdel'),1);flowCommit();return}
   if(c('#fnDel')&&nd&&fcanNode(nd)&&nd.id!==p.start){p.nodes=p.nodes.filter(function(y){return y.id!==nd.id});p.nodes.forEach(function(y){y.next=y.next.filter(function(l){return l.to!==nd.id})});S.fdr[p.id]=p;S.fnode=p.start;flowCommit();return}
+  if(c('#fpTidy')){p.nodes.forEach(function(y){delete y.x;delete y.y});flowCommit();return}
   if(c('#fpPub')){var live=profGet(S.fpid),note=($('#fpNote').value||'').trim();var nv=fclone(S.fdr[S.fpid]);nv.ver=live.ver+1;nv.hist=live.hist.concat([{ver:nv.ver,at:Date.now(),by:ADMIN?'Coreframe':'Akith',note:note}]);S.flows[S.flows.indexOf(live)]=nv;delete S.fdr[S.fpid];$('#fpNote').value='';renderFlowEd();toast('Published as v'+nv.ver+'. Handlers see it on the next call.');return}
   if(c('#fpDiscard')){delete S.fdr[S.fpid];renderFlowEd();toast('Draft discarded');return}
   if(c('#fpNew')&&ADMIN){var nm=($('#fpNewName').value||'').trim();if(!nm){toast('Name the profile');return}var base=fclone(profGet(S.fpid)),id='p_'+Date.now();base.id=id;base.name=nm;base.ver=1;base.hist=[];base.need=$('#fpNewNeed').value;S.flows.push(base);S.fpid=id;$('#fpNewName').value='';renderFlowEd();return}
