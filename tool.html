@@ -513,6 +513,36 @@ tbody tr:hover{background:var(--surface-2)}
 .tipbox{position:fixed;z-index:200;display:none;max-width:260px;background:#0b1f33;color:#fff;font-size:13px;line-height:1.4;padding:8px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(8,28,46,.3);pointer-events:none}body.noscroll{overflow:hidden}.studio.full{position:fixed;inset:0;z-index:70;margin:0;padding:16px;background:var(--bg,#eef5fa);overflow:auto;grid-template-columns:240px minmax(0,1fr) 340px;align-items:stretch}.studio.full .stl,.studio.full .str{position:static;max-height:calc(100vh - 32px)}.studio.full .stc .flscroll{height:calc(100vh - 66px)}.sttop{grid-template-columns:auto 1fr;align-items:center}.sttop .pill{grid-column:1/-1;justify-self:start}.sttop h2{grid-column:1/-1}
 @media(max-width:1180px){.studio.full{grid-template-columns:1fr}.studio.full .stl,.studio.full .str{max-height:none}}
 #flMap{cursor:grab;touch-action:none}#flMap.panning{cursor:grabbing}#flMap .flnode.mv{cursor:grab}
+
+/* ---------- phones and tablets ---------- */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{padding-bottom:env(safe-area-inset-bottom,0px)}
+.studio>*{min-width:0}
+@media(max-width:1180px){.studio,.studio.full{grid-template-columns:minmax(0,1fr)}}
+#simBtn{max-width:100%;white-space:normal}.dtbody select,.dtbody input,.dtbody .btn{max-width:100%}.dtbody{flex-wrap:wrap}.demotools .dtbody{max-width:calc(100vw - 32px)}
+.flnode.mv{touch-action:none}
+@media(max-width:1180px){.studio.full #stBack{position:fixed;top:calc(env(safe-area-inset-top,0px) + 24px);right:24px;z-index:90;background:var(--surface);box-shadow:0 4px 16px rgba(8,28,46,.25)}.studio.full .stc{order:-1}.studio.full .stc .flscroll{height:calc(100vh - 96px);height:calc(100dvh - 96px);min-height:300px}}
+@media(max-width:760px){
+  .tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;width:100%;max-width:100%;display:flex}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs .tab{flex:0 0 auto;white-space:nowrap}
+  .card{padding:16px}
+  .flscroll{min-height:360px;height:60vh;height:60dvh}
+  .stc .flscroll{min-height:360px;height:60vh;height:60dvh}
+  .flwrap.full{inset:0;border-radius:0}
+  #panel-desk .sheet{max-height:none}
+  .qpaper{max-height:calc(100dvh - 32px)}
+  .drawer{width:100%}
+  .top .brand p{display:none}.top{gap:8px;padding-bottom:8px}.top-actions{gap:8px}
+  #flMap~*,.flhint{font-size:13px}
+}
+@media(pointer:coarse){
+  input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:16px!important}
+  .btn,.tab,.seg button,.chip,.pill.btn,summary,.paltile,.tap{min-height:44px}
+  .btn.sm{min-height:40px}
+  .chk input{width:20px;height:20px}
+  .tipbox{display:none!important}
+}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -630,7 +660,7 @@ tbody tr:hover{background:var(--surface-2)}
           <h3 class="stlab">View</h3>
           <div class="stbtns"><button type="button" class="btn sm" data-fz="-" aria-label="Zoom out" data-tip="Zoom out: make the map smaller">−</button><span id="fzv" class="muted small">100%</span><button type="button" class="btn sm" data-fz="+" aria-label="Zoom in" data-tip="Zoom in: make the map bigger">+</button></div>
           <div class="stbtns"><button type="button" class="btn sm" data-fz="0" data-tip="Fit to width: shrink or grow the map to fit this window">Fit to width</button><button type="button" class="btn sm" id="fpTidy" data-tip="Tidy up: put every tile back in neat columns. Your own positions are lost.">Tidy up</button><button type="button" class="btn sm" id="flFull" data-tip="Full screen: the whole editor fills the window, with the tools kept">Full screen</button></div>
-          <p class="muted small" style="margin:0">Scroll the mouse wheel to zoom. Drag empty space to move around the map. Drag a tile to move it. Drag from the dot on its right edge onto another tile to link them.</p>
+          <p class="muted small" style="margin:0">Use − and + to zoom (or scroll the mouse wheel). Drag empty space to move around the map. Drag a tile to move it. Drag from the dot on its right edge onto another tile to link them.</p>
           <h3 class="stlab">Publish</h3>
           <div class="field"><label for="fpNote">What changed (optional)</label><input id="fpNote" placeholder="For example: new price reply"></div>
           <div class="stbtns"><button class="btn primary" type="button" id="fpPub" data-tip="Publish: save your changes as a new version. Handlers see it on their next call.">Publish</button><button class="btn" type="button" id="fpDiscard" data-tip="Discard draft: throw away changes you have not published">Discard draft</button></div>
@@ -3058,6 +3088,7 @@ function showTab(t){
   S.tab=t;
   var tb=$('.toolbar');if(tb)tb.hidden=(t==='desk'||t==='lab'||t==='dev'||t==='followups'||t==='clients'||t==='data');
   $$('.tab').forEach(function(b){var on=b.getAttribute('data-tab')===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
+  var ab=$('#tab-'+t);if(ab&&ab.scrollIntoView&&ab.parentElement&&ab.parentElement.scrollWidth>ab.parentElement.clientWidth){try{ab.parentElement.scrollTo({left:ab.offsetLeft-16,behavior:'auto'})}catch(e){}}
   ['dash','desk','followups','clients','calls','coaching','sources','numbers','data','web','sales','scripts','stock','dev','lab'].forEach(function(p){$('#panel-'+p).hidden=p!==t});
   if(t==='desk')renderDesk();
   if(t==='sales')renderSales();
