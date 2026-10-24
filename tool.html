@@ -490,6 +490,8 @@ tbody tr:hover{background:var(--surface-2)}
 .tap.lnk{position:relative}.tap.lnk::after{content:'';position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--brand);opacity:.55}.tap.lnkon{box-shadow:0 0 0 3px rgba(37,99,168,.35);border-color:var(--brand)}.linkkey{font-size:12px;color:var(--ink-2);margin:8px 0 0}
 .flnode.mv{cursor:grab}.flnode.mv:active{cursor:grabbing}.flnode{touch-action:none}.flh{cursor:crosshair}.flscroll{background:var(--surface-2)}
 .flscroll{max-height:none;height:min(72vh,760px);min-height:480px}.flwrap.full{position:fixed;inset:16px;z-index:70;background:var(--surface);box-shadow:0 0 0 100vmax rgba(8,28,46,.55)}.flwrap.full .flscroll{height:calc(100vh - 88px)}.fltool{display:flex;gap:8px;align-items:center;padding:8px 16px;border-bottom:1px solid var(--line);background:var(--surface)}.fltype{font-size:11px!important}.fltitle{font-size:15px!important}.swatches{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sw{width:32px;height:32px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}.sw[aria-pressed=true]{box-shadow:0 0 0 3px var(--ink)}
+#panel-scripts{max-width:none}.studio{display:grid;grid-template-columns:240px minmax(0,1fr) 340px;gap:16px;align-items:start;margin-bottom:16px}.stl,.str{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:16px;align-content:start;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}.sttop{display:grid;gap:8px}.stlab{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}.stbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.stl input,.stl select{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface);color:var(--ink);font:inherit;margin-top:4px}.stc .flwrap{margin-top:0;border-radius:16px;border-width:2px}.stc .flscroll{height:calc(100vh - 96px);min-height:620px;max-height:none;background-image:none}.flpal .chips{display:grid;gap:8px;margin-top:8px}.paltile{display:grid;grid-template-columns:16px 1fr;gap:0 8px;text-align:left;border:1px solid var(--line);border-left:6px solid var(--c);border-radius:8px;padding:8px 16px 8px 8px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}.paltile i{grid-row:span 2}.paltile b{font-size:14px}.paltile span{font-size:12px;color:var(--ink-2)}.paltile:hover{background:var(--surface-2)}.str{padding:16px}.str:empty{display:none}
+@media(max-width:1180px){.studio{grid-template-columns:1fr}.stl,.str{position:static;max-height:none}.flpal .chips{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.stc .flscroll{min-height:480px;height:70vh}}
 </style>
 
 </head><body><div class="login" id="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -596,17 +598,26 @@ tbody tr:hover{background:var(--surface-2)}
     </section>
 
     <section class="panel" id="panel-scripts" role="tabpanel" aria-labelledby="tab-scripts" hidden>
-      <div class="card">
-        <div class="sechead"><h2 style="margin:0">Call scripts</h2><span id="fpStatus" class="pill good"></span></div>
-        <p class="muted" style="margin:8px 0 16px;max-width:72ch">Each script is a flow of tiles. Tap a tile on the map to edit it. Rules link a tile to the next one, depending on what the caller says. Buying signals and objections can sit "anytime", so the handler taps them whenever they come up. When you publish, handlers see the new version on their next call.</p>
-        <p class="msg err" id="fpLock" role="note" hidden>Only the owner edits scripts. You can read them here and use them on the call sheet.</p>
-        <div class="row2"><div class="field"><label for="fpSel">Script profile</label><select id="fpSel"></select></div>
-        <div class="field" id="fpAdmin" hidden><label for="fpNewName">Coreframe: new profile (copies the one selected)</label><div class="stsearch"><input id="fpNewName" placeholder="Name, for example Borewell, repeat client"><select id="fpNewNeed" aria-label="Used for"></select><button class="btn" type="button" id="fpNew">Create</button><button class="btn sm out" type="button" id="fpDelP">Delete profile</button></div></div></div>
-        <div id="fpAddRow" class="flpal"><span class="muted small">Add a tile after the selected one. Drag tiles to move them. Drag from the dot on a tile's right edge to another tile to link them. <button type="button" class="btn sm" id="fpTidy">Tidy up</button></span><div class="chips" style="margin-top:8px"></div></div>
-        <div class="flwrap" id="flWrap"><div class="fltool"><button type="button" class="btn sm" data-fz="-" aria-label="Zoom out">−</button><span id="fzv" class="muted small">100%</span><button type="button" class="btn sm" data-fz="+" aria-label="Zoom in">+</button><button type="button" class="btn sm" data-fz="0">Fit to width</button><button type="button" class="btn sm" id="flFull">Full screen</button></div><div id="flMap" class="flscroll"></div></div>
+      <div class="studio">
+        <aside class="stl" aria-label="Script tools">
+          <div class="sttop"><h2 style="margin:0">Script editor</h2><span id="fpStatus" class="pill good"></span></div>
+          <p class="msg err" id="fpLock" role="note" hidden>Only the owner edits scripts. You can read them here.</p>
+          <div class="field"><label for="fpSel">Script profile</label><select id="fpSel"></select></div>
+          <div class="field" id="fpAdmin" hidden><label for="fpNewName">Coreframe: new profile</label><input id="fpNewName" placeholder="Name"><select id="fpNewNeed" aria-label="Used for"></select><div class="stbtns"><button class="btn" type="button" id="fpNew">Create copy</button><button class="btn sm out" type="button" id="fpDelP">Delete</button></div></div>
+          <div id="fpAddRow" class="flpal"><h3 class="stlab">Add a tile</h3><div class="chips"></div></div>
+          <h3 class="stlab">View</h3>
+          <div class="stbtns"><button type="button" class="btn sm" data-fz="-" aria-label="Zoom out">−</button><span id="fzv" class="muted small">100%</span><button type="button" class="btn sm" data-fz="+" aria-label="Zoom in">+</button></div>
+          <div class="stbtns"><button type="button" class="btn sm" data-fz="0">Fit to width</button><button type="button" class="btn sm" id="fpTidy">Tidy up</button><button type="button" class="btn sm" id="flFull">Full screen</button></div>
+          <p class="muted small" style="margin:0">Drag a tile to move it. Drag from the dot on its right edge onto another tile to link them.</p>
+          <h3 class="stlab">Publish</h3>
+          <div class="field"><label for="fpNote">What changed (optional)</label><input id="fpNote" placeholder="For example: new price reply"></div>
+          <div class="stbtns"><button class="btn primary" type="button" id="fpPub">Publish</button><button class="btn" type="button" id="fpDiscard">Discard draft</button></div>
+          <p class="muted small" style="margin:0">Handlers see a published version on their next call.</p>
+        </aside>
+        <div class="stc"><div class="flwrap" id="flWrap"><div id="flMap" class="flscroll"></div></div></div>
+        <aside class="str" id="flEd" aria-label="Selected tile"></aside>
       </div>
-      <div class="card" id="flEd"></div>
-      <div class="card"><h3 style="margin:0 0 8px">Publish</h3><div class="field"><label for="fpNote">What changed and why (optional)</label><input id="fpNote" placeholder="For example: added a reply for the price objection"></div><div class="d-actions"><button class="btn primary" type="button" id="fpPub">Publish new version</button><button class="btn" type="button" id="fpDiscard">Discard draft</button></div><h3 style="margin:24px 0 8px">Version history</h3><ul class="fulist" id="fpHist" style="margin:0;padding:0;list-style:none"></ul></div>
+      <div class="card"><h3 style="margin:0 0 8px">Version history</h3><ul class="fulist" id="fpHist" style="margin:0;padding:0;list-style:none"></ul></div>
       <div class="card"><h2>Results by script version</h2><p class="muted" style="margin:0 0 16px">Calls saved on the desk, grouped by the script version in use. Small numbers mean little, so read this after at least 20 calls per script.</p><div class="tablewrap"><table id="scResults" style="min-width:560px"></table></div></div>
     </section>
 
@@ -2648,7 +2659,7 @@ function renderFlowEd(){
   $('#fpStatus').textContent=dirty?'Draft changes not yet shown to handlers':'Live version v'+live.ver+(live.hist.length?' · last change '+new Date(live.hist[live.hist.length-1].at).toLocaleDateString(undefined,{day:'numeric',month:'short'}):' · starting script');
   $('#fpStatus').className='pill '+(dirty?'warn':'good');
   $('#fpPub').disabled=!dirty;$('#fpDiscard').disabled=!dirty;$('#fpNote').disabled=!can;
-  $('#fpAddRow').hidden=!can;$('#fpAddRow .chips').innerHTML=Object.keys(FT).map(function(k){return '<button type="button" class="chip" style="--c:'+FT[k][1]+'" data-fadd="'+k+'">+ '+FT[k][0]+'</button>'}).join('');$('#fpNewNeed').innerHTML=NEEDS.filter(function(n){return CSN[n]&&n!=='none'}).map(function(n){return '<option value="'+n+'">'+esc(CSN[n].title)+'</option>'}).join('');
+  $('#fpAddRow').hidden=!can;$('#fpAddRow .chips').innerHTML=Object.keys(FT).map(function(k){return '<button type="button" class="paltile" style="--c:'+FT[k][1]+'" data-fadd="'+k+'"><i></i><b>'+FT[k][0]+'</b><span>'+FT[k][2]+'</span></button>'}).join('');$('#fpNewNeed').innerHTML=NEEDS.filter(function(n){return CSN[n]&&n!=='none'}).map(function(n){return '<option value="'+n+'">'+esc(CSN[n].title)+'</option>'}).join('');
   $('#flMap').innerHTML=flowSvg(p);$('#fzv').textContent=Math.round((S.fz||1)*100)+'%';
   if(!S.fnode||!fnode(p,S.fnode))S.fnode=p.start;
   renderNodeEd(p);
